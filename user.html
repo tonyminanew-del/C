@@ -63,7 +63,6 @@
       measurementId: "G-E7Q76Z53SB"
     };
 
-    // تهيئة فايربيس
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
@@ -90,27 +89,34 @@
       });
     }
 
-    // متابعة حالة تسجيل الدخول تلقائياً
+    // دالة التوجيه بعد نجاح تسجيل الدخول
+    function handleSuccessfulLogin(userName) {
+      statusMsg.style.color = "#4ade80";
+      statusMsg.innerText = `👋 Hello ${userName}! جاري توجيهك للأسئلة...`;
+      
+      setTimeout(() => {
+        window.location.href = "user/question.html";
+      }, 1500);
+    }
+
+    // متابعة حالة تسجيل الدخول تلقائياً (لو المستخدم مسجل من قبل)
     auth.onAuthStateChanged((user) => {
       if (user) {
-        statusMsg.style.color = "#4ade80";
-        statusMsg.innerText = `تم الدخول بنجاح! مرحباً ${user.displayName}`;
+        handleSuccessfulLogin(user.displayName);
       }
     });
 
-    // عند الضغط على الزر
+    // عند الضغط على زر تسجيل الدخول
     loginBtn.addEventListener('click', () => {
       statusMsg.style.color = "#38bdf8";
-      statusMsg.innerText = "جاري البدء...";
+      statusMsg.innerText = "جاري الاتصال بـ Google...";
 
       auth.signInWithPopup(provider)
         .then((result) => {
-          statusMsg.style.color = "#4ade80";
-          statusMsg.innerText = `تم الدخول بنجاح! مرحباً ${result.user.displayName}`;
+          handleSuccessfulLogin(result.user.displayName);
         })
         .catch((error) => {
           console.warn("Popup blocked/failed, trying redirect...", error);
-          // في حال فشل النافذة المنبثقة يتم التحويل تلقائياً
           auth.signInWithRedirect(provider);
         });
     });
