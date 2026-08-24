@@ -352,9 +352,10 @@
             document.getElementById('address').innerText = data.address || "غير مسجل";
             document.getElementById('birthDate').innerText = data.birthDate || "غير مسجل";
 
-            // إظهار صورة البروفايل لو مخزنة
-            if (data.photoBase64) {
-              document.getElementById('avatarContainer').innerHTML = `<img src="${data.photoBase64}" alt="Profile">`;
+            // فحص الحقلين لعرض الصورة أيهما وُجد
+            const userImg = data.photoBase64 || data.image;
+            if (userImg) {
+              document.getElementById('avatarContainer').innerHTML = `<img src="${userImg}" alt="Profile">`;
             } else if (user.photoURL) {
               document.getElementById('avatarContainer').innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
             }
@@ -380,7 +381,7 @@
       }
     });
 
-    // دالة رفع وتحويل الصورة إلى Base64 وحفظها في Firestore
+    // دالة رفع وتحويل الصورة وتحديث الحقلين معاً (photoBase64 و image)
     function uploadProfilePhoto(event) {
       const file = event.target.files[0];
       if (!file || !currentUser) return;
@@ -395,7 +396,8 @@
         
         try {
           await db.collection('servants').doc(currentUser.uid).update({
-            photoBase64: base64Image
+            photoBase64: base64Image,
+            image: base64Image
           });
 
           document.getElementById('avatarContainer').innerHTML = `<img src="${base64Image}" alt="Profile">`;
@@ -406,7 +408,7 @@
         } catch (err) {
           console.error(err);
           status.style.color = "#f87171";
-          status.innerText = "حدث خطأ أثناء الحفظ.";
+          status.innerText = "حدث خطأ أثناء الحفظ (ربما حجم الصورة كبير جداً).";
         }
       };
 
@@ -416,7 +418,7 @@
     // تسجيل الخروج
     document.getElementById('logoutBtn').addEventListener('click', () => {
       auth.signOut().then(() => {
-        window.location.href = "../user.html";
+        window.location.href = "user.html";
       });
     });
   </script>
