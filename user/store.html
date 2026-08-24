@@ -161,11 +161,6 @@
       opacity: 0.9;
     }
 
-    .add-to-cart-btn:disabled {
-      background: #475569;
-      cursor: not-allowed;
-    }
-
     .empty-msg {
       text-align: center;
       color: #94a3b8;
@@ -303,21 +298,25 @@
       });
     }
 
-    // جلب الهدايا المضافة
+    // جلب الهدايا المتاحة فقط (إخفاء الهدية إذا أصبحت كميتها 0 أو أقل)
     function loadGifts() {
       const giftsContainer = document.getElementById('giftsContainer');
 
       db.collection('gifts').onSnapshot((snapshot) => {
         giftsContainer.innerHTML = '';
 
-        if (snapshot.empty) {
-          giftsContainer.innerHTML = '<div class="empty-msg">لا توجد هدايا متاحة حالياً 🎁</div>';
-          return;
-        }
+        let availableGiftsCount = 0;
 
         snapshot.forEach((doc) => {
           const gift = doc.data();
           const giftId = doc.id;
+
+          // تخطي الهدية وعدم عرضها إذا نفدت كميتها
+          if (!gift.quantity || gift.quantity <= 0) {
+            return;
+          }
+
+          availableGiftsCount++;
 
           const giftCard = document.createElement('div');
           giftCard.className = 'gift-card';
@@ -325,8 +324,6 @@
           const imgHTML = gift.image 
             ? `<img src="${gift.image}" alt="${gift.name}">` 
             : `<div class="gift-img-placeholder">🎁</div>`;
-
-          const isOutOfStock = gift.quantity <= 0;
 
           giftCard.innerHTML = `
             <div class="gift-img-box">${imgHTML}</div>
@@ -336,14 +333,17 @@
               <span class="gift-qty">المتاح: ${gift.quantity}</span>
             </div>
             <button class="add-to-cart-btn" 
-              ${isOutOfStock ? 'disabled' : ''} 
               onclick="addToBasket('${giftId}', '${gift.name}', ${gift.points}, ${gift.quantity}, '${gift.image || ''}')">
-              ${isOutOfStock ? 'نفدت الكمية' : 'إضافة للسلة 🛒'}
+              إضافة للسلة 🛒
             </button>
           `;
 
           giftsContainer.appendChild(giftCard);
         });
+
+        if (availableGiftsCount === 0) {
+          giftsContainer.innerHTML = '<div class="empty-msg">لا توجد هدايا متاحة حالياً 🎁</div>';
+        }
       });
     }
 
@@ -351,13 +351,11 @@
     async function addToBasket(giftId, name, points, quantity, image) {
       if (!currentUser) return;
 
-      // 1. التحقق من رصيد النقاط
       if (currentUserPoints < points) {
         alert("النقاط غير كافية للشراء ❌");
         return;
       }
 
-      // 2. التحقق من توفر الكمية
       if (quantity <= 0) {
         alert("عذراً، نفدت الكمية! ❌");
         return;
@@ -370,17 +368,17 @@
 
         const doc = await basketRef.get();
 
-        // أ) خصم النقاط من حساب المخدوم
+        // 1. خصم النقاط من حساب المخدوم
         await userRef.update({
           points: firebase.firestore.FieldValue.increment(-points)
         });
 
-        // ب) تقليل الكمية المتاحة من الهدية في المخزن
+        // 2. تقليل الكمية المتاحة في المخزن بمقدار 1
         await giftRef.update({
           quantity: firebase.firestore.FieldValue.increment(-1)
         });
 
-        // ج) إضافة الهدية أو زيادة العدد في السلة
+        // 3. إضافة الهدية للسلة
         if (doc.exists) {
           const currentCount = doc.data().count || 1;
           await basketRef.update({ count: currentCount + 1 });
