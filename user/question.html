@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>بيانات المخدوم - 3D Experience</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-  
-  <!-- استدعاء مكتبات فايربيس -->
+
+  <title>بيانات المخدوم</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -20,8 +25,8 @@
     }
 
     body {
-      background-color: #0b0f19;
-      color: #ffffff;
+      background: #0b0f19;
+      color: #fff;
       min-height: 100vh;
       display: flex;
       justify-content: center;
@@ -31,15 +36,15 @@
     }
 
     .main-card {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255,255,255,.04);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255,255,255,.12);
       border-radius: 24px;
       padding: 35px 25px;
       width: 100%;
       max-width: 550px;
-      box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 30px 60px rgba(0,0,0,.6);
     }
 
     .header-box {
@@ -58,9 +63,9 @@
       margin-bottom: 5px;
     }
 
-    p.sub-title {
+    .sub-title {
       color: #94a3b8;
-      font-size: 0.9rem;
+      font-size: .9rem;
     }
 
     form {
@@ -71,7 +76,10 @@
 
     .row {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      grid-template-columns: repeat(
+        auto-fit,
+        minmax(180px, 1fr)
+      );
       gap: 12px;
     }
 
@@ -82,137 +90,235 @@
     }
 
     label {
-      font-size: 0.85rem;
+      font-size: .85rem;
       color: #cbd5e1;
       font-weight: 600;
     }
 
     .custom-input {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.15);
       border-radius: 12px;
       padding: 12px 14px;
-      color: #ffffff;
-      font-size: 0.95rem;
+      color: #fff;
+      font-size: .95rem;
       outline: none;
-      transition: all 0.3s ease;
+      transition: .3s;
       width: 100%;
     }
 
     .custom-input:focus {
       border-color: #38bdf8;
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
+      background: rgba(255,255,255,.08);
+      box-shadow: 0 0 15px rgba(56,189,248,.2);
     }
 
     .custom-input option {
-      background-color: #0f172a;
+      background: #0f172a;
       color: #fff;
     }
 
     .submit-btn {
       margin-top: 10px;
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
-      color: #ffffff;
+      background: linear-gradient(
+        135deg,
+        #38bdf8,
+        #0284c7
+      );
+      color: #fff;
       border: none;
       border-radius: 12px;
       padding: 14px;
       font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 10px 20px rgba(2, 132, 199, 0.3);
+      transition: .3s;
+      box-shadow: 0 10px 20px rgba(2,132,199,.3);
     }
 
     .submit-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 25px rgba(2, 132, 199, 0.5);
+      box-shadow: 0 15px 25px rgba(2,132,199,.5);
     }
 
     .status-msg {
       text-align: center;
       margin-top: 15px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: .95rem;
     }
   </style>
 </head>
+
 <body>
 
   <div class="main-card">
-    
+
     <div class="header-box">
       <div class="icon-badge">📋</div>
-      <h2 id="welcomeText">أهلاً بك...</h2>
-      <p class="sub-title">رجاء تسجيل البيانات الخاصة بك لتحديث قاعدة البيانات</p>
+
+      <h2 id="welcomeText">
+        أهلاً بك...
+      </h2>
+
+      <p class="sub-title">
+        رجاء تسجيل البيانات الخاصة بك لتحديث قاعدة البيانات
+      </p>
     </div>
 
     <form id="userDataForm">
-      
+
       <!-- الاسم -->
       <div class="input-group">
         <label>الاسم بالكامل:</label>
-        <input type="text" id="fullName" class="custom-input" placeholder="أدخل اسمك" required>
+
+        <input
+          type="text"
+          id="fullName"
+          class="custom-input"
+          placeholder="أدخل اسمك"
+          required
+        >
       </div>
 
-      <!-- الأرقام -->
+      <!-- أرقام التليفونات -->
       <div class="row">
+
         <div class="input-group">
           <label>رقم التليفون الشخصي:</label>
-          <input type="tel" id="userPhone" class="custom-input" placeholder="01XXXXXXXXX" required>
+
+          <input
+            type="tel"
+            id="userPhone"
+            class="custom-input"
+            placeholder="01XXXXXXXXX"
+            required
+          >
         </div>
+
         <div class="input-group">
           <label>رقم تليفون الأب:</label>
-          <input type="tel" id="fatherPhone" class="custom-input" placeholder="01XXXXXXXXX" required>
+
+          <input
+            type="tel"
+            id="fatherPhone"
+            class="custom-input"
+            placeholder="01XXXXXXXXX"
+            required
+          >
         </div>
+
       </div>
 
       <div class="input-group">
         <label>رقم تليفون الأم:</label>
-        <input type="tel" id="motherPhone" class="custom-input" placeholder="01XXXXXXXXX" required>
+
+        <input
+          type="tel"
+          id="motherPhone"
+          class="custom-input"
+          placeholder="01XXXXXXXXX"
+          required
+        >
       </div>
 
       <!-- العنوان وتاريخ الميلاد -->
       <div class="row">
+
         <div class="input-group">
           <label>العنوان بالكامل:</label>
-          <input type="text" id="address" class="custom-input" placeholder="المنطقة - الشارع - رقم العقار" required>
+
+          <input
+            type="text"
+            id="address"
+            class="custom-input"
+            placeholder="المنطقة - الشارع - رقم العقار"
+            required
+          >
         </div>
+
         <div class="input-group">
           <label>تاريخ الميلاد:</label>
-          <input type="date" id="birthDate" class="custom-input" required>
+
+          <input
+            type="date"
+            id="birthDate"
+            class="custom-input"
+            required
+          >
         </div>
+
       </div>
 
-      <!-- المرحلة والصف الدراسي -->
+      <!-- المرحلة والصف -->
       <div class="row">
+
         <div class="input-group">
           <label>المرحلة الدراسية:</label>
-          <select id="stage" class="custom-input" required onchange="updateGrades()">
-            <option value="" disabled selected>اختر المرحلة</option>
-            <option value="primary">ابتدائي</option>
-            <option value="prep">إعدادي</option>
-            <option value="sec">ثانوي</option>
+
+          <select
+            id="stage"
+            class="custom-input"
+            required
+            onchange="updateGrades()"
+          >
+            <option value="" disabled selected>
+              اختر المرحلة
+            </option>
+
+            <option value="primary">
+              ابتدائي
+            </option>
+
+            <option value="prep">
+              إعدادي
+            </option>
+
+            <option value="sec">
+              ثانوي
+            </option>
           </select>
         </div>
 
         <div class="input-group">
           <label>الصف الدراسي:</label>
-          <select id="grade" class="custom-input" required disabled>
-            <option value="" disabled selected>اختر المرحلة أولاً</option>
+
+          <select
+            id="grade"
+            class="custom-input"
+            required
+            disabled
+          >
+            <option value="" disabled selected>
+              اختر المرحلة أولاً
+            </option>
           </select>
         </div>
+
       </div>
 
-      <button type="submit" class="submit-btn">حفظ البيانات</button>
+      <button
+        type="submit"
+        class="submit-btn"
+      >
+        حفظ البيانات
+      </button>
 
     </form>
 
-    <div id="statusMessage" class="status-msg"></div>
+    <div
+      id="statusMessage"
+      class="status-msg"
+    ></div>
 
   </div>
 
   <script>
+
+    /* =========================
+       Firebase
+    ========================= */
+
     const firebaseConfig = {
       apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
       authDomain: "church-7afe1.firebaseapp.com",
@@ -226,89 +332,260 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
+
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    const welcomeText = document.getElementById('welcomeText');
-    const fullNameInput = document.getElementById('fullName');
-    const statusMsg = document.getElementById('statusMessage');
 
-    // متابعة حالة التسجيل وجلب اسم الحساب
+    /* =========================
+       العناصر
+    ========================= */
+
+    const welcomeText =
+      document.getElementById("welcomeText");
+
+    const fullNameInput =
+      document.getElementById("fullName");
+
+    const statusMsg =
+      document.getElementById("statusMessage");
+
+
+    /* =========================
+       تسجيل الدخول
+    ========================= */
+
     auth.onAuthStateChanged((user) => {
+
       if (user) {
-        welcomeText.innerText = `أهلاً يا ${user.displayName}`;
-        fullNameInput.placeholder = user.displayName;
+
+        const name =
+          user.displayName ||
+          "المخدوم";
+
+        welcomeText.innerText =
+          `أهلاً يا ${name}`;
+
+        if (!fullNameInput.value) {
+          fullNameInput.placeholder = name;
+        }
+
+      } else {
+
+        welcomeText.innerText =
+          "أهلاً بك...";
+
       }
+
     });
 
-    // تحديث خيارات الصف بناءً على المرحلة
+
+    /* =========================
+       الصفوف
+    ========================= */
+
     function updateGrades() {
-      const stage = document.getElementById('stage').value;
-      const gradeSelect = document.getElementById('grade');
-      
-      gradeSelect.innerHTML = '<option value="" disabled selected>اختر الصف</option>';
+
+      const stage =
+        document.getElementById("stage").value;
+
+      const gradeSelect =
+        document.getElementById("grade");
+
+      gradeSelect.innerHTML =
+        '<option value="" disabled selected>اختر الصف</option>';
+
       gradeSelect.disabled = false;
 
       let options = [];
-      if (stage === 'primary') {
-        options = ['الصف الأول الابتدائي', 'الصف الثاني الابتدائي', 'الصف الثالث الابتدائي', 'الصف الرابع الابتدائي', 'الصف الخامس الابتدائي', 'الصف السادس الابتدائي'];
-      } else if (stage === 'prep') {
-        options = ['الصف الأول الإعدادي', 'الصف الثاني الإعدادي', 'الصف الثالث الإعدادي'];
-      } else if (stage === 'sec') {
-        options = ['الصف الأول الثانوي', 'الصف الثاني الثانوي', 'الصف الثالث الثانوي'];
+
+      if (stage === "primary") {
+
+        options = [
+          "الصف الأول الابتدائي",
+          "الصف الثاني الابتدائي",
+          "الصف الثالث الابتدائي",
+          "الصف الرابع الابتدائي",
+          "الصف الخامس الابتدائي",
+          "الصف السادس الابتدائي"
+        ];
+
       }
 
-      options.forEach(opt => {
-        const optionEl = document.createElement('option');
-        optionEl.value = opt;
-        optionEl.textContent = opt;
-        gradeSelect.appendChild(optionEl);
+      else if (stage === "prep") {
+
+        options = [
+          "الصف الأول الإعدادي",
+          "الصف الثاني الإعدادي",
+          "الصف الثالث الإعدادي"
+        ];
+
+      }
+
+      else if (stage === "sec") {
+
+        options = [
+          "الصف الأول الثانوي",
+          "الصف الثاني الثانوي",
+          "الصف الثالث الثانوي"
+        ];
+
+      }
+
+
+      options.forEach((grade) => {
+
+        const option =
+          document.createElement("option");
+
+        option.value = grade;
+        option.textContent = grade;
+
+        gradeSelect.appendChild(option);
+
       });
+
     }
 
-    // حفظ البيانات ثم التوجيه إلى home.html
-    document.getElementById('userDataForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const user = auth.currentUser;
 
-      if (!user) {
-        statusMsg.style.color = "#f87171";
-        statusMsg.innerText = "برجاء تسجيل الدخول أولاً!";
-        return;
-      }
+    /* =========================
+       حفظ البيانات
+    ========================= */
 
-      statusMsg.style.color = "#38bdf8";
-      statusMsg.innerText = "جاري حفظ البيانات...";
+    document
+      .getElementById("userDataForm")
+      .addEventListener(
+        "submit",
+        async (e) => {
 
-      try {
-        await db.collection('servants').doc(user.uid).set({
-          uid: user.uid,
-          email: user.email || "",
-          fullName: fullNameInput.value || user.displayName,
-          userPhone: document.getElementById('userPhone').value,
-          fatherPhone: document.getElementById('fatherPhone').value,
-          motherPhone: document.getElementById('motherPhone').value,
-          address: document.getElementById('address').value,
-          birthDate: document.getElementById('birthDate').value,
-          stage: document.getElementById('stage').value,
-          grade: document.getElementById('grade').value,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+          e.preventDefault();
 
-        statusMsg.style.color = "#4ade80";
-        statusMsg.innerText = "تم الحفظ بنجاح! جاري التوجيه للرئيسية... ✨";
+          const user =
+            auth.currentUser;
 
-        // التوجيه لصفحة home.html بعد ثانية واحدة
-        setTimeout(() => {
-          window.location.href = "home.html";
-        }, 1000);
+          if (!user) {
 
-      } catch (error) {
-        console.error("Firestore Error:", error);
-        statusMsg.style.color = "#f87171";
-        statusMsg.innerText = "خطأ: " + error.message;
-      }
-    });
+            statusMsg.style.color =
+              "#f87171";
+
+            statusMsg.innerText =
+              "برجاء تسجيل الدخول أولاً!";
+
+            return;
+          }
+
+
+          statusMsg.style.color =
+            "#38bdf8";
+
+          statusMsg.innerText =
+            "جاري حفظ البيانات...";
+
+
+          try {
+
+            await db
+              .collection("servants")
+              .doc(user.uid)
+              .set({
+
+                uid: user.uid,
+
+                email:
+                  user.email || "",
+
+                fullName:
+                  fullNameInput.value.trim() ||
+                  user.displayName ||
+                  "",
+
+                userPhone:
+                  document
+                    .getElementById("userPhone")
+                    .value
+                    .trim(),
+
+                fatherPhone:
+                  document
+                    .getElementById("fatherPhone")
+                    .value
+                    .trim(),
+
+                motherPhone:
+                  document
+                    .getElementById("motherPhone")
+                    .value
+                    .trim(),
+
+                address:
+                  document
+                    .getElementById("address")
+                    .value
+                    .trim(),
+
+                birthDate:
+                  document
+                    .getElementById("birthDate")
+                    .value,
+
+                stage:
+                  document
+                    .getElementById("stage")
+                    .value,
+
+                grade:
+                  document
+                    .getElementById("grade")
+                    .value,
+
+                /* بيانات الإدارة */
+
+                points: 0,
+
+                isBlocked: false,
+
+                updatedAt:
+                  firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
+
+              });
+
+
+            statusMsg.style.color =
+              "#4ade80";
+
+            statusMsg.innerText =
+              "تم الحفظ بنجاح! جاري التوجيه للرئيسية... ✨";
+
+
+            setTimeout(() => {
+
+              window.location.href =
+                "home.html";
+
+            }, 1000);
+
+
+          } catch (error) {
+
+            console.error(
+              "Firestore Error:",
+              error
+            );
+
+            statusMsg.style.color =
+              "#f87171";
+
+            statusMsg.innerText =
+              "خطأ: " +
+              error.message;
+
+          }
+
+        }
+      );
+
   </script>
 
 </body>
