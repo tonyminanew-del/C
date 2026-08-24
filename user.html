@@ -6,10 +6,13 @@
   <title>تسجيل دخول المستخدم - 3D Experience</title>
   <link rel="stylesheet" href="user.css">
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- استدعاء فايربيس المباشر والمستقر -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 </head>
 <body class="dark-body">
 
-  <!-- خلفية أسود عميق مع إضاءات ثلاثية الأبعاد -->
   <div class="dark-background">
     <div class="glow-orb orb-1 animate-orb"></div>
     <div class="glow-orb orb-2 animate-orb-delay"></div>
@@ -17,25 +20,19 @@
   </div>
 
   <main class="main-container auth-container 3d-perspective">
-    
-    
 
-    <!-- الكارت المجسم (3D Card) -->
     <div class="card-3d-wrapper" id="cardWrapper">
       <div class="glass-auth-card-3d fall-down-3d">
         
-        <!-- طبقة الشعار ثلاثية الأبعاد -->
         <div class="layer-3d logo-layer">
           <div class="logo-badge-3d">⛪</div>
         </div>
 
-        <!-- طبقة النصوص -->
         <div class="layer-3d text-layer">
           <h1>بوابة المستخدم / الخادم</h1>
           <p>سجل دخولك بحساب Google للمتابعة للخدمة والافتقاد</p>
         </div>
 
-        <!-- طبقة الزرار المرتفعة -->
         <div class="layer-3d button-layer">
           <button id="googleLoginBtn" class="google-btn-3d">
             <svg class="google-icon" viewBox="0 0 24 24" width="22" height="22">
@@ -55,10 +52,7 @@
 
   </main>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase.app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase.auth.js";
-
+  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
       authDomain: "church-7afe1.firebaseapp.com",
@@ -69,48 +63,56 @@
       measurementId: "G-E7Q76Z53SB"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
+    // تهيئة فايربيس
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
 
     const loginBtn = document.getElementById('googleLoginBtn');
     const statusMsg = document.getElementById('statusMessage');
 
-    // تأثير حركة الماوس ثلاثية الأبعاد (3D Parallax Tilt)
+    // تأثير حركة الماوس 3D
     const card = document.querySelector('.glass-auth-card-3d');
     const wrapper = document.getElementById('cardWrapper');
 
-    wrapper.addEventListener('mousemove', (e) => {
-      const rect = wrapper.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width / 2;
-      const y = e.clientY - rect.top - rect.height / 2;
-      
-      const rotateX = (-y / rect.height) * 30; // دوران محور X
-      const rotateY = (x / rect.width) * 30;  // دوران محور Y
+    if (wrapper && card) {
+      wrapper.addEventListener('mousemove', (e) => {
+        const rect = wrapper.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        card.style.transform = `rotateX(${(-y / rect.height) * 25}deg) rotateY(${(x / rect.width) * 25}deg)`;
+      });
 
-      card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-    });
+      wrapper.addEventListener('mouseleave', () => {
+        card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+      });
+    }
 
-    wrapper.addEventListener('mouseleave', () => {
-      card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-    });
-
-    loginBtn.addEventListener('click', async () => {
-      try {
-        statusMsg.style.color = "#38bdf8";
-        statusMsg.innerText = "جاري فتح نافذة جوجل...";
-        
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-
+    // متابعة حالة تسجيل الدخول تلقائياً
+    auth.onAuthStateChanged((user) => {
+      if (user) {
         statusMsg.style.color = "#4ade80";
-        statusMsg.innerText = `أهلاً بك يا ${user.displayName}! جاري توجيهك...`;
-        
-      } catch (error) {
-        console.error(error);
-        statusMsg.style.color = "#f87171";
-        statusMsg.innerText = "حدث خطأ في التسجيل، تأكد من تفعيل Google Provider في Firebase Console.";
+        statusMsg.innerText = `تم الدخول بنجاح! مرحباً ${user.displayName}`;
       }
+    });
+
+    // عند الضغط على الزر
+    loginBtn.addEventListener('click', () => {
+      statusMsg.style.color = "#38bdf8";
+      statusMsg.innerText = "جاري البدء...";
+
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          statusMsg.style.color = "#4ade80";
+          statusMsg.innerText = `تم الدخول بنجاح! مرحباً ${result.user.displayName}`;
+        })
+        .catch((error) => {
+          console.warn("Popup blocked/failed, trying redirect...", error);
+          // في حال فشل النافذة المنبثقة يتم التحويل تلقائياً
+          auth.signInWithRedirect(provider);
+        });
     });
   </script>
 
