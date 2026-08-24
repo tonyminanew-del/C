@@ -6,7 +6,7 @@
   <title>بيانات المخدوم - 3D Experience</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   
-  <!-- استدعاء فايربيس المباشر -->
+  <!-- استدعاء مكتبات فايربيس -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -233,7 +233,7 @@
     const fullNameInput = document.getElementById('fullName');
     const statusMsg = document.getElementById('statusMessage');
 
-    // قراءة اسم المستخدم من التسجيل
+    // متابعة حالة التسجيل وجلب اسم الحساب
     auth.onAuthStateChanged((user) => {
       if (user) {
         welcomeText.innerText = `أهلاً يا ${user.displayName}`;
@@ -241,7 +241,7 @@
       }
     });
 
-    // تغيير الصفوف عند اختيار المرحلة
+    // تحديث خيارات الصف بناءً على المرحلة
     function updateGrades() {
       const stage = document.getElementById('stage').value;
       const gradeSelect = document.getElementById('grade');
@@ -266,19 +266,25 @@
       });
     }
 
-    // حفظ البيانات
+    // حفظ البيانات ثم التوجيه إلى home.html
     document.getElementById('userDataForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const user = auth.currentUser;
+
+      if (!user) {
+        statusMsg.style.color = "#f87171";
+        statusMsg.innerText = "برجاء تسجيل الدخول أولاً!";
+        return;
+      }
 
       statusMsg.style.color = "#38bdf8";
       statusMsg.innerText = "جاري حفظ البيانات...";
 
       try {
-        await db.collection('servants').doc(user ? user.uid : "guest_" + Date.now()).set({
-          uid: user ? user.uid : "guest",
-          email: user ? user.email : "",
-          fullName: fullNameInput.value || (user ? user.displayName : ""),
+        await db.collection('servants').doc(user.uid).set({
+          uid: user.uid,
+          email: user.email || "",
+          fullName: fullNameInput.value || user.displayName,
           userPhone: document.getElementById('userPhone').value,
           fatherPhone: document.getElementById('fatherPhone').value,
           motherPhone: document.getElementById('motherPhone').value,
@@ -290,15 +296,20 @@
         });
 
         statusMsg.style.color = "#4ade80";
-        statusMsg.innerText = "تم حفظ البيانات بنجاح! ✨";
+        statusMsg.innerText = "تم الحفظ بنجاح! جاري التوجيه للرئيسية... ✨";
+
+        // التوجيه لصفحة home.html بعد ثانية واحدة
+        setTimeout(() => {
+          window.location.href = "../home.html";
+        }, 1000);
+
       } catch (error) {
-        console.error(error);
+        console.error("Firestore Error:", error);
         statusMsg.style.color = "#f87171";
-        statusMsg.innerText = "حدث خطأ أثناء الحفظ، حاول مرة أخرى.";
+        statusMsg.innerText = "خطأ: " + error.message;
       }
     });
   </script>
 
 </body>
 </html>
-
