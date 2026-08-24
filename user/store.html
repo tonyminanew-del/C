@@ -1,17 +1,32 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>معرض الهدايا - تطبيق الكنيسة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-  
-  <!-- استدعاء فايربيس -->
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    معرض الهدايا - تطبيق الكنيسة
+  </title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -19,388 +34,1718 @@
       font-family: 'Cairo', sans-serif;
     }
 
+
     body {
+
       background-color: #0b0f19;
+
       color: #ffffff;
+
       min-height: 100vh;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
-      padding: 20px 20px 95px 20px;
+
+      padding:
+        20px
+        20px
+        100px
+        20px;
+
       overflow-x: hidden;
+
     }
+
 
     .container {
+
       width: 100%;
+
       max-width: 500px;
+
       display: flex;
+
       flex-direction: column;
+
       gap: 20px;
+
     }
 
-    /* كارت النقاط العلوي */
+
+    /* =========================
+       كارت النقاط
+    ========================= */
+
     .top-points-card {
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(2, 132, 199, 0.05));
-      border: 1px solid rgba(56, 189, 248, 0.3);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(56,189,248,.15),
+          rgba(2,132,199,.05)
+        );
+
+      border:
+        1px solid
+        rgba(56,189,248,.3);
+
       border-radius: 20px;
+
       padding: 15px 20px;
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
-      backdrop-filter: blur(15px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+
+      backdrop-filter:
+        blur(15px);
+
+      box-shadow:
+        0 10px 25px
+        rgba(0,0,0,.4);
+
     }
+
+
+    .points-info {
+
+      text-align: left;
+
+    }
+
 
     .points-info h4 {
-      font-size: 0.9rem;
+
+      font-size: .9rem;
+
       color: #94a3b8;
+
+      margin-bottom: 2px;
+
     }
+
 
     .points-info div {
+
       font-size: 1.6rem;
+
       font-weight: 900;
+
       color: #38bdf8;
-      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+
+      text-shadow:
+        0 0 10px
+        rgba(56,189,248,.4);
+
     }
+
 
     .store-title {
+
       font-size: 1.2rem;
+
       font-weight: 800;
+
       color: #fff;
+
       display: flex;
+
       align-items: center;
+
       gap: 8px;
+
     }
 
-    /* شبكة المنتجات والهدايا */
-    .gifts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
+
+    /* =========================
+       رسالة الحظر
+    ========================= */
+
+    .blocked-box {
+
+      display: none;
+
+      background:
+        rgba(239,68,68,.1);
+
+      border:
+        1px solid
+        rgba(239,68,68,.4);
+
+      border-radius: 18px;
+
+      padding: 18px;
+
+      text-align: center;
+
+      color: #fca5a5;
+
+      line-height: 1.8;
+
     }
+
+
+    .blocked-box strong {
+
+      display: block;
+
+      color: #ef4444;
+
+      font-size: 1.1rem;
+
+      margin-bottom: 5px;
+
+    }
+
+
+    /* =========================
+       شبكة الهدايا
+    ========================= */
+
+    .gifts-grid {
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(
+          auto-fit,
+          minmax(140px, 1fr)
+        );
+
+      gap: 15px;
+
+    }
+
 
     .gift-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+
+      background:
+        rgba(255,255,255,.04);
+
+      border:
+        1px solid
+        rgba(255,255,255,.12);
+
       border-radius: 20px;
+
       padding: 12px;
+
       display: flex;
+
       flex-direction: column;
+
       justify-content: space-between;
-      backdrop-filter: blur(12px);
-      transition: all 0.3s ease;
+
+      backdrop-filter:
+        blur(12px);
+
+      transition:
+        all .3s ease;
+
       position: relative;
+
+      overflow: hidden;
+
     }
+
 
     .gift-card:hover {
-      transform: translateY(-5px);
-      border-color: #38bdf8;
-      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.15);
+
+      transform:
+        translateY(-5px);
+
+      border-color:
+        #38bdf8;
+
+      box-shadow:
+        0 10px 20px
+        rgba(56,189,248,.15);
+
     }
+
 
     .gift-img-box {
+
       width: 100%;
+
       height: 120px;
+
       border-radius: 14px;
+
       overflow: hidden;
-      background: rgba(255, 255, 255, 0.05);
+
+      background:
+        rgba(255,255,255,.05);
+
       margin-bottom: 10px;
+
       display: flex;
+
       justify-content: center;
+
       align-items: center;
+
     }
+
 
     .gift-img-box img {
+
       width: 100%;
+
       height: 100%;
+
       object-fit: cover;
+
     }
+
 
     .gift-img-placeholder {
+
       font-size: 40px;
+
     }
+
 
     .gift-name {
-      font-size: 0.95rem;
+
+      font-size: .95rem;
+
       font-weight: 700;
+
       color: #fff;
+
       margin-bottom: 4px;
+
+      min-height: 25px;
+
     }
+
 
     .gift-details {
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: center;
+
       margin-bottom: 10px;
-      font-size: 0.8rem;
+
+      font-size: .8rem;
+
+      gap: 5px;
+
     }
+
 
     .gift-price {
+
       color: #38bdf8;
+
       font-weight: 800;
+
     }
+
 
     .gift-qty {
+
       color: #94a3b8;
+
     }
+
 
     .add-to-cart-btn {
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
+
+      background:
+        linear-gradient(
+          135deg,
+          #38bdf8,
+          #0284c7
+        );
+
       color: #fff;
+
       border: none;
+
       border-radius: 12px;
-      padding: 8px;
-      font-size: 0.85rem;
+
+      padding: 9px;
+
+      font-size: .85rem;
+
       font-weight: 700;
+
       cursor: pointer;
-      transition: all 0.2s ease;
+
+      transition: .2s;
+
       width: 100%;
+
     }
+
 
     .add-to-cart-btn:hover {
-      opacity: 0.9;
+
+      opacity: .9;
+
+      transform:
+        translateY(-1px);
+
     }
+
+
+    .add-to-cart-btn:disabled {
+
+      background: #334155;
+
+      color: #94a3b8;
+
+      cursor: not-allowed;
+
+      transform: none;
+
+    }
+
 
     .empty-msg {
+
       text-align: center;
+
       color: #94a3b8;
+
       grid-column: 1 / -1;
+
       padding: 40px 0;
-      font-size: 0.95rem;
+
+      font-size: .95rem;
+
     }
 
-    /* الشريط السفلي */
-    .bottom-nav {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 30px);
-      max-width: 450px;
-      background: rgba(15, 23, 42, 0.9);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 25px;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 10px 10px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-      z-index: 100;
+
+    /* =========================
+       Loading
+    ========================= */
+
+    .loading {
+
+      text-align: center;
+
+      color: #38bdf8;
+
+      padding: 30px;
+
+      grid-column: 1 / -1;
+
     }
+
+
+    /* =========================
+       الشريط السفلي
+    ========================= */
+
+    .bottom-nav {
+
+      position: fixed;
+
+      bottom: 15px;
+
+      left: 50%;
+
+      transform:
+        translateX(-50%);
+
+      width:
+        calc(100% - 30px);
+
+      max-width: 450px;
+
+      background:
+        rgba(15,23,42,.9);
+
+      backdrop-filter:
+        blur(20px);
+
+      -webkit-backdrop-filter:
+        blur(20px);
+
+      border:
+        1px solid
+        rgba(255,255,255,.15);
+
+      border-radius: 25px;
+
+      display: flex;
+
+      justify-content:
+        space-around;
+
+      align-items: center;
+
+      padding: 10px;
+
+      box-shadow:
+        0 20px 40px
+        rgba(0,0,0,.7);
+
+      z-index: 100;
+
+    }
+
 
     .nav-item {
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       text-decoration: none;
+
       color: #94a3b8;
-      font-size: 0.75rem;
+
+      font-size: .75rem;
+
       font-weight: 600;
+
       gap: 4px;
-      transition: all 0.3s ease;
+
+      transition: .3s;
+
       width: 23%;
+
     }
 
-    .nav-item .nav-icon {
+
+    .nav-icon {
+
       font-size: 20px;
-      transition: transform 0.3s ease;
+
+      transition:
+        transform .3s;
+
     }
 
-    .nav-item:hover, .nav-item.active {
+
+    .nav-item:hover,
+    .nav-item.active {
+
       color: #38bdf8;
+
     }
 
-    .nav-item:hover .nav-icon, .nav-item.active .nav-icon {
-      transform: translateY(-3px);
+
+    .nav-item:hover .nav-icon,
+    .nav-item.active .nav-icon {
+
+      transform:
+        translateY(-3px);
+
     }
+
+
+    /* =========================
+       رسالة العملية
+    ========================= */
+
+    .toast {
+
+      position: fixed;
+
+      top: 20px;
+
+      left: 50%;
+
+      transform:
+        translateX(-50%)
+        translateY(-120px);
+
+      width:
+        calc(100% - 40px);
+
+      max-width: 450px;
+
+      padding: 14px 18px;
+
+      border-radius: 14px;
+
+      background: #0f172a;
+
+      border:
+        1px solid
+        rgba(255,255,255,.15);
+
+      box-shadow:
+        0 15px 35px
+        rgba(0,0,0,.5);
+
+      text-align: center;
+
+      font-weight: 700;
+
+      z-index: 9999;
+
+      transition:
+        transform .3s ease;
+
+    }
+
+
+    .toast.show {
+
+      transform:
+        translateX(-50%)
+        translateY(0);
+
+    }
+
+
+    .toast.success {
+
+      border-color:
+        rgba(34,197,94,.5);
+
+      color: #4ade80;
+
+    }
+
+
+    .toast.error {
+
+      border-color:
+        rgba(239,68,68,.5);
+
+      color: #f87171;
+
+    }
+
+
+    @media (max-width: 360px) {
+
+      .gifts-grid {
+
+        grid-template-columns:
+          repeat(2, 1fr);
+
+        gap: 10px;
+
+      }
+
+      .gift-img-box {
+
+        height: 100px;
+
+      }
+
+    }
+
   </style>
+
 </head>
+
+
 <body>
+
+
+  <!-- رسالة -->
+  <div
+    id="toast"
+    class="toast"
+  ></div>
+
 
   <div class="container">
 
-    <!-- رصيد النقاط العلوي -->
+
+    <!-- =========================
+         النقاط
+    ========================= -->
+
     <div class="top-points-card">
-      <div class="store-title">🎁 معرض الهدايا</div>
-      <div class="points-info">
-        <h4>نقاطك الحالية</h4>
-        <div id="userPoints">0</div>
+
+      <div class="store-title">
+
+        🎁
+
+        <span>
+          معرض الهدايا
+        </span>
+
       </div>
+
+
+      <div class="points-info">
+
+        <h4>
+          نقاطك الحالية
+        </h4>
+
+        <div id="userPoints">
+          0
+        </div>
+
+      </div>
+
     </div>
 
-    <!-- شبكة المنتجات والهدايا -->
-    <div class="gifts-grid" id="giftsContainer">
-      <div class="empty-msg">جاري تحميل الهدايا...</div>
+
+    <!-- =========================
+         الحظر
+    ========================= -->
+
+    <div
+      id="blockedBox"
+      class="blocked-box"
+    >
+
+      <strong>
+        🚫 الحساب محظور
+      </strong>
+
+      لا يمكنك شراء الهدايا حالياً.
+      <br>
+      يرجى التواصل مع المسؤول.
+
     </div>
+
+
+    <!-- =========================
+         الهدايا
+    ========================= -->
+
+    <div
+      class="gifts-grid"
+      id="giftsContainer"
+    >
+
+      <div class="loading">
+        جاري تحميل الهدايا...
+      </div>
+
+    </div>
+
 
   </div>
 
-  <!-- الشريط السفلي للتنقل -->
+
+  <!-- =========================
+       الشريط السفلي
+  ========================= -->
+
   <nav class="bottom-nav">
-    <a href="home.html" class="nav-item">
-      <span class="nav-icon">🏠</span>
-      <span>الرئيسية</span>
+
+    <a
+      href="home.html"
+      class="nav-item"
+    >
+
+      <span class="nav-icon">
+        🏠
+      </span>
+
+      <span>
+        الرئيسية
+      </span>
+
     </a>
-    <a href="profile.html" class="nav-item">
-      <span class="nav-icon">👤</span>
-      <span>البروفايل</span>
+
+
+    <a
+      href="profile.html"
+      class="nav-item"
+    >
+
+      <span class="nav-icon">
+        👤
+      </span>
+
+      <span>
+        البروفايل
+      </span>
+
     </a>
-    <a href="store.html" class="nav-item active">
-      <span class="nav-icon">🎁</span>
-      <span>المعرض</span>
+
+
+    <a
+      href="store.html"
+      class="nav-item active"
+    >
+
+      <span class="nav-icon">
+        🎁
+      </span>
+
+      <span>
+        المعرض
+      </span>
+
     </a>
-    <a href="basket.html" class="nav-item">
-      <span class="nav-icon">🛒</span>
-      <span>السلة</span>
+
+
+    <a
+      href="basket.html"
+      class="nav-item"
+    >
+
+      <span class="nav-icon">
+        🛒
+      </span>
+
+      <span>
+        السلة
+      </span>
+
     </a>
+
   </nav>
 
+
   <script>
+
+
+    /* =========================
+       Firebase
+    ========================= */
+
     const firebaseConfig = {
-      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-      authDomain: "church-7afe1.firebaseapp.com",
-      projectId: "church-7afe1",
-      storageBucket: "church-7afe1.firebasestorage.app",
-      messagingSenderId: "1072334615357",
-      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
-      measurementId: "G-E7Q76Z53SB"
+
+      apiKey:
+        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+
+      authDomain:
+        "church-7afe1.firebaseapp.com",
+
+      projectId:
+        "church-7afe1",
+
+      storageBucket:
+        "church-7afe1.firebasestorage.app",
+
+      messagingSenderId:
+        "1072334615357",
+
+      appId:
+        "1:1072334615357:web:c03b199f00ea9d19d40b54",
+
+      measurementId:
+        "G-E7Q76Z53SB"
+
     };
 
+
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+
+      firebase.initializeApp(
+        firebaseConfig
+      );
+
     }
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+
+
+    const auth =
+      firebase.auth();
+
+    const db =
+      firebase.firestore();
+
+
+    /* =========================
+       المتغيرات
+    ========================= */
 
     let currentUser = null;
+
     let currentUserPoints = 0;
 
-    // متابعة المستخدم وجلب نقاطه والهدايا
-    auth.onAuthStateChanged((user) => {
-      if (user) {
+    let currentUserBlocked = false;
+
+    let userListener = null;
+
+    let giftsListener = null;
+
+
+    /* =========================
+       تسجيل الدخول
+    ========================= */
+
+    auth.onAuthStateChanged(
+      (user) => {
+
+        if (!user) {
+
+          window.location.href =
+            "user.html";
+
+          return;
+
+        }
+
+
         currentUser = user;
-        loadUserPoints(user.uid);
-        loadGifts();
-      } else {
-        window.location.href = "user.html";
-      }
-    });
 
-    // جلب نقاط المخدوم المباشرة
-    function loadUserPoints(uid) {
-      db.collection('servants').doc(uid).onSnapshot((doc) => {
-        if (doc.exists) {
-          currentUserPoints = doc.data().points || 0;
-          document.getElementById('userPoints').innerText = currentUserPoints;
-        }
-      });
+
+        listenToUser(user.uid);
+
+        listenToGifts();
+
+      }
+    );
+
+
+    /* =========================
+       متابعة بيانات المستخدم
+    ========================= */
+
+    function listenToUser(uid) {
+
+      if (userListener) {
+
+        userListener();
+
+        userListener = null;
+
+      }
+
+
+      userListener =
+        db
+          .collection("servants")
+          .doc(uid)
+          .onSnapshot(
+
+            (doc) => {
+
+              if (!doc.exists) {
+
+                currentUserPoints = 0;
+
+                currentUserBlocked = false;
+
+                updateUserUI();
+
+                return;
+
+              }
+
+
+              const data =
+                doc.data();
+
+
+              currentUserPoints =
+                Number(data.points) || 0;
+
+
+              currentUserBlocked =
+                data.isBlocked === true;
+
+
+              updateUserUI();
+
+
+              /*
+                إعادة رسم الهدايا
+                حتى تتغير الأزرار عند الحظر
+              */
+
+              if (giftsListener) {
+
+                /*
+                  onSnapshot سيعيد البيانات
+                  تلقائياً، فلا نحتاج استدعاء
+                  إضافي هنا.
+                */
+
+              }
+
+            },
+
+            (error) => {
+
+              console.error(
+                "User listener error:",
+                error
+              );
+
+              showToast(
+                "تعذر تحميل بيانات حسابك",
+                "error"
+              );
+
+            }
+
+          );
+
     }
 
-    // جلب الهدايا المتاحة فقط (إخفاء الهدية إذا أصبحت كميتها 0 أو أقل)
-    function loadGifts() {
-      const giftsContainer = document.getElementById('giftsContainer');
 
-      db.collection('gifts').onSnapshot((snapshot) => {
-        giftsContainer.innerHTML = '';
+    /* =========================
+       تحديث واجهة المستخدم
+    ========================= */
 
-        let availableGiftsCount = 0;
+    function updateUserUI() {
 
-        snapshot.forEach((doc) => {
-          const gift = doc.data();
-          const giftId = doc.id;
+      document
+        .getElementById(
+          "userPoints"
+        )
+        .innerText =
+        currentUserPoints;
 
-          // تخطي الهدية وعدم عرضها إذا نفدت كميتها
-          if (!gift.quantity || gift.quantity <= 0) {
-            return;
-          }
 
-          availableGiftsCount++;
+      const blockedBox =
+        document.getElementById(
+          "blockedBox"
+        );
 
-          const giftCard = document.createElement('div');
-          giftCard.className = 'gift-card';
 
-          const imgHTML = gift.image 
-            ? `<img src="${gift.image}" alt="${gift.name}">` 
-            : `<div class="gift-img-placeholder">🎁</div>`;
+      if (currentUserBlocked) {
 
-          giftCard.innerHTML = `
-            <div class="gift-img-box">${imgHTML}</div>
-            <div class="gift-name">${gift.name}</div>
-            <div class="gift-details">
-              <span class="gift-price">⭐ ${gift.points} نقطة</span>
-              <span class="gift-qty">المتاح: ${gift.quantity}</span>
-            </div>
-            <button class="add-to-cart-btn" 
-              onclick="addToBasket('${giftId}', '${gift.name}', ${gift.points}, ${gift.quantity}, '${gift.image || ''}')">
-              إضافة للسلة 🛒
-            </button>
-          `;
+        blockedBox.style.display =
+          "block";
 
-          giftsContainer.appendChild(giftCard);
-        });
+      }
 
-        if (availableGiftsCount === 0) {
-          giftsContainer.innerHTML = '<div class="empty-msg">لا توجد هدايا متاحة حالياً 🎁</div>';
-        }
-      });
+      else {
+
+        blockedBox.style.display =
+          "none";
+
+      }
+
     }
 
-    // شراء الهدية (خصم النقاط، تقليل الكمية، والإضافة للسلة)
-    async function addToBasket(giftId, name, points, quantity, image) {
-      if (!currentUser) return;
 
-      if (currentUserPoints < points) {
-        alert("النقاط غير كافية للشراء ❌");
-        return;
+    /* =========================
+       تحميل الهدايا
+    ========================= */
+
+    function listenToGifts() {
+
+      const container =
+        document.getElementById(
+          "giftsContainer"
+        );
+
+
+      if (giftsListener) {
+
+        giftsListener();
+
+        giftsListener = null;
+
       }
 
-      if (quantity <= 0) {
-        alert("عذراً، نفدت الكمية! ❌");
+
+      giftsListener =
+        db
+          .collection("gifts")
+          .onSnapshot(
+
+            (snapshot) => {
+
+              container.innerHTML = "";
+
+              let availableCount = 0;
+
+
+              snapshot.forEach(
+                (doc) => {
+
+                  const gift =
+                    doc.data();
+
+
+                  const giftId =
+                    doc.id;
+
+
+                  const quantity =
+                    Number(
+                      gift.quantity
+                    ) || 0;
+
+
+                  const points =
+                    Number(
+                      gift.points
+                    ) || 0;
+
+
+                  const name =
+                    gift.name ||
+                    "هدية";
+
+
+                  /*
+                    لا نعرض الهدايا
+                    التي نفدت
+                  */
+
+                  if (
+                    quantity <= 0
+                  ) {
+
+                    return;
+
+                  }
+
+
+                  availableCount++;
+
+
+                  const card =
+                    document
+                      .createElement(
+                        "div"
+                      );
+
+
+                  card.className =
+                    "gift-card";
+
+
+                  /*
+                    الصورة
+                  */
+
+                  let imageHTML =
+                    `
+                    <div
+                      class="gift-img-placeholder"
+                    >
+                      🎁
+                    </div>
+                    `;
+
+
+                  if (gift.image) {
+
+                    imageHTML =
+                      `
+                      <img
+                        src="${escapeHtml(
+                          gift.image
+                        )}"
+                        alt="${escapeHtml(
+                          name
+                        )}"
+                        loading="lazy"
+                      >
+                      `;
+
+                  }
+
+
+                  /*
+                    زر الشراء
+                  */
+
+                  const disabled =
+                    currentUserBlocked
+                      ? "disabled"
+                      : "";
+
+
+                  const buttonText =
+                    currentUserBlocked
+                      ? "الحساب محظور 🚫"
+                      : "إضافة للسلة 🛒";
+
+
+                  card.innerHTML =
+                    `
+                    <div
+                      class="gift-img-box"
+                    >
+                      ${imageHTML}
+                    </div>
+
+
+                    <div
+                      class="gift-name"
+                    >
+                      ${escapeHtml(
+                        name
+                      )}
+                    </div>
+
+
+                    <div
+                      class="gift-details"
+                    >
+
+                      <span
+                        class="gift-price"
+                      >
+                        ⭐ ${points} نقطة
+                      </span>
+
+                      <span
+                        class="gift-qty"
+                      >
+                        المتاح:
+                        ${quantity}
+                      </span>
+
+                    </div>
+
+
+                    <button
+                      class="add-to-cart-btn"
+                      ${disabled}
+                      data-gift-id="${escapeHtml(
+                        giftId
+                      )}"
+                    >
+                      ${buttonText}
+                    </button>
+                    `;
+
+
+                  /*
+                    ربط الزر بالهدية
+                  */
+
+                  const button =
+                    card.querySelector(
+                      ".add-to-cart-btn"
+                    );
+
+
+                  button.addEventListener(
+                    "click",
+                    () => {
+
+                      addToBasket(
+                        giftId
+                      );
+
+                    }
+                  );
+
+
+                  container
+                    .appendChild(card);
+
+                }
+              );
+
+
+              if (
+                availableCount === 0
+              ) {
+
+                container.innerHTML =
+                  `
+                  <div class="empty-msg">
+                    لا توجد هدايا متاحة
+                    حالياً 🎁
+                  </div>
+                  `;
+
+              }
+
+            },
+
+            (error) => {
+
+              console.error(
+                "Gifts error:",
+                error
+              );
+
+
+              container.innerHTML =
+                `
+                <div class="empty-msg">
+                  ⚠️ حدث خطأ أثناء تحميل الهدايا
+                </div>
+                `;
+
+            }
+
+          );
+
+    }
+
+
+    /* =========================
+       شراء / إضافة للسلة
+       Transaction
+    ========================= */
+
+    async function addToBasket(
+      giftId
+    ) {
+
+      if (!currentUser) {
+
+        showToast(
+          "برجاء تسجيل الدخول أولاً",
+          "error"
+        );
+
         return;
+
       }
+
+
+      /*
+        فحص سريع قبل بدء العملية
+      */
+
+      if (currentUserBlocked) {
+
+        showToast(
+          "حسابك محظور ولا يمكنك شراء الهدايا 🚫",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const userRef =
+        db
+          .collection("servants")
+          .doc(currentUser.uid);
+
+
+      const giftRef =
+        db
+          .collection("gifts")
+          .doc(giftId);
+
+
+      const basketRef =
+        userRef
+          .collection("basket")
+          .doc(giftId);
+
 
       try {
-        const userRef = db.collection('servants').doc(currentUser.uid);
-        const basketRef = userRef.collection('basket').doc(giftId);
-        const giftRef = db.collection('gifts').doc(giftId);
 
-        const doc = await basketRef.get();
+        await db.runTransaction(
+          async (transaction) => {
 
-        // 1. خصم النقاط من حساب المخدوم
-        await userRef.update({
-          points: firebase.firestore.FieldValue.increment(-points)
-        });
+            /*
+              مهم:
+              نقرأ كل البيانات أولاً
+              قبل الكتابة.
+            */
 
-        // 2. تقليل الكمية المتاحة في المخزن بمقدار 1
-        await giftRef.update({
-          quantity: firebase.firestore.FieldValue.increment(-1)
-        });
+            const userDoc =
+              await transaction.get(
+                userRef
+              );
 
-        // 3. إضافة الهدية للسلة
-        if (doc.exists) {
-          const currentCount = doc.data().count || 1;
-          await basketRef.update({ count: currentCount + 1 });
-        } else {
-          await basketRef.set({
-            giftId: giftId,
-            name: name,
-            points: points,
-            image: image,
-            count: 1,
-            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+
+            const giftDoc =
+              await transaction.get(
+                giftRef
+              );
+
+
+            const basketDoc =
+              await transaction.get(
+                basketRef
+              );
+
+
+            /* =====================
+               التأكد من المستخدم
+            ===================== */
+
+            if (!userDoc.exists) {
+
+              throw new Error(
+                "USER_NOT_FOUND"
+              );
+
+            }
+
+
+            const userData =
+              userDoc.data();
+
+
+            /* =====================
+               التأكد من الحظر
+            ===================== */
+
+            if (
+              userData.isBlocked === true
+            ) {
+
+              throw new Error(
+                "USER_BLOCKED"
+              );
+
+            }
+
+
+            /* =====================
+               التأكد من الهدية
+            ===================== */
+
+            if (!giftDoc.exists) {
+
+              throw new Error(
+                "GIFT_NOT_FOUND"
+              );
+
+            }
+
+
+            const gift =
+              giftDoc.data();
+
+
+            const giftPoints =
+              Number(
+                gift.points
+              ) || 0;
+
+
+            const giftQuantity =
+              Number(
+                gift.quantity
+              ) || 0;
+
+
+            const userPoints =
+              Number(
+                userData.points
+              ) || 0;
+
+
+            /* =====================
+               الكمية
+            ===================== */
+
+            if (
+              giftQuantity <= 0
+            ) {
+
+              throw new Error(
+                "OUT_OF_STOCK"
+              );
+
+            }
+
+
+            /* =====================
+               النقاط
+            ===================== */
+
+            if (
+              userPoints < giftPoints
+            ) {
+
+              throw new Error(
+                "NOT_ENOUGH_POINTS"
+              );
+
+            }
+
+
+            /* =====================
+               بيانات السلة
+            ===================== */
+
+            const oldCount =
+              basketDoc.exists
+                ? Number(
+                    basketDoc.data()
+                      .count
+                  ) || 0
+                : 0;
+
+
+            /* =====================
+               خصم النقاط
+            ===================== */
+
+            transaction.update(
+              userRef,
+              {
+
+                points:
+                  userPoints -
+                  giftPoints,
+
+                updatedAt:
+                  firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
+
+              }
+            );
+
+
+            /* =====================
+               تقليل المخزون
+            ===================== */
+
+            transaction.update(
+              giftRef,
+              {
+
+                quantity:
+                  giftQuantity - 1,
+
+                updatedAt:
+                  firebase.firestore
+                    .FieldValue
+                    .serverTimestamp()
+
+              }
+            );
+
+
+            /* =====================
+               السلة
+            ===================== */
+
+            const basketData = {
+
+              giftId:
+                giftId,
+
+              name:
+                gift.name || "هدية",
+
+              points:
+                giftPoints,
+
+              image:
+                gift.image || "",
+
+              count:
+                oldCount + 1,
+
+              updatedAt:
+                firebase.firestore
+                  .FieldValue
+                  .serverTimestamp()
+
+            };
+
+
+            if (basketDoc.exists) {
+
+              transaction.update(
+                basketRef,
+                basketData
+              );
+
+            }
+
+            else {
+
+              transaction.set(
+                basketRef,
+                {
+
+                  ...basketData,
+
+                  addedAt:
+                    firebase.firestore
+                      .FieldValue
+                      .serverTimestamp()
+
+                }
+              );
+
+            }
+
+          }
+        );
+
+
+        /*
+          نجحت العملية بالكامل
+        */
+
+        showToast(
+          "تم شراء الهدية وإضافتها للسلة بنجاح! 🛒✨",
+          "success"
+        );
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Purchase error:",
+          error
+        );
+
+
+        switch (error.message) {
+
+          case "USER_BLOCKED":
+
+            showToast(
+              "حسابك محظور ولا يمكنك شراء الهدايا 🚫",
+              "error"
+            );
+
+            break;
+
+
+          case "USER_NOT_FOUND":
+
+            showToast(
+              "لم يتم العثور على بيانات حسابك",
+              "error"
+            );
+
+            break;
+
+
+          case "GIFT_NOT_FOUND":
+
+            showToast(
+              "هذه الهدية لم تعد موجودة",
+              "error"
+            );
+
+            break;
+
+
+          case "OUT_OF_STOCK":
+
+            showToast(
+              "عذراً، نفدت كمية هذه الهدية ❌",
+              "error"
+            );
+
+            break;
+
+
+          case "NOT_ENOUGH_POINTS":
+
+            showToast(
+              "النقاط غير كافية لشراء هذه الهدية ⭐",
+              "error"
+            );
+
+            break;
+
+
+          default:
+
+            showToast(
+              "حدث خطأ أثناء تنفيذ العملية ❌",
+              "error"
+            );
+
         }
 
-        alert("تم الخصم والإضافة إلى السلة بنجاح! 🛒✨");
-
-      } catch (err) {
-        console.error("Error adding to basket:", err);
-        alert("حدث خطأ أثناء تنفيذ العملية!");
       }
+
     }
+
+
+    /* =========================
+       Toast
+    ========================= */
+
+    let toastTimer = null;
+
+
+    function showToast(
+      message,
+      type
+    ) {
+
+      const toast =
+        document.getElementById(
+          "toast"
+        );
+
+
+      toast.innerText =
+        message;
+
+
+      toast.className =
+        "toast " +
+        type +
+        " show";
+
+
+      if (toastTimer) {
+
+        clearTimeout(
+          toastTimer
+        );
+
+      }
+
+
+      toastTimer =
+        setTimeout(
+          () => {
+
+            toast.classList.remove(
+              "show"
+            );
+
+          },
+          3000
+        );
+
+    }
+
+
+    /* =========================
+       حماية النصوص
+    ========================= */
+
+    function escapeHtml(value) {
+
+      return String(value)
+
+        .replaceAll(
+          "&",
+          "&amp;"
+        )
+
+        .replaceAll(
+          "<",
+          "&lt;"
+        )
+
+        .replaceAll(
+          ">",
+          "&gt;"
+        )
+
+        .replaceAll(
+          '"',
+          "&quot;"
+        )
+
+        .replaceAll(
+          "'",
+          "&#039;"
+        );
+
+    }
+
+
   </script>
 
 </body>
+
 </html>
