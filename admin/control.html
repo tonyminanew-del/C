@@ -40,13 +40,14 @@
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 20px;
       padding: 20px;
-      text-align: center;
       backdrop-filter: blur(10px);
     }
 
     .header-card h2 {
       color: #38bdf8;
       font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 10px;
     }
 
     .form-group {
@@ -77,6 +78,11 @@
       color: #fff;
     }
 
+    .search-box {
+      display: flex;
+      gap: 8px;
+    }
+
     .btn-main {
       background: linear-gradient(135deg, #38bdf8, #0284c7);
       color: #fff;
@@ -85,8 +91,8 @@
       border-radius: 12px;
       font-weight: 700;
       cursor: pointer;
-      width: 100%;
       transition: 0.3s;
+      white-space: nowrap;
     }
 
     .btn-main:hover {
@@ -139,7 +145,7 @@
       margin-right: 5px;
     }
 
-    /* النافذة المنبثقة للتعديل (Modal) */
+    /* النافذة المنبثقة للتعديل */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -230,7 +236,7 @@
       <h2>⚙️ لوحة إدارة المخدومين</h2>
     </div>
 
-    <!-- Step 1: اختيار المرحلة أدخل الباسورد -->
+    <!-- Step 1: اختيار المرحلة وكلمة السر -->
     <div class="header-card">
       <div class="form-group">
         <label>اختر المرحلة الدراسية:</label>
@@ -247,22 +253,25 @@
           <label>🔒 أدخل كلمة سر المرحلة:</label>
           <input type="password" id="stagePassword" placeholder="كلمة السر">
         </div>
-        <button class="btn-main" onclick="verifyPassword()">فتح القفل 🔓</button>
+        <button class="btn-main" style="width:100%;" onclick="verifyPassword()">فتح القفل 🔓</button>
       </div>
     </div>
 
-    <!-- Step 2: اختيار الصف والبحث (يظهر بعد فتح القفل) -->
+    <!-- Step 2: اختيار الصف والبحث (يظهر فور فتح القفل) -->
     <div id="unlockedSection" class="header-card hidden">
       <div class="form-group">
         <label>اختر الصف الدراسي:</label>
         <select id="gradeSelect" onchange="fetchServants()">
-          <!-- سيتم تغذيته تلقائياً بالخيارات حسب المرحلة -->
+          <!-- يتم ملؤه تلقائياً حسب المرحلة -->
         </select>
       </div>
 
       <div class="form-group">
-        <label>🔍 بحث في هذه المرحلة والصف:</label>
-        <input type="text" id="searchInput" placeholder="ابحث باسم المخدوم..." oninput="filterServants()">
+        <label>🔍 البحث عن مخدوم:</label>
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="اكتب اسم المخدوم..." onkeypress="handleEnterSearch(event)">
+          <button class="btn-main" onclick="executeSearch()">بحث 🔍</button>
+        </div>
       </div>
     </div>
 
@@ -300,7 +309,7 @@
         </div>
       </div>
 
-      <button class="btn-main" style="margin-top: 15px;" onclick="saveServantData()">حفظ التعديلات 💾</button>
+      <button class="btn-main" style="width: 100%; margin-top: 15px;" onclick="saveServantData()">حفظ التعديلات 💾</button>
       
       <div id="blockBtnContainer"></div>
     </div>
@@ -322,23 +331,20 @@
     }
     const db = firebase.firestore();
 
-    // كلمات السر المحددة لكل مرحلة
     const stagePasswords = {
       primary: "344",
       prep: "455",
       secondary: "899"
     };
 
-    // الصفوف لكل مرحلة
     const stageGrades = {
       primary: ["الصف الأول", "الصف الثاني", "الصف الثالث", "الصف الرابع", "الصف الخامس", "الصف السادس"],
       prep: ["الصف الأول الإعدادي", "الصف الثاني الإعدادي", "الصف الثالث الإعدادي"],
       secondary: ["الصف الأول الثانوي", "الصف الثاني الثانوي", "الصف الثالث الثانوي"]
     };
 
-    let allServantsData = []; // تخزين بيانات المخدومين المؤقتة للبحث
+    let allServantsData = [];
 
-    // إعادة القفل عند تغيير المرحلة
     function resetLock() {
       const stage = document.getElementById('stageSelect').value;
       const lockBox = document.getElementById('lockBox');
@@ -355,7 +361,6 @@
       }
     }
 
-    // التحقق من كلمة السر
     function verifyPassword() {
       const stage = document.getElementById('stageSelect').value;
       const passwordInput = document.getElementById('stagePassword').value;
@@ -364,15 +369,12 @@
         alert("تم فتح القفل بنجاح! 🔓");
         document.getElementById('lockBox').classList.add('hidden');
         document.getElementById('unlockedSection').classList.remove('hidden');
-        
-        // تغذية الصفوف حسب المرحلة
         populateGrades(stage);
       } else {
         alert("كلمة السر خاطئة! ❌");
       }
     }
 
-    // تعبئة قائمة الصفوف
     function populateGrades(stage) {
       const gradeSelect = document.getElementById('gradeSelect');
       gradeSelect.innerHTML = '<option value="">-- اختر الصف --</option>';
@@ -385,26 +387,26 @@
       });
     }
 
-    // جلب المخدومين المحددين بالمرحلة والصف فقط
+    // جلب المخدومين فور اختيار الصف
     function fetchServants() {
       const stage = document.getElementById('stageSelect').value;
       const grade = document.getElementById('gradeSelect').value;
       const listContainer = document.getElementById('servantsList');
+      document.getElementById('searchInput').value = '';
 
       if (!stage || !grade) {
         listContainer.innerHTML = '';
         return;
       }
 
-      listContainer.innerHTML = '<div style="text-align:center;">جاري الجلب...</div>';
+      listContainer.innerHTML = '<div style="text-align:center;">جاري تحميل الأسماء...</div>';
 
       db.collection('servants')
         .where('stage', '==', stage)
         .where('grade', '==', grade)
         .onSnapshot(snapshot => {
           allServantsData = [];
-          listContainer.innerHTML = '';
-
+          
           if (snapshot.empty) {
             listContainer.innerHTML = '<div style="text-align:center; color:#94a3b8;">لا يوجد مخدومين في هذا الصف</div>';
             return;
@@ -420,21 +422,29 @@
         });
     }
 
-    // عرض القائمة
+    // عرض قائمة الأسماء مع المعالجة الكاملة لمسميات الحقول
     function renderServantsList(list) {
       const listContainer = document.getElementById('servantsList');
       listContainer.innerHTML = '';
 
+      if (list.length === 0) {
+        listContainer.innerHTML = '<div style="text-align:center; color:#94a3b8;">لم يتم العثور على أي نتائج</div>';
+        return;
+      }
+
       list.forEach(data => {
+        const servantName = data.name || data.fullName || data.username || data.userName || 'بدون اسم';
+        const servantPhone = data.phone || data.phoneNumber || data.mobile || 'لا يوجد رقم';
+
         const card = document.createElement('div');
         card.className = `servant-card ${data.isBlocked ? 'blocked' : ''}`;
         card.onclick = () => openModal(data);
 
         card.innerHTML = `
           <div>
-            <strong>${data.name || 'بدون اسم'}</strong>
+            <strong>${servantName}</strong>
             ${data.isBlocked ? '<span class="badge-blocked">محظور</span>' : ''}
-            <div style="font-size: 0.8rem; color: #94a3b8;">📞 ${data.phone || 'لا يوجد'}</div>
+            <div style="font-size: 0.8rem; color: #94a3b8;">📞 ${servantPhone}</div>
           </div>
           <div style="font-weight: bold; color: #38bdf8;">
             ⭐ ${data.points || 0}
@@ -444,18 +454,32 @@
       });
     }
 
-    // تصفية نتائج البحث
-    function filterServants() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = allServantsData.filter(s => s.name && s.name.toLowerCase().includes(query));
-      renderServantsList(filtered);
+    function executeSearch() {
+      const query = document.getElementById('searchInput').value.trim().toLowerCase();
+      if (query === '') {
+        renderServantsList(allServantsData);
+      } else {
+        const filtered = allServantsData.filter(s => {
+          const servantName = (s.name || s.fullName || s.username || s.userName || '').toLowerCase();
+          return servantName.includes(query);
+        });
+        renderServantsList(filtered);
+      }
     }
 
-    // فتح شاشة التعديل
+    function handleEnterSearch(event) {
+      if (event.key === 'Enter') {
+        executeSearch();
+      }
+    }
+
     function openModal(data) {
+      const servantName = data.name || data.fullName || data.username || data.userName || '';
+      const servantPhone = data.phone || data.phoneNumber || data.mobile || '';
+
       document.getElementById('editUserId').value = data.id;
-      document.getElementById('editName').value = data.name || '';
-      document.getElementById('editPhone').value = data.phone || '';
+      document.getElementById('editName').value = servantName;
+      document.getElementById('editPhone').value = servantPhone;
       document.getElementById('editPoints').value = data.points || 0;
 
       const blockBtnContainer = document.getElementById('blockBtnContainer');
@@ -472,7 +496,6 @@
       document.getElementById('editModal').style.display = 'none';
     }
 
-    // تغيير النقاط بالأزرار
     function changePoints(val) {
       const input = document.getElementById('editPoints');
       let current = parseInt(input.value) || 0;
@@ -481,7 +504,6 @@
       input.value = current;
     }
 
-    // حفظ بيانات المخدوم
     async function saveServantData() {
       const id = document.getElementById('editUserId').value;
       const name = document.getElementById('editName').value;
@@ -502,7 +524,6 @@
       }
     }
 
-    // إجراء حظر أو إزالة حظر المخدوم
     async function toggleBlock(blockStatus) {
       const id = document.getElementById('editUserId').value;
       try {
