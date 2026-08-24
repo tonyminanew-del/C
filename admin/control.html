@@ -107,7 +107,6 @@
       margin-top: 10px;
     }
 
-    /* قائمة المخدومين */
     .servants-list {
       display: flex;
       flex-direction: column;
@@ -145,7 +144,6 @@
       margin-right: 5px;
     }
 
-    /* النافذة المنبثقة للتعديل */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -257,19 +255,18 @@
       </div>
     </div>
 
-    <!-- Step 2: اختيار الصف والبحث (يظهر فور فتح القفل) -->
+    <!-- Step 2: اختيار الصف والبحث -->
     <div id="unlockedSection" class="header-card hidden">
       <div class="form-group">
         <label>اختر الصف الدراسي:</label>
         <select id="gradeSelect" onchange="fetchServants()">
-          <!-- يتم ملؤه تلقائياً حسب المرحلة -->
         </select>
       </div>
 
       <div class="form-group">
         <label>🔍 البحث عن مخدوم:</label>
         <div class="search-box">
-          <input type="text" id="searchInput" placeholder="اكتب اسم المخدوم..." onkeypress="handleEnterSearch(event)">
+          <input type="text" id="searchInput" placeholder="اكتب اسم المخدوم..." oninput="executeSearch()">
           <button class="btn-main" onclick="executeSearch()">بحث 🔍</button>
         </div>
       </div>
@@ -344,8 +341,13 @@
     };
 
     let allServantsData = [];
+    let unsubscribeListener = null;
 
     function resetLock() {
+      if (unsubscribeListener) {
+        unsubscribeListener();
+        unsubscribeListener = null;
+      }
       const stage = document.getElementById('stageSelect').value;
       const lockBox = document.getElementById('lockBox');
       const unlockedSection = document.getElementById('unlockedSection');
@@ -387,12 +389,16 @@
       });
     }
 
-    // جلب المخدومين فور اختيار الصف
+    // جلب المخدومين لحظياً (Real-Time)
     function fetchServants() {
       const stage = document.getElementById('stageSelect').value;
       const grade = document.getElementById('gradeSelect').value;
       const listContainer = document.getElementById('servantsList');
-      document.getElementById('searchInput').value = '';
+
+      if (unsubscribeListener) {
+        unsubscribeListener();
+        unsubscribeListener = null;
+      }
 
       if (!stage || !grade) {
         listContainer.innerHTML = '';
@@ -401,7 +407,7 @@
 
       listContainer.innerHTML = '<div style="text-align:center;">جاري تحميل الأسماء...</div>';
 
-      db.collection('servants')
+      unsubscribeListener = db.collection('servants')
         .where('stage', '==', stage)
         .where('grade', '==', grade)
         .onSnapshot(snapshot => {
@@ -418,11 +424,17 @@
             allServantsData.push(data);
           });
 
-          renderServantsList(allServantsData);
+          executeSearch();
+        }, error => {
+          console.error("Firestore Error:", error);
+          listContainer.innerHTML = `
+            <div style="text-align:center; color:#ef4444; padding: 15px;">
+              ⚠️ تعذر جلب البيانات. يرجى التأكد من إتاحة صلاحيات القراءة في قواعد Firebase.
+            </div>
+          `;
         });
     }
 
-    // عرض قائمة الأسماء مع المعالجة الكاملة لمسميات الحقول
     function renderServantsList(list) {
       const listContainer = document.getElementById('servantsList');
       listContainer.innerHTML = '';
@@ -464,12 +476,6 @@
           return servantName.includes(query);
         });
         renderServantsList(filtered);
-      }
-    }
-
-    function handleEnterSearch(event) {
-      if (event.key === 'Enter') {
-        executeSearch();
       }
     }
 
