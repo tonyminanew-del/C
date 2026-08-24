@@ -1,0 +1,181 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Cairo', sans-serif;
+}
+
+body {
+  background-color: #050505; /* أسود حالك */
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* خلفية إضاءة خفيفة */
+.dark-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.glow-orb {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+}
+
+.orb-1 {
+  background: #38bdf8;
+  top: -100px;
+  right: -100px;
+}
+
+.orb-2 {
+  background: #a855f7;
+  bottom: -100px;
+  left: -100px;
+}
+
+/* الحاوية الرئيسية */
+.main-container {
+  width: 90%;
+  max-width: 850px;
+  padding: 20px;
+  z-index: 1;
+}
+
+/* الهيدر */
+.hero-section {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.logo-badge {
+  font-size: 60px;
+  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  display: inline-block;
+  padding: 15px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.hero-section h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #ffffff, #94a3b8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-section p {
+  color: #94a3b8;
+  font-size: 1rem;
+}
+
+/* شبكة الكارتات */
+.cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .cards-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* تصميم الجلاسمورفيزم */
+.glass-card {
+  text-decoration: none; /* لإلغاء الخط تحت الروابط */
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 30px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.1);
+}
+
+.admin-card:hover {
+  border-color: rgba(245, 158, 11, 0.4);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
+.icon-box {
+  font-size: 40px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+.card-content {
+  flex-grow: 1;
+}
+
+.card-content h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  color: #f8fafc;
+}
+
+.card-content p {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.4;
+}
+
+.action-arrow {
+  font-size: 20px;
+  color: #64748b;
+  transition: 0.3s;
+}
+
+.glass-card:hover .action-arrow {
+  color: #38bdf8;
+  transform: translateX(-5px);
+}
+
+.admin-card:hover .action-arrow {
+  color: #f59e0b;
+}
+
+.footer-note {
+  text-align: center;
+  margin-top: 40px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
