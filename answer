@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بيانات الخادم - تطبيق الكنيسة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- استدعاء فايربيس -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background-color: #0b0f19;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .servant-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 30px;
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 5px;
+    }
+
+    .card-sub {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    /* دائرة رفع صورة الخادم */
+    .avatar-wrapper {
+      position: relative;
+      width: 95px;
+      height: 95px;
+      margin: 0 auto 20px auto;
+      cursor: pointer;
+    }
+
+    .avatar-circle {
+      width: 100%;
+      height: 100%;
+      background: rgba(56, 189, 248, 0.15);
+      border: 2px solid #38bdf8;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 38px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.25);
+      transition: all 0.3s ease;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-icon {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      background: #38bdf8;
+      color: #0b0f19;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .avatar-wrapper:hover .avatar-circle {
+      transform: scale(1.05);
+      border-color: #0284c7;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+      text-align: right;
+    }
+
+    .form-label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .input-box, .select-box {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .select-box option {
+      background: #0b0f19;
+      color: #fff;
+    }
+
+    .input-box:focus, .select-box:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    .save-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+    }
+
+    .save-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .status-msg {
+      margin-top: 15px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="servant-card">
+    <div class="card-title">👨‍🏫 بيانات الخادم</div>
+    <div class="card-sub">يرجى استكمال واستعراض بيانات الخدمة</div>
+
+    <!-- رفع الصورة -->
+    <div class="avatar-wrapper" onclick="document.getElementById('servantPhotoInput').click()">
+      <div class="avatar-circle" id="servantAvatar">👤</div>
+      <div class="camera-icon">📷</div>
+    </div>
+    <input type="file" id="servantPhotoInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+
+    <div class="form-group">
+      <label class="form-label">اللقب / صفة الخدمة:</label>
+      <select id="servantTitle" class="select-box">
+        <option value="أخ">أخ 👨‍🏫</option>
+        <option value="تاسوني">تاسوني 👩‍🏫</option>
+        <option value="أبونا">أبونا ⛪</option>
+      </select>
+
+      <label class="form-label">اسم الخادم بالكامل:</label>
+      <input type="text" id="servantName" class="input-box" placeholder="أدخل الاسم">
+
+      <label class="form-label">رقم تليفون الخادم:</label>
+      <input type="tel" id="servantPhone" class="input-box" placeholder="أدخل رقم التليفون">
+    </div>
+
+    <button class="save-btn" onclick="saveServantData()">حفظ البيانات 💾</button>
+
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let currentUser = null;
+    let photoBase64Data = "";
+
+    // التأكد من تسجيل الدخول وجلب البيانات المسجلة سابقاً إن وجدت
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById('servantName').value = user.displayName || "";
+
+        try {
+          const doc = await db.collection('admins').doc(user.uid).get();
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.name) document.getElementById('servantName').value = data.name;
+            if (data.phone) document.getElementById('servantPhone').value = data.phone;
+            if (data.title) document.getElementById('servantTitle').value = data.title;
+            if (data.photo) {
+              photoBase64Data = data.photo;
+              document.getElementById('servantAvatar').innerHTML = `<img src="${data.photo}" alt="Servant">`;
+            }
+          }
+        } catch (err) {
+          console.error("Error loading servant data:", err);
+        }
+      } else {
+        window.location.href = "admin.html";
+      }
+    });
+
+    // تحويل الصورة المرفوعة إلى Base64
+    function handlePhotoUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        photoBase64Data = e.target.result;
+        document.getElementById('servantAvatar').innerHTML = `<img src="${photoBase64Data}" alt="Servant">`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // حفظ البيانات في Firestore
+    async function saveServantData() {
+      if (!currentUser) return;
+
+      const title = document.getElementById('servantTitle').value;
+      const name = document.getElementById('servantName').value.trim();
+      const phone = document.getElementById('servantPhone').value.trim();
+      const statusMsg = document.getElementById('statusMsg');
+
+      if (!name || !phone) {
+        statusMsg.style.color = "#f87171";
+        statusMsg.innerText = "يرجى كتابة الاسم ورقم التليفون!";
+        return;
+      }
+
+      statusMsg.style.color = "#38bdf8";
+      statusMsg.innerText = "جاري حفظ البيانات...";
+
+      try {
+        await db.collection('admins').doc(currentUser.uid).set({
+          title: title,
+          name: name,
+          phone: phone,
+          photo: photoBase64Data,
+          email: currentUser.email,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        statusMsg.style.color = "#4ade80";
+        statusMsg.innerText = "تم حفظ بيانات الخادم بنجاح! ✨";
+      } catch (err) {
+        console.error("Error saving servant data:", err);
+        statusMsg.style.color = "#f87171";
+        statusMsg.innerText = "حدث خطأ أثناء حفظ البيانات.";
+      }
+    }
+  </script>
+
+</body>
+</html>
