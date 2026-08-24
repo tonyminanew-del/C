@@ -181,8 +181,8 @@
       const provider = new firebase.auth.GoogleAuthProvider();
       auth.signInWithPopup(provider)
         .then((result) => {
-          // التوجيه للوحة التحكم الرئيسية للخادام
-          window.location.href = "admin_dashboard.html";
+          // التوجيه لصفحة answer.html مباشرة
+          window.location.href = "answer.html";
         })
         .catch((error) => {
           console.error(error);
@@ -193,4 +193,3 @@
 
 </body>
 </html>
-
