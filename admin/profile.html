@@ -1,1 +1,645 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>البروفايل - لوحة الخادم</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background: #0b0f19;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px 20px 100px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .profile-card {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(56,189,248,.15),
+          rgba(15,23,42,.7)
+        );
+
+      border: 1px solid rgba(56,189,248,.3);
+      border-radius: 25px;
+      padding: 25px 20px;
+      text-align: center;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 15px 35px rgba(0,0,0,.4);
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin: auto;
+      background: rgba(56,189,248,.15);
+      border: 3px solid #38bdf8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      font-size: 45px;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .name {
+      margin-top: 15px;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: #38bdf8;
+    }
+
+    .title {
+      color: #94a3b8;
+      margin-top: 3px;
+      font-size: .95rem;
+    }
+
+    .data-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    .data-card h3 {
+      color: #38bdf8;
+      margin-bottom: 15px;
+      font-size: 1.05rem;
+    }
+
+    .data-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 15px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .data-row:last-child {
+      border-bottom: none;
+    }
+
+    .data-label {
+      color: #94a3b8;
+      font-size: .85rem;
+      flex-shrink: 0;
+    }
+
+    .data-value {
+      color: #fff;
+      font-weight: 700;
+      text-align: left;
+      word-break: break-word;
+    }
+
+    .loading {
+      text-align: center;
+      color: #94a3b8;
+      padding: 40px 10px;
+    }
+
+    .error {
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      color: #f87171;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .logout-btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 13px;
+      background: #ef4444;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      opacity: .9;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 30px);
+      max-width: 450px;
+
+      background: rgba(15,23,42,.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 25px;
+
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+
+      padding: 10px 5px;
+
+      box-shadow: 0 20px 40px rgba(0,0,0,.7);
+
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      text-decoration: none;
+      color: #94a3b8;
+
+      font-size: .7rem;
+      font-weight: 600;
+
+      gap: 3px;
+      width: 20%;
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    .nav-item.active {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- البروفايل الرئيسي -->
+    <div class="profile-card">
+
+      <div class="avatar" id="avatar">
+        👤
+      </div>
+
+      <div class="name" id="profileName">
+        جاري التحميل...
+      </div>
+
+      <div class="title" id="profileTitle">
+        ...
+      </div>
+
+    </div>
+
+    <!-- كل بيانات الخادم -->
+    <div class="data-card">
+
+      <h3>📋 بيانات الخادم</h3>
+
+      <div id="profileData">
+        <div class="loading">
+          جاري تحميل البيانات...
+        </div>
+      </div>
+
+    </div>
+
+    <!-- تسجيل الخروج -->
+    <button
+      class="logout-btn"
+      onclick="logout()"
+    >
+      تسجيل الخروج 🚪
+    </button>
+
+  </div>
+
+  <!-- الشريط السفلي -->
+  <nav class="bottom-nav">
+
+    <a href="home.html" class="nav-item">
+      <span class="nav-icon">🏠</span>
+      <span>الرئيسية</span>
+    </a>
+
+    <a href="profile.html" class="nav-item active">
+      <span class="nav-icon">👤</span>
+      <span>البروفايل</span>
+    </a>
+
+    <a href="control.html" class="nav-item">
+      <span class="nav-icon">⚙️</span>
+      <span>الإدارة</span>
+    </a>
+
+    <a href="store.html" class="nav-item">
+      <span class="nav-icon">🎁</span>
+      <span>المعرض</span>
+    </a>
+
+    <a href="basket.html" class="nav-item">
+      <span class="nav-icon">🛒</span>
+      <span>السلة</span>
+    </a>
+
+  </nav>
+
+  <script>
+
+    /* =========================
+       Firebase
+    ========================= */
+
+    const firebaseConfig = {
+
+      apiKey:
+        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+
+      authDomain:
+        "church-7afe1.firebaseapp.com",
+
+      projectId:
+        "church-7afe1",
+
+      storageBucket:
+        "church-7afe1.firebasestorage.app",
+
+      messagingSenderId:
+        "1072334615357",
+
+      appId:
+        "1:1072334615357:web:c03b199f00ea9d19d40b54",
+
+      measurementId:
+        "G-E7Q76Z53SB"
+    };
+
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+
+    /* =========================
+       تحويل البيانات إلى نص آمن
+    ========================= */
+
+    function escapeHtml(value) {
+
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+
+    }
+
+
+    /* =========================
+       أسماء الحقول
+    ========================= */
+
+    const fieldNames = {
+
+      name: "الاسم",
+
+      fullName: "الاسم الكامل",
+
+      title: "الصفة",
+
+      phone: "رقم الهاتف",
+
+      userPhone: "رقم الهاتف",
+
+      email: "البريد الإلكتروني",
+
+      stage: "المرحلة",
+
+      grade: "الصف",
+
+      role: "الصلاحية",
+
+      photo: "الصورة",
+
+      uid: "معرف الحساب",
+
+      createdAt: "تاريخ إنشاء الحساب",
+
+      updatedAt: "آخر تحديث",
+
+      isBlocked: "حالة الحساب"
+
+    };
+
+
+    /* =========================
+       تنسيق القيم
+    ========================= */
+
+    function formatValue(key, value) {
+
+      if (value === null || value === undefined) {
+        return "غير موجود";
+      }
+
+
+      if (key === "isBlocked") {
+
+        return value === true
+          ? "محظور 🚫"
+          : "نشط ✅";
+
+      }
+
+
+      if (
+        value &&
+        typeof value.toDate === "function"
+      ) {
+
+        const date = value.toDate();
+
+        return date.toLocaleString(
+          "ar-EG",
+          {
+            dateStyle: "medium",
+            timeStyle: "short"
+          }
+        );
+
+      }
+
+
+      if (typeof value === "boolean") {
+        return value ? "نعم" : "لا";
+      }
+
+
+      if (typeof value === "object") {
+        return JSON.stringify(value);
+      }
+
+
+      return String(value);
+
+    }
+
+
+    /* =========================
+       تحميل البروفايل
+    ========================= */
+
+    auth.onAuthStateChanged(async (user) => {
+
+      if (!user) {
+
+        window.location.href = "../admin.html";
+
+        return;
+
+      }
+
+
+      try {
+
+        const doc = await db
+          .collection("admins")
+          .doc(user.uid)
+          .get();
+
+
+        if (!doc.exists) {
+
+          document.getElementById("profileData").innerHTML = `
+            <div class="error">
+              ⚠️ لا توجد بيانات لهذا الخادم في قاعدة البيانات.
+            </div>
+          `;
+
+          document.getElementById("profileName").innerText =
+            user.displayName || "الخادم";
+
+          return;
+
+        }
+
+
+        const data = doc.data();
+
+
+        /* الصورة */
+
+        if (data.photo) {
+
+          document.getElementById("avatar").innerHTML = `
+            <img
+              src="${escapeHtml(data.photo)}"
+              alt="صورة الخادم"
+            >
+          `;
+
+        }
+
+
+        /* الاسم */
+
+        const name =
+          data.name ||
+          data.fullName ||
+          user.displayName ||
+          "الخادم";
+
+
+        document.getElementById("profileName")
+          .innerText = name;
+
+
+        /* الصفة */
+
+        document.getElementById("profileTitle")
+          .innerText =
+            data.title ||
+            data.role ||
+            "خادم";
+
+
+        /* عرض كل البيانات */
+
+        const profileData =
+          document.getElementById("profileData");
+
+        profileData.innerHTML = "";
+
+
+        Object.keys(data).forEach((key) => {
+
+          /* لا نعرض الصورة داخل البيانات */
+          if (key === "photo") {
+            return;
+          }
+
+
+          const row =
+            document.createElement("div");
+
+          row.className = "data-row";
+
+
+          const label =
+            fieldNames[key] || key;
+
+
+          const value =
+            formatValue(key, data[key]);
+
+
+          row.innerHTML = `
+
+            <div class="data-label">
+              ${escapeHtml(label)}
+            </div>
+
+            <div class="data-value">
+              ${escapeHtml(value)}
+            </div>
+
+          `;
+
+
+          profileData.appendChild(row);
+
+        });
+
+
+        /* إضافة UID حتى لو غير موجود في Firestore */
+
+        if (!data.uid) {
+
+          const row =
+            document.createElement("div");
+
+          row.className = "data-row";
+
+          row.innerHTML = `
+
+            <div class="data-label">
+              معرف الحساب
+            </div>
+
+            <div class="data-value">
+              ${escapeHtml(user.uid)}
+            </div>
+
+          `;
+
+          profileData.appendChild(row);
+
+        }
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Profile Error:",
+          error
+        );
+
+
+        document.getElementById("profileData")
+          .innerHTML = `
+
+          <div class="error">
+
+            ⚠️ تعذر تحميل بيانات البروفايل.
+
+            <br><br>
+
+            ${escapeHtml(error.message)}
+
+          </div>
+
+        `;
+
+      }
+
+    });
+
+
+    /* =========================
+       تسجيل الخروج
+    ========================= */
+
+    async function logout() {
+
+      try {
+
+        await auth.signOut();
+
+        window.location.href = "../admin.html";
+
+      }
+
+      catch (error) {
+
+        console.error(error);
+
+        alert(
+          "حدث خطأ أثناء تسجيل الخروج"
+        );
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
