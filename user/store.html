@@ -293,21 +293,17 @@
       }
     });
 
-    // جلب نقاط المخدوم
-    async function loadUserPoints(uid) {
-      try {
-        const doc = await db.collection('servants').doc(uid).get();
+    // جلب نقاط المخدوم المباشرة
+    function loadUserPoints(uid) {
+      db.collection('servants').doc(uid).onSnapshot((doc) => {
         if (doc.exists) {
-          const data = doc.data();
-          currentUserPoints = data.points || 0;
+          currentUserPoints = doc.data().points || 0;
           document.getElementById('userPoints').innerText = currentUserPoints;
         }
-      } catch (err) {
-        console.error("Error loading points:", err);
-      }
+      });
     }
 
-    // جلب الهدايا المضافة من مجموعة 'gifts' الخاصة بالخادم
+    // جلب الهدايا المضافة من مجموعة 'gifts'
     function loadGifts() {
       const giftsContainer = document.getElementById('giftsContainer');
 
@@ -351,36 +347,37 @@
       });
     }
 
-    // إضافة الهدية للسلة
+    // إضافة الهدية للسلة وتقليل الكمية المتاحة في قاعدة البيانات
     async function addToBasket(giftId, name, points, quantity, image) {
       if (!currentUser) return;
 
-      // التحقق من كفاية النقاط أولاً
+      // 1. التحقق من النقاط
       if (currentUserPoints < points) {
         alert("النقاط غير كافية ❌");
         return;
       }
 
+      // 2. التحقق من وجود كمية
+      if (quantity <= 0) {
+        alert("عذراً، نفدت الكمية! ❌");
+        return;
+      }
+
       try {
         const basketRef = db.collection('servants').doc(currentUser.uid).collection('basket').doc(giftId);
+        const giftRef = db.collection('gifts').doc(giftId);
         const doc = await basketRef.get();
 
         if (doc.exists) {
           const currentCount = doc.data().count || 1;
           const totalPointsNeeded = (currentCount + 1) * points;
 
-          // التحقق من النقاط في حال زيادة الكمية
           if (currentUserPoints < totalPointsNeeded) {
             alert("النقاط غير كافية لزيادة الكمية ❌");
             return;
           }
 
-          if (currentCount < quantity) {
-            await basketRef.update({ count: currentCount + 1 });
-            alert("تمت زيادة الكمية في السلة! 🛒");
-          } else {
-            alert("لقد وصلت للحد الأقصى المتاح من هذه الهدية!");
-          }
+          await basketRef.update({ count: currentCount + 1 });
         } else {
           await basketRef.set({
             giftId: giftId,
@@ -390,8 +387,15 @@
             count: 1,
             addedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
-          alert("تمت الإضافة إلى السلة بنجاح! ✨");
         }
+
+        // 3. تقليل الكمية المتاحة بمقدار 1 فوراً
+        await giftRef.update({
+          quantity: firebase.firestore.FieldValue.increment(-1)
+        });
+
+        alert("تمت الإضافة إلى السلة بنجاح! 🛒✨");
+
       } catch (err) {
         console.error("Error adding to basket:", err);
         alert("حدث خطأ أثناء الإضافة للسلة");
