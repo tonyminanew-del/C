@@ -2,17 +2,10 @@
 <html lang="ar" dir="rtl">
 
 <head>
-
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>
-    لوحة الإدارة - التحكم بالمخدومين
-  </title>
+  <title>لوحة الإدارة - الخادم</title>
 
   <link
     href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
@@ -21,526 +14,649 @@
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-
   <style>
-
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Cairo', sans-serif;
+      font-family: "Cairo", sans-serif;
     }
-
 
     body {
-
-      background-color: #0b0f19;
-
+      background: #0b0f19;
       color: #fff;
-
       min-height: 100vh;
-
       padding: 20px;
-
-      display: flex;
-
-      justify-content: center;
-
     }
 
-
-    .admin-container {
-
+    .container {
       width: 100%;
-
-      max-width: 600px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 20px;
-
+      max-width: 650px;
+      margin: auto;
     }
 
-
-    .header-card {
-
-      background:
-        rgba(255,255,255,.05);
-
-      border:
-        1px solid rgba(255,255,255,.1);
-
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 20px;
-
       padding: 20px;
-
-      backdrop-filter:
-        blur(10px);
-
+      margin-bottom: 18px;
+      backdrop-filter: blur(12px);
     }
 
-
-    .header-card h2 {
-
-      color: #38bdf8;
-
-      font-size: 1.5rem;
-
+    h1,
+    h2 {
       text-align: center;
-
+      color: #38bdf8;
       margin-bottom: 10px;
-
     }
 
+    .admin-info {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
 
     .form-group {
-
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 8px;
-
       margin-bottom: 15px;
-
     }
-
 
     label {
-
-      font-size: .9rem;
-
-      color: #94a3b8;
-
+      display: block;
+      color: #cbd5e1;
+      font-size: 0.9rem;
+      margin-bottom: 7px;
+      font-weight: 600;
     }
-
 
     select,
     input {
-
       width: 100%;
-
       padding: 12px;
-
-      background:
-        rgba(15,23,42,.8);
-
-      border:
-        1px solid rgba(255,255,255,.15);
-
       border-radius: 12px;
-
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: #0f172a;
       color: #fff;
-
-      font-size: 1rem;
-
       outline: none;
-
+      font-size: 1rem;
     }
 
+    select:focus,
+    input:focus {
+      border-color: #38bdf8;
+    }
 
     select option {
-
       background: #0f172a;
-
       color: #fff;
-
     }
 
+    .password-box {
+      display: none;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 15px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .password-box.show {
+      display: block;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .main-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #fff;
+      font-weight: 800;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    .main-btn:hover {
+      opacity: 0.9;
+    }
+
+    .logout-btn {
+      background: #ef4444;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-weight: 700;
+      display: block;
+      margin: 12px auto 0;
+    }
 
     .search-box {
-
       display: flex;
-
       gap: 8px;
-
     }
 
-
-    .btn-main {
-
-      background:
-        linear-gradient(
-          135deg,
-          #38bdf8,
-          #0284c7
-        );
-
-      color: #fff;
-
-      border: none;
-
-      padding: 12px;
-
-      border-radius: 12px;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      transition: .3s;
-
-      white-space: nowrap;
-
+    .search-box input {
+      flex: 1;
     }
-
-
-    .btn-main:hover {
-
-      opacity: .9;
-
-      transform:
-        translateY(-1px);
-
-    }
-
-
-    .lock-box {
-
-      background:
-        rgba(239,68,68,.1);
-
-      border:
-        1px solid rgba(239,68,68,.3);
-
-      padding: 15px;
-
-      border-radius: 15px;
-
-      margin-top: 10px;
-
-    }
-
 
     .servants-list {
-
       display: flex;
-
       flex-direction: column;
-
       gap: 12px;
-
     }
 
-
     .servant-card {
-
-      background:
-        rgba(255,255,255,.03);
-
-      border:
-        1px solid rgba(255,255,255,.1);
-
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 16px;
-
       padding: 15px;
 
       display: flex;
-
       justify-content: space-between;
-
       align-items: center;
 
       cursor: pointer;
-
-      transition: .3s;
-
+      transition: 0.25s;
     }
-
 
     .servant-card:hover {
-
-      border-color:
-        #38bdf8;
-
-      background:
-        rgba(56,189,248,.05);
-
+      border-color: #38bdf8;
+      transform: translateY(-2px);
     }
-
 
     .servant-card.blocked {
-
-      border-color:
-        #ef4444;
-
-      background:
-        rgba(239,68,68,.05);
-
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.06);
     }
 
+    .servant-name {
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
 
-    .badge-blocked {
+    .servant-phone {
+      color: #94a3b8;
+      font-size: 0.8rem;
+    }
 
-      background:
-        #ef4444;
+    .points {
+      color: #38bdf8;
+      font-weight: 900;
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
 
+    .blocked-badge {
+      display: inline-block;
+      background: #ef4444;
       color: #fff;
-
-      font-size: .75rem;
-
-      padding: 2px 8px;
-
+      font-size: 0.7rem;
+      padding: 2px 7px;
       border-radius: 6px;
-
       margin-right: 5px;
-
     }
 
+    .message {
+      text-align: center;
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      display: none;
+      font-weight: 700;
+    }
 
-    .modal-overlay {
+    .message.show {
+      display: block;
+    }
 
+    .message.error {
+      background: rgba(239, 68, 68, 0.1);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+    }
+
+    .message.success {
+      background: rgba(34, 197, 94, 0.1);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.25);
+    }
+
+    .message.info {
+      background: rgba(56, 189, 248, 0.1);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    /* Modal */
+
+    .modal {
       position: fixed;
+      inset: 0;
 
-      top: 0;
-
-      left: 0;
-
-      width: 100%;
-
-      height: 100%;
-
-      background:
-        rgba(0,0,0,.8);
+      background: rgba(0, 0, 0, 0.8);
 
       display: none;
-
       justify-content: center;
-
       align-items: center;
 
       padding: 20px;
 
       z-index: 1000;
-
     }
 
+    .modal.show {
+      display: flex;
+    }
 
     .modal-content {
+      width: 100%;
+      max-width: 450px;
+
+      max-height: 90vh;
+      overflow-y: auto;
 
       background: #0f172a;
 
-      border:
-        1px solid rgba(255,255,255,.2);
+      border: 1px solid rgba(255, 255, 255, 0.15);
 
       border-radius: 20px;
-
-      width: 100%;
-
-      max-width: 450px;
 
       padding: 20px;
 
       position: relative;
-
-      max-height: 90vh;
-
-      overflow-y: auto;
-
     }
 
-
     .close-btn {
-
       position: absolute;
+      top: 10px;
+      left: 12px;
 
-      top: 15px;
-
-      left: 15px;
-
-      background: none;
-
-      border: none;
-
+      background: transparent;
       color: #94a3b8;
 
       font-size: 1.5rem;
-
-      cursor: pointer;
-
     }
 
+    .modal-title {
+      color: #38bdf8;
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
 
     .points-control {
-
       display: flex;
-
       align-items: center;
-
-      gap: 8px;
-
+      gap: 7px;
     }
 
+    .points-control input {
+      text-align: center;
+      font-weight: 900;
+    }
 
-    .btn-qty {
+    .point-btn {
+      width: 42px;
+      height: 42px;
 
-      background:
-        #38bdf8;
+      border-radius: 10px;
 
+      background: #38bdf8;
       color: #000;
 
-      border: none;
-
-      width: 40px;
-
-      height: 40px;
-
-      border-radius: 10px;
-
-      font-size: 1rem;
-
-      font-weight: bold;
-
-      cursor: pointer;
-
+      font-weight: 900;
+      font-size: 0.9rem;
     }
 
-
-    .btn-block {
-
-      background:
-        #ef4444;
-
-      color: #fff;
-
-      border: none;
-
-      padding: 10px;
-
-      border-radius: 10px;
-
-      font-weight: bold;
-
-      cursor: pointer;
-
+    .save-btn {
       width: 100%;
-
       margin-top: 10px;
 
+      padding: 12px;
+
+      border-radius: 12px;
+
+      background: #38bdf8;
+      color: #000;
+
+      font-weight: 900;
     }
 
-
-    .btn-unblock {
-
-      background:
-        #22c55e;
-
-      color: #fff;
-
-      border: none;
-
-      padding: 10px;
-
-      border-radius: 10px;
-
-      font-weight: bold;
-
-      cursor: pointer;
-
+    .block-btn,
+    .unblock-btn {
       width: 100%;
-
       margin-top: 10px;
 
+      padding: 12px;
+
+      border-radius: 12px;
+
+      color: #fff;
+      font-weight: 900;
     }
 
-
-    .hidden {
-
-      display: none !important;
-
+    .block-btn {
+      background: #ef4444;
     }
 
+    .unblock-btn {
+      background: #22c55e;
+    }
+
+    .loading {
+      text-align: center;
+      color: #94a3b8;
+      padding: 30px;
+    }
+
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      padding: 30px;
+    }
+
+    @media (max-width: 450px) {
+      .search-box {
+        flex-direction: column;
+      }
+
+      .servant-card {
+        padding: 12px;
+      }
+
+      .points-control {
+        gap: 4px;
+      }
+
+      .point-btn {
+        width: 38px;
+      }
+    }
   </style>
-
 </head>
-
 
 <body>
 
+<div class="container">
 
-  <div class="admin-container">
+  <!-- Header -->
+
+  <div class="card">
+
+    <h1>⚙️ لوحة الإدارة</h1>
+
+    <div
+      id="adminInfo"
+      class="admin-info"
+    >
+      جاري التحقق من حساب الخادم...
+    </div>
+
+    <button
+      class="logout-btn"
+      onclick="logout()"
+    >
+      تسجيل الخروج
+    </button>
+
+  </div>
 
 
-    <!-- العنوان -->
+  <!-- الرسائل -->
 
-    <div class="header-card">
+  <div
+    id="message"
+    class="message"
+  ></div>
 
-      <h2>
-        ⚙️ لوحة إدارة المخدومين
-      </h2>
+
+  <!-- اختيار المرحلة -->
+
+  <div class="card">
+
+    <div class="form-group">
+
+      <label>
+        اختر المرحلة الدراسية:
+      </label>
+
+      <select
+        id="stageSelect"
+        onchange="stageChanged()"
+      >
+
+        <option value="">
+          -- اختر المرحلة --
+        </option>
+
+        <option value="primary">
+          ابتدائي
+        </option>
+
+        <option value="prep">
+          إعدادي
+        </option>
+
+        <option value="sec">
+          ثانوي
+        </option>
+
+      </select>
 
     </div>
 
 
-    <!-- اختيار المرحلة -->
+    <!-- كلمة السر -->
 
-    <div class="header-card">
+    <div
+      id="passwordBox"
+      class="password-box"
+    >
 
       <div class="form-group">
 
         <label>
-          اختر المرحلة الدراسية:
+          🔒 كلمة سر المرحلة
         </label>
 
-        <select
-          id="stageSelect"
-          onchange="resetLock()"
+        <input
+          type="password"
+          id="stagePassword"
+          placeholder="أدخل كلمة السر"
+          onkeydown="passwordEnter(event)"
         >
-
-          <option value="">
-            -- اختر المرحلة --
-          </option>
-
-          <option value="primary">
-            ابتدائي
-          </option>
-
-          <option value="prep">
-            إعدادي
-          </option>
-
-          <option value="sec">
-            ثانوي
-          </option>
-
-        </select>
 
       </div>
 
+      <button
+        class="main-btn"
+        onclick="verifyStage()"
+      >
+        فتح المرحلة 🔓
+      </button>
 
-      <!-- كلمة السر -->
+    </div>
 
-      <div
-        id="lockBox"
-        class="lock-box hidden"
+  </div>
+
+
+  <!-- البحث -->
+
+  <div
+    id="controlPanel"
+    class="card"
+    style="display:none;"
+  >
+
+    <div class="form-group">
+
+      <label>
+        اختر الصف:
+      </label>
+
+      <select
+        id="gradeSelect"
+        onchange="loadServants()"
       >
 
-        <div class="form-group">
+        <option value="">
+          -- اختر الصف --
+        </option>
 
-          <label>
-            🔒 أدخل كلمة سر المرحلة:
-          </label>
+      </select>
 
-          <input
-            type="password"
-            id="stagePassword"
-            placeholder="كلمة السر"
-          >
+    </div>
 
-        </div>
 
+    <div class="form-group">
+
+      <label>
+        🔍 البحث عن مخدوم
+      </label>
+
+      <div class="search-box">
+
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="اكتب الاسم..."
+          oninput="searchServants()"
+        >
 
         <button
-          class="btn-main"
-          style="width:100%;"
-          onclick="verifyPassword()"
+          class="main-btn"
+          style="width:auto;"
+          onclick="searchServants()"
         >
-          فتح القفل 🔓
+          بحث
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- القائمة -->
+
+  <div
+    id="servantsList"
+    class="servants-list"
+  ></div>
+
+</div>
+
+
+<!-- Modal -->
+
+<div
+  id="editModal"
+  class="modal"
+>
+
+  <div class="modal-content">
+
+    <button
+      class="close-btn"
+      onclick="closeModal()"
+    >
+      ✕
+    </button>
+
+
+    <h2 class="modal-title">
+      تعديل بيانات المخدوم
+    </h2>
+
+
+    <input
+      type="hidden"
+      id="editUserId"
+    >
+
+
+    <!-- الاسم -->
+
+    <div class="form-group">
+
+      <label>
+        الاسم بالكامل
+      </label>
+
+      <input
+        type="text"
+        id="editName"
+      >
+
+    </div>
+
+
+    <!-- الهاتف -->
+
+    <div class="form-group">
+
+      <label>
+        رقم التليفون الشخصي
+      </label>
+
+      <input
+        type="tel"
+        id="editPhone"
+      >
+
+    </div>
+
+
+    <!-- النقاط -->
+
+    <div class="form-group">
+
+      <label>
+        النقاط
+      </label>
+
+      <div class="points-control">
+
+        <button
+          class="point-btn"
+          onclick="changePoints(-5)"
+        >
+          -5
+        </button>
+
+        <button
+          class="point-btn"
+          onclick="changePoints(-1)"
+        >
+          -1
+        </button>
+
+        <input
+          type="number"
+          id="editPoints"
+          min="0"
+        >
+
+        <button
+          class="point-btn"
+          onclick="changePoints(1)"
+        >
+          +1
+        </button>
+
+        <button
+          class="point-btn"
+          onclick="changePoints(5)"
+        >
+          +5
         </button>
 
       </div>
@@ -548,701 +664,608 @@
     </div>
 
 
-    <!-- البحث -->
+    <!-- حفظ -->
 
-    <div
-      id="unlockedSection"
-      class="header-card hidden"
+    <button
+      class="save-btn"
+      onclick="saveServant()"
     >
-
-      <div class="form-group">
-
-        <label>
-          اختر الصف الدراسي:
-        </label>
-
-        <select
-          id="gradeSelect"
-          onchange="fetchServants()"
-        >
-        </select>
-
-      </div>
+      حفظ التعديلات 💾
+    </button>
 
 
-      <div class="form-group">
+    <!-- الحظر -->
 
-        <label>
-          🔍 البحث عن مخدوم:
-        </label>
-
-        <div class="search-box">
-
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="اكتب اسم المخدوم..."
-            oninput="executeSearch()"
-          >
-
-          <button
-            class="btn-main"
-            onclick="executeSearch()"
-          >
-            بحث 🔍
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- القائمة -->
-
-    <div
-      id="servantsList"
-      class="servants-list"
-    >
-    </div>
+    <div id="blockContainer"></div>
 
   </div>
 
-
-  <!-- Modal -->
-
-  <div
-    id="editModal"
-    class="modal-overlay"
-  >
-
-    <div class="modal-content">
-
-      <button
-        class="close-btn"
-        onclick="closeModal()"
-      >
-        ✕
-      </button>
+</div>
 
 
-      <h3
-        style="
-          margin-bottom:15px;
-          color:#38bdf8;
-        "
-      >
-        تعديل بيانات المخدوم
-      </h3>
+<script>
+
+  /* =====================================
+     Firebase Configuration
+  ===================================== */
+
+  const firebaseConfig = {
+
+    apiKey:
+      "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+
+    authDomain:
+      "church-7afe1.firebaseapp.com",
+
+    projectId:
+      "church-7afe1",
+
+    storageBucket:
+      "church-7afe1.firebasestorage.app",
+
+    messagingSenderId:
+      "1072334615357",
+
+    appId:
+      "1:1072334615357:web:c03b199f00ea9d19d40b54",
+
+    measurementId:
+      "G-E7Q76Z53SB"
+
+  };
 
 
-      <input
-        type="hidden"
-        id="editUserId"
-      >
+  if (!firebase.apps.length) {
+
+    firebase.initializeApp(firebaseConfig);
+
+  }
 
 
-      <!-- الاسم -->
+  /* =====================================
+     Firebase Services
+  ===================================== */
 
-      <div class="form-group">
+  const auth = firebase.auth();
 
-        <label>
-          الاسم الكامل:
-        </label>
-
-        <input
-          type="text"
-          id="editName"
-        >
-
-      </div>
+  const db = firebase.firestore();
 
 
-      <!-- الهاتف -->
+  /* =====================================
+     Stage Passwords
+  ===================================== */
 
-      <div class="form-group">
+  const stagePasswords = {
 
-        <label>
-          رقم الهاتف:
-        </label>
+    primary: "344",
 
-        <input
-          type="text"
-          id="editPhone"
-        >
+    prep: "455",
 
-      </div>
+    sec: "899"
 
-
-      <!-- النقاط -->
-
-      <div class="form-group">
-
-        <label>
-          النقاط الحالية:
-        </label>
-
-        <div class="points-control">
-
-          <button
-            class="btn-qty"
-            onclick="changePoints(-5)"
-          >
-            -5
-          </button>
-
-          <button
-            class="btn-qty"
-            onclick="changePoints(-1)"
-          >
-            -1
-          </button>
-
-          <input
-            type="number"
-            id="editPoints"
-            style="
-              text-align:center;
-              font-weight:bold;
-              font-size:1.2rem;
-            "
-          >
-
-          <button
-            class="btn-qty"
-            onclick="changePoints(1)"
-          >
-            +1
-          </button>
-
-          <button
-            class="btn-qty"
-            onclick="changePoints(5)"
-          >
-            +5
-          </button>
-
-        </div>
-
-      </div>
+  };
 
 
-      <!-- حفظ -->
+  /* =====================================
+     Grades
+  ===================================== */
 
-      <button
-        class="btn-main"
-        style="
-          width:100%;
-          margin-top:15px;
-        "
-        onclick="saveServantData()"
-      >
-        حفظ التعديلات 💾
-      </button>
+  const stageGrades = {
 
+    primary: [
 
-      <!-- حظر -->
+      "الصف الأول الابتدائي",
+      "الصف الثاني الابتدائي",
+      "الصف الثالث الابتدائي",
+      "الصف الرابع الابتدائي",
+      "الصف الخامس الابتدائي",
+      "الصف السادس الابتدائي"
 
-      <div id="blockBtnContainer">
-      </div>
+    ],
 
-    </div>
+    prep: [
 
-  </div>
+      "الصف الأول الإعدادي",
+      "الصف الثاني الإعدادي",
+      "الصف الثالث الإعدادي"
 
+    ],
 
-  <script>
+    sec: [
 
+      "الصف الأول الثانوي",
+      "الصف الثاني الثانوي",
+      "الصف الثالث الثانوي"
 
-    /* =========================
-       Firebase
-    ========================= */
+    ]
 
-    const firebaseConfig = {
-
-      apiKey:
-        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-
-      authDomain:
-        "church-7afe1.firebaseapp.com",
-
-      projectId:
-        "church-7afe1",
-
-      storageBucket:
-        "church-7afe1.firebasestorage.app",
-
-      messagingSenderId:
-        "1072334615357",
-
-      appId:
-        "1:1072334615357:web:c03b199f00ea9d19d40b54",
-
-      measurementId:
-        "G-E7Q76Z53SB"
-
-    };
+  };
 
 
-    if (!firebase.apps.length) {
+  /* =====================================
+     Variables
+  ===================================== */
 
-      firebase.initializeApp(
-        firebaseConfig
+  let currentAdmin = null;
+
+  let selectedStage = "";
+
+  let servants = [];
+
+  let unsubscribe = null;
+
+
+  /* =====================================
+     Authentication
+  ===================================== */
+
+  auth.onAuthStateChanged((user) => {
+
+    if (!user) {
+
+      document.getElementById(
+        "adminInfo"
+      ).innerText =
+        "غير مسجل الدخول.";
+
+      showMessage(
+        "يجب تسجيل الدخول بحساب الخادم أولاً.",
+        "error"
+      );
+
+      setTimeout(() => {
+
+        window.location.href =
+          "user.html";
+
+      }, 1500);
+
+      return;
+
+    }
+
+
+    currentAdmin = user;
+
+
+    document.getElementById(
+      "adminInfo"
+    ).innerText =
+      "تم تسجيل الدخول: " +
+      (
+        user.email ||
+        "حساب الخادم"
+      );
+
+  });
+
+
+  /* =====================================
+     Stage Changed
+  ===================================== */
+
+  function stageChanged() {
+
+    const stage =
+      document.getElementById(
+        "stageSelect"
+      ).value;
+
+
+    selectedStage = stage;
+
+
+    stopListener();
+
+
+    document.getElementById(
+      "servantsList"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+      "searchInput"
+    ).value = "";
+
+
+    document.getElementById(
+      "controlPanel"
+    ).style.display = "none";
+
+
+    const passwordBox =
+      document.getElementById(
+        "passwordBox"
+      );
+
+
+    if (!stage) {
+
+      passwordBox.classList.remove(
+        "show"
+      );
+
+      return;
+
+    }
+
+
+    passwordBox.classList.add(
+      "show"
+    );
+
+
+    document.getElementById(
+      "stagePassword"
+    ).value = "";
+
+  }
+
+
+  /* =====================================
+     Enter Password
+  ===================================== */
+
+  function passwordEnter(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      verifyStage();
+
+    }
+
+  }
+
+
+  /* =====================================
+     Verify Stage
+  ===================================== */
+
+  function verifyStage() {
+
+    if (!currentAdmin) {
+
+      showMessage(
+        "حساب الخادم غير مسجل الدخول.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const password =
+      document.getElementById(
+        "stagePassword"
+      ).value;
+
+
+    if (
+      stagePasswords[selectedStage] ===
+      password
+    ) {
+
+      document.getElementById(
+        "passwordBox"
+      ).classList.remove(
+        "show"
+      );
+
+
+      document.getElementById(
+        "controlPanel"
+      ).style.display =
+        "block";
+
+
+      populateGrades(
+        selectedStage
+      );
+
+
+      showMessage(
+        "تم فتح المرحلة بنجاح 🔓",
+        "success"
       );
 
     }
 
+    else {
 
-    const db =
-      firebase.firestore();
-
-
-    /* =========================
-       كلمات السر
-    ========================= */
-
-    const stagePasswords = {
-
-      primary: "344",
-
-      prep: "455",
-
-      sec: "899"
-
-    };
-
-
-    /* =========================
-       الصفوف
-    ========================= */
-
-    const stageGrades = {
-
-      primary: [
-
-        "الصف الأول الابتدائي",
-
-        "الصف الثاني الابتدائي",
-
-        "الصف الثالث الابتدائي",
-
-        "الصف الرابع الابتدائي",
-
-        "الصف الخامس الابتدائي",
-
-        "الصف السادس الابتدائي"
-
-      ],
-
-
-      prep: [
-
-        "الصف الأول الإعدادي",
-
-        "الصف الثاني الإعدادي",
-
-        "الصف الثالث الإعدادي"
-
-      ],
-
-
-      sec: [
-
-        "الصف الأول الثانوي",
-
-        "الصف الثاني الثانوي",
-
-        "الصف الثالث الثانوي"
-
-      ]
-
-    };
-
-
-    let allServantsData = [];
-
-    let unsubscribeListener = null;
-
-
-    /* =========================
-       إعادة القفل
-    ========================= */
-
-    function resetLock() {
-
-      if (unsubscribeListener) {
-
-        unsubscribeListener();
-
-        unsubscribeListener = null;
-
-      }
-
-
-      const stage =
-        document
-          .getElementById("stageSelect")
-          .value;
-
-
-      const lockBox =
-        document.getElementById("lockBox");
-
-
-      const unlockedSection =
-        document.getElementById(
-          "unlockedSection"
-        );
-
-
-      document
-        .getElementById("servantsList")
-        .innerHTML = "";
-
-
-      document
-        .getElementById("searchInput")
-        .value = "";
-
-
-      if (stage) {
-
-        lockBox
-          .classList
-          .remove("hidden");
-
-        unlockedSection
-          .classList
-          .add("hidden");
-
-        document
-          .getElementById(
-            "stagePassword"
-          )
-          .value = "";
-
-      }
-
-      else {
-
-        lockBox
-          .classList
-          .add("hidden");
-
-        unlockedSection
-          .classList
-          .add("hidden");
-
-      }
+      showMessage(
+        "كلمة السر غير صحيحة ❌",
+        "error"
+      );
 
     }
 
-
-    /* =========================
-       التحقق من كلمة السر
-    ========================= */
-
-    function verifyPassword() {
-
-      const stage =
-        document
-          .getElementById(
-            "stageSelect"
-          )
-          .value;
+  }
 
 
-      const password =
-        document
-          .getElementById(
-            "stagePassword"
-          )
-          .value;
+  /* =====================================
+     Populate Grades
+  ===================================== */
+
+  function populateGrades(stage) {
+
+    const select =
+      document.getElementById(
+        "gradeSelect"
+      );
 
 
-      if (
-        stagePasswords[stage] ===
-        password
-      ) {
-
-        alert(
-          "تم فتح القفل بنجاح! 🔓"
-        );
+    select.innerHTML =
+      `
+      <option value="">
+        -- اختر الصف --
+      </option>
+      `;
 
 
-        document
-          .getElementById("lockBox")
-          .classList
-          .add("hidden");
+    stageGrades[stage].forEach(
+      (grade) => {
 
-
-        document
-          .getElementById(
-            "unlockedSection"
-          )
-          .classList
-          .remove("hidden");
-
-
-        populateGrades(stage);
-
-      }
-
-      else {
-
-        alert(
-          "كلمة السر خاطئة! ❌"
-        );
-
-      }
-
-    }
-
-
-    /* =========================
-       إضافة الصفوف
-    ========================= */
-
-    function populateGrades(stage) {
-
-      const gradeSelect =
-        document
-          .getElementById(
-            "gradeSelect"
+        const option =
+          document.createElement(
+            "option"
           );
 
 
-      gradeSelect.innerHTML =
-        `
-        <option value="">
-          -- اختر الصف --
-        </option>
-        `;
+        option.value =
+          grade;
 
 
-      stageGrades[stage]
-        .forEach((grade) => {
+        option.textContent =
+          grade;
 
-          const option =
-            document.createElement(
-              "option"
+
+        select.appendChild(
+          option
+        );
+
+      }
+    );
+
+  }
+
+
+  /* =====================================
+     Load Servants
+  ===================================== */
+
+  function loadServants() {
+
+    const stage =
+      document.getElementById(
+        "stageSelect"
+      ).value;
+
+
+    const grade =
+      document.getElementById(
+        "gradeSelect"
+      ).value;
+
+
+    const list =
+      document.getElementById(
+        "servantsList"
+      );
+
+
+    stopListener();
+
+
+    if (!stage || !grade) {
+
+      list.innerHTML = "";
+
+      return;
+
+    }
+
+
+    list.innerHTML =
+      `
+      <div class="loading">
+        جاري تحميل المخدومين...
+      </div>
+      `;
+
+
+    /*
+      مهم:
+      الاستعلام مطابق تمامًا
+      لبيانات user.html
+    */
+
+    unsubscribe =
+      db
+        .collection("servants")
+        .where(
+          "stage",
+          "==",
+          stage
+        )
+        .where(
+          "grade",
+          "==",
+          grade
+        )
+        .onSnapshot(
+
+          (snapshot) => {
+
+            servants = [];
+
+
+            snapshot.forEach(
+              (doc) => {
+
+                servants.push({
+
+                  id: doc.id,
+
+                  ...doc.data()
+
+                });
+
+              }
             );
 
-          option.value =
-            grade;
 
-          option.textContent =
-            grade;
+            searchServants();
 
-          gradeSelect
-            .appendChild(option);
+          },
 
-        });
+          (error) => {
+
+            console.error(
+              "Firestore Error:",
+              error
+            );
+
+
+            list.innerHTML =
+              `
+              <div class="empty">
+
+                ⚠️ تعذر جلب البيانات.
+
+                <br><br>
+
+                <small>
+                  ${escapeHTML(error.message)}
+                </small>
+
+              </div>
+              `;
+
+          }
+
+        );
+
+  }
+
+
+  /* =====================================
+     Stop Listener
+  ===================================== */
+
+  function stopListener() {
+
+    if (unsubscribe) {
+
+      unsubscribe();
+
+      unsubscribe = null;
+
+    }
+
+  }
+
+
+  /* =====================================
+     Search
+  ===================================== */
+
+  function searchServants() {
+
+    const query =
+      document.getElementById(
+        "searchInput"
+      ).value
+        .trim()
+        .toLowerCase();
+
+
+    if (!query) {
+
+      renderServants(
+        servants
+      );
+
+      return;
 
     }
 
 
-    /* =========================
-       جلب المخدومين
-    ========================= */
+    const filtered =
+      servants.filter(
+        (servant) => {
 
-    function fetchServants() {
-
-      const stage =
-        document
-          .getElementById(
-            "stageSelect"
-          )
-          .value;
+          const name =
+            (
+              servant.fullName ||
+              ""
+            )
+            .toLowerCase();
 
 
-      const grade =
-        document
-          .getElementById(
-            "gradeSelect"
-          )
-          .value;
-
-
-      const listContainer =
-        document
-          .getElementById(
-            "servantsList"
+          return name.includes(
+            query
           );
 
-
-      if (unsubscribeListener) {
-
-        unsubscribeListener();
-
-        unsubscribeListener = null;
-
-      }
+        }
+      );
 
 
-      if (!stage || !grade) {
+    renderServants(
+      filtered
+    );
 
-        listContainer.innerHTML = "";
-
-        return;
-
-      }
+  }
 
 
-      listContainer.innerHTML =
+  /* =====================================
+     Render Servants
+  ===================================== */
+
+  function renderServants(list) {
+
+    const container =
+      document.getElementById(
+        "servantsList"
+      );
+
+
+    container.innerHTML = "";
+
+
+    if (list.length === 0) {
+
+      container.innerHTML =
         `
-        <div
-          style="
-            text-align:center;
-            color:#94a3b8;
-          "
-        >
-          جاري تحميل الأسماء...
+        <div class="empty">
+          لا يوجد مخدومين في هذا الصف.
         </div>
         `;
 
-
-      unsubscribeListener =
-        db
-          .collection("servants")
-          .where(
-            "stage",
-            "==",
-            stage
-          )
-          .where(
-            "grade",
-            "==",
-            grade
-          )
-          .onSnapshot(
-
-            (snapshot) => {
-
-              allServantsData = [];
-
-
-              if (snapshot.empty) {
-
-                listContainer.innerHTML =
-                  `
-                  <div
-                    style="
-                      text-align:center;
-                      color:#94a3b8;
-                    "
-                  >
-                    لا يوجد مخدومين في هذا الصف
-                  </div>
-                  `;
-
-                return;
-
-              }
-
-
-              snapshot.forEach(
-                (doc) => {
-
-                  const data =
-                    doc.data();
-
-                  data.id =
-                    doc.id;
-
-                  allServantsData
-                    .push(data);
-
-                }
-              );
-
-
-              executeSearch();
-
-            },
-
-
-            (error) => {
-
-              console.error(
-                "Firestore Error:",
-                error
-              );
-
-
-              listContainer.innerHTML =
-                `
-                <div
-                  style="
-                    text-align:center;
-                    color:#ef4444;
-                    padding:15px;
-                  "
-                >
-                  ⚠️ تعذر جلب البيانات.
-                  <br>
-                  تأكد من صلاحيات Firestore.
-                </div>
-                `;
-
-            }
-
-          );
+      return;
 
     }
 
 
-    /* =========================
-       عرض القائمة
-    ========================= */
+    list.forEach(
+      (servant) => {
 
-    function renderServantsList(list) {
-
-      const listContainer =
-        document
-          .getElementById(
-            "servantsList"
-          );
-
-
-      listContainer.innerHTML = "";
-
-
-      if (list.length === 0) {
-
-        listContainer.innerHTML =
-          `
-          <div
-            style="
-              text-align:center;
-              color:#94a3b8;
-            "
-          >
-            لم يتم العثور على أي نتائج
-          </div>
-          `;
-
-        return;
-
-      }
-
-
-      list.forEach((data) => {
-
-        const servantName =
-          data.fullName ||
+        const name =
+          servant.fullName ||
           "بدون اسم";
 
 
-        const servantPhone =
-          data.userPhone ||
+        const phone =
+          servant.userPhone ||
           "لا يوجد رقم";
 
 
         const points =
-          Number(data.points) ||
-          0;
+          Number(
+            servant.points
+          ) || 0;
 
 
         const card =
@@ -1254,473 +1277,447 @@
         card.className =
           "servant-card" +
           (
-            data.isBlocked
+            servant.isBlocked
               ? " blocked"
               : ""
           );
 
 
         card.onclick =
-          () => openModal(data);
+          () => openModal(
+            servant
+          );
 
 
         card.innerHTML =
           `
           <div>
 
-            <strong>
-              ${escapeHtml(servantName)}
-            </strong>
+            <div class="servant-name">
 
-            ${
-              data.isBlocked
-                ? `
-                  <span class="badge-blocked">
-                    محظور
-                  </span>
-                `
-                : ""
-            }
+              ${escapeHTML(name)}
 
-            <div
-              style="
-                font-size:.8rem;
-                color:#94a3b8;
-              "
-            >
-              📞
-              ${escapeHtml(servantPhone)}
+              ${
+                servant.isBlocked
+                  ? `
+                    <span class="blocked-badge">
+                      محظور
+                    </span>
+                    `
+                  : ""
+              }
+
+            </div>
+
+            <div class="servant-phone">
+              📞 ${escapeHTML(phone)}
             </div>
 
           </div>
 
-
-          <div
-            style="
-              font-weight:bold;
-              color:#38bdf8;
-            "
-          >
+          <div class="points">
             ⭐ ${points}
           </div>
           `;
 
 
-        listContainer
-          .appendChild(card);
-
-      });
-
-    }
-
-
-    /* =========================
-       حماية عرض النص
-    ========================= */
-
-    function escapeHtml(value) {
-
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-    }
-
-
-    /* =========================
-       البحث
-    ========================= */
-
-    function executeSearch() {
-
-      const query =
-        document
-          .getElementById(
-            "searchInput"
-          )
-          .value
-          .trim()
-          .toLowerCase();
-
-
-      if (!query) {
-
-        renderServantsList(
-          allServantsData
+        container.appendChild(
+          card
         );
-
-        return;
 
       }
+    );
+
+  }
 
 
-      const filtered =
-        allServantsData.filter(
-          (servant) => {
+  /* =====================================
+     Open Modal
+  ===================================== */
 
-            const name =
-              (
-                servant.fullName ||
-                ""
-              )
-              .toLowerCase();
+  function openModal(servant) {
 
-
-            return name.includes(
-              query
-            );
-
-          }
-        );
+    document.getElementById(
+      "editUserId"
+    ).value =
+      servant.id;
 
 
-      renderServantsList(
-        filtered
+    document.getElementById(
+      "editName"
+    ).value =
+      servant.fullName ||
+      "";
+
+
+    document.getElementById(
+      "editPhone"
+    ).value =
+      servant.userPhone ||
+      "";
+
+
+    document.getElementById(
+      "editPoints"
+    ).value =
+      Number(
+        servant.points
+      ) || 0;
+
+
+    const blockContainer =
+      document.getElementById(
+        "blockContainer"
+      );
+
+
+    if (servant.isBlocked) {
+
+      blockContainer.innerHTML =
+        `
+        <button
+          class="unblock-btn"
+          onclick="toggleBlock(false)"
+        >
+          إزالة الحظر 🔓
+        </button>
+        `;
+
+    }
+
+    else {
+
+      blockContainer.innerHTML =
+        `
+        <button
+          class="block-btn"
+          onclick="toggleBlock(true)"
+        >
+          حظر المخدوم 🚫
+        </button>
+        `;
+
+    }
+
+
+    document.getElementById(
+      "editModal"
+    ).classList.add(
+      "show"
+    );
+
+  }
+
+
+  /* =====================================
+     Close Modal
+  ===================================== */
+
+  function closeModal() {
+
+    document.getElementById(
+      "editModal"
+    ).classList.remove(
+      "show"
+    );
+
+  }
+
+
+  /* =====================================
+     Change Points
+  ===================================== */
+
+  function changePoints(value) {
+
+    const input =
+      document.getElementById(
+        "editPoints"
+      );
+
+
+    let points =
+      parseInt(
+        input.value
+      ) || 0;
+
+
+    points += value;
+
+
+    if (points < 0) {
+
+      points = 0;
+
+    }
+
+
+    input.value =
+      points;
+
+  }
+
+
+  /* =====================================
+     Save Servant
+  ===================================== */
+
+  async function saveServant() {
+
+    const id =
+      document.getElementById(
+        "editUserId"
+      ).value;
+
+
+    const name =
+      document.getElementById(
+        "editName"
+      ).value
+        .trim();
+
+
+    const phone =
+      document.getElementById(
+        "editPhone"
+      ).value
+        .trim();
+
+
+    const points =
+      Math.max(
+        0,
+        parseInt(
+          document.getElementById(
+            "editPoints"
+          ).value
+        ) || 0
+      );
+
+
+    if (!id) {
+
+      alert(
+        "لم يتم تحديد المخدوم."
+      );
+
+      return;
+
+    }
+
+
+    if (!name) {
+
+      alert(
+        "اكتب اسم المخدوم."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      await db
+        .collection("servants")
+        .doc(id)
+        .update({
+
+          fullName:
+            name,
+
+          userPhone:
+            phone,
+
+          points:
+            points,
+
+          updatedAt:
+            firebase.firestore
+              .FieldValue
+              .serverTimestamp()
+
+        });
+
+
+      alert(
+        "تم حفظ التعديلات بنجاح ✅"
+      );
+
+
+      closeModal();
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Save Error:",
+        error
+      );
+
+
+      alert(
+        "❌ لم يتم الحفظ:\n" +
+        error.message
       );
 
     }
 
-
-    /* =========================
-       فتح التعديل
-    ========================= */
-
-    function openModal(data) {
-
-      document
-        .getElementById(
-          "editUserId"
-        )
-        .value =
-        data.id;
+  }
 
 
-      document
-        .getElementById(
-          "editName"
-        )
-        .value =
-        data.fullName || "";
+  /* =====================================
+     Block / Unblock
+  ===================================== */
+
+  async function toggleBlock(
+    status
+  ) {
+
+    const id =
+      document.getElementById(
+        "editUserId"
+      ).value;
 
 
-      document
-        .getElementById(
-          "editPhone"
-        )
-        .value =
-        data.userPhone || "";
+    if (!id) return;
 
 
-      document
-        .getElementById(
-          "editPoints"
-        )
-        .value =
-        Number(data.points) || 0;
+    const confirmation =
+      status
 
+        ? confirm(
+            "هل تريد حظر هذا المخدوم؟"
+          )
 
-      const container =
-        document
-          .getElementById(
-            "blockBtnContainer"
+        : confirm(
+            "هل تريد إزالة الحظر؟"
           );
 
 
-      if (data.isBlocked) {
-
-        container.innerHTML =
-          `
-          <button
-            class="btn-unblock"
-            onclick="toggleBlock(false)"
-          >
-            إزالة الحظر 🔓
-          </button>
-          `;
-
-      }
-
-      else {
-
-        container.innerHTML =
-          `
-          <button
-            class="btn-block"
-            onclick="toggleBlock(true)"
-          >
-            حظر المخدوم 🚫
-          </button>
-          `;
-
-      }
+    if (!confirmation) return;
 
 
-      document
-        .getElementById(
+    try {
+
+      await db
+        .collection("servants")
+        .doc(id)
+        .update({
+
+          isBlocked:
+            status,
+
+          updatedAt:
+            firebase.firestore
+              .FieldValue
+              .serverTimestamp()
+
+        });
+
+
+      alert(
+        status
+          ? "تم حظر المخدوم 🚫"
+          : "تم إزالة الحظر 🔓"
+      );
+
+
+      closeModal();
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Block Error:",
+        error
+      );
+
+
+      alert(
+        "❌ حدث خطأ:\n" +
+        error.message
+      );
+
+    }
+
+  }
+
+
+  /* =====================================
+     Logout
+  ===================================== */
+
+  async function logout() {
+
+    try {
+
+      stopListener();
+
+      await auth.signOut();
+
+      window.location.href =
+        "user.html";
+
+    }
+
+    catch (error) {
+
+      console.error(
+        error
+      );
+
+      alert(
+        "حدث خطأ أثناء تسجيل الخروج."
+      );
+
+    }
+
+  }
+
+
+  /* =====================================
+     Escape HTML
+  ===================================== */
+
+  function escapeHTML(value) {
+
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+
+  }
+
+
+  /* =====================================
+     Close Modal Outside
+  ===================================== */
+
+  document
+    .getElementById("editModal")
+    .addEventListener(
+      "click",
+      (event) => {
+
+        if (
+          event.target.id ===
           "editModal"
-        )
-        .style.display =
-        "flex";
+        ) {
 
-    }
-
-
-    /* =========================
-       إغلاق النافذة
-    ========================= */
-
-    function closeModal() {
-
-      document
-        .getElementById(
-          "editModal"
-        )
-        .style.display =
-        "none";
-
-    }
-
-
-    /* =========================
-       تغيير النقاط
-    ========================= */
-
-    function changePoints(value) {
-
-      const input =
-        document
-          .getElementById(
-            "editPoints"
-          );
-
-
-      let current =
-        parseInt(input.value) ||
-        0;
-
-
-      current += value;
-
-
-      if (current < 0) {
-
-        current = 0;
-
-      }
-
-
-      input.value =
-        current;
-
-    }
-
-
-    /* =========================
-       حفظ التعديلات
-    ========================= */
-
-    async function saveServantData() {
-
-      const id =
-        document
-          .getElementById(
-            "editUserId"
-          )
-          .value;
-
-
-      const name =
-        document
-          .getElementById(
-            "editName"
-          )
-          .value
-          .trim();
-
-
-      const phone =
-        document
-          .getElementById(
-            "editPhone"
-          )
-          .value
-          .trim();
-
-
-      const points =
-        Math.max(
-          0,
-          parseInt(
-            document
-              .getElementById(
-                "editPoints"
-              )
-              .value
-          ) || 0
-        );
-
-
-      if (!id) {
-
-        alert(
-          "لم يتم تحديد المخدوم!"
-        );
-
-        return;
-
-      }
-
-
-      if (!name) {
-
-        alert(
-          "اكتب اسم المخدوم!"
-        );
-
-        return;
-
-      }
-
-
-      try {
-
-        await db
-          .collection("servants")
-          .doc(id)
-          .update({
-
-            fullName:
-              name,
-
-            userPhone:
-              phone,
-
-            points:
-              points,
-
-            updatedAt:
-              firebase.firestore
-                .FieldValue
-                .serverTimestamp()
-
-          });
-
-
-        alert(
-          "تم حفظ البيانات بنجاح! ✅"
-        );
-
-
-        closeModal();
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "Update Error:",
-          error
-        );
-
-        alert(
-          "حدث خطأ أثناء حفظ البيانات!"
-        );
-
-      }
-
-    }
-
-
-    /* =========================
-       الحظر
-    ========================= */
-
-    async function toggleBlock(
-      blockStatus
-    ) {
-
-      const id =
-        document
-          .getElementById(
-            "editUserId"
-          )
-          .value;
-
-
-      if (!id) return;
-
-
-      try {
-
-        await db
-          .collection("servants")
-          .doc(id)
-          .update({
-
-            isBlocked:
-              blockStatus,
-
-            updatedAt:
-              firebase.firestore
-                .FieldValue
-                .serverTimestamp()
-
-          });
-
-
-        alert(
-          blockStatus
-            ? "تم حظر المخدوم! 🚫"
-            : "تم إزالة الحظر! 🔓"
-        );
-
-
-        closeModal();
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "Block Error:",
-          error
-        );
-
-        alert(
-          "حدث خطأ أثناء تغيير حالة الحظر!"
-        );
-
-      }
-
-    }
-
-
-    /* =========================
-       إغلاق Modal بالضغط خارجه
-    ========================= */
-
-    document
-      .getElementById("editModal")
-      .addEventListener(
-        "click",
-        function(e) {
-
-          if (
-            e.target === this
-          ) {
-
-            closeModal();
-
-          }
+          closeModal();
 
         }
-      );
 
-  </script>
+      }
+    );
+
+</script>
 
 </body>
-
 </html>
