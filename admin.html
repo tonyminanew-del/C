@@ -1,1 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - الخادم</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- استدعاء فايربيس -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background-color: #0b0f19;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .auth-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 30px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .admin-icon {
+      font-size: 45px;
+      margin-bottom: 10px;
+    }
+
+    .auth-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 5px;
+    }
+
+    .auth-sub {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 20px;
+    }
+
+    .input-box {
+      width: 100%;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 14px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .input-box:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-pass {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #fff;
+    }
+
+    .btn-google {
+      background: #ffffff;
+      color: #0b0f19;
+      margin-top: 10px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    .error-msg {
+      color: #f87171;
+      font-size: 0.85rem;
+      margin-top: 10px;
+    }
+
+    /* إخفاء شاشة جوجل حتى يتم التحقق من الرقم السري */
+    #googleStep {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-card">
+    <div class="admin-icon">📋</div>
+    <div class="auth-title">لوحة الخادم (Admin)</div>
+    <div class="auth-sub" id="stepSub">يرجى إدخال كلمة السر للمتابعة</div>
+
+    <!-- خطوة 1: كلمة السر -->
+    <div id="passwordStep">
+      <input type="password" id="adminPassword" class="input-box" placeholder="أدخل كلمة السر هنا">
+      <button class="btn btn-pass" onclick="verifyPassword()">تأكيد كلمة السر 🔒</button>
+    </div>
+
+    <!-- خطوة 2: تسجيل الدخول بجوجل -->
+    <div id="googleStep">
+      <button class="btn btn-google" onclick="loginWithGoogle()">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
+        دخول عبر Google
+      </button>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const auth = firebase.auth();
+
+    // التحقق من باسورد الخادم
+    function verifyPassword() {
+      const passInput = document.getElementById('adminPassword').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (passInput === "stmina") {
+        errorMsg.innerText = "";
+        document.getElementById('passwordStep').style.display = "none";
+        document.getElementById('googleStep').style.display = "block";
+        document.getElementById('stepSub').innerText = "تم تأكيد كلمة السر، سجل الآن بجوجل";
+      } else {
+        errorMsg.innerText = "كلمة السر غير صحيحة ❌";
+      }
+    }
+
+    // التسجيل بجوجل
+    function loginWithGoogle() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider)
+        .then((result) => {
+          // التوجيه للوحة التحكم الرئيسية للخادام
+          window.location.href = "admin_dashboard.html";
+        })
+        .catch((error) => {
+          console.error(error);
+          document.getElementById('errorMsg').innerText = "فشل تسجيل الدخول بجوجل";
+        });
+    }
+  </script>
+
+</body>
+</html>
 
