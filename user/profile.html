@@ -38,7 +38,7 @@
       gap: 20px;
     }
 
-    /* كارت الهيدر الرئيسي للمستخدم */
+    /* كارت الهيدر الرئيسي */
     .user-header-card {
       background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.6));
       border: 1px solid rgba(56, 189, 248, 0.25);
@@ -49,9 +49,18 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     }
 
+    /* دائرة رفع الصورة */
+    .avatar-wrapper {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      margin: 0 auto 12px auto;
+      cursor: pointer;
+    }
+
     .avatar-circle {
-      width: 80px;
-      height: 80px;
+      width: 100%;
+      height: 100%;
       background: rgba(56, 189, 248, 0.2);
       border: 2px solid #38bdf8;
       border-radius: 50%;
@@ -59,8 +68,37 @@
       justify-content: center;
       align-items: center;
       font-size: 36px;
-      margin: 0 auto 12px auto;
+      overflow: hidden;
       box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .avatar-circle img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .camera-icon {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      background: #38bdf8;
+      color: #0b0f19;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+
+    .avatar-wrapper:hover .avatar-circle {
+      transform: scale(1.05);
+      border-color: #0284c7;
     }
 
     .user-name {
@@ -75,7 +113,7 @@
       color: #94a3b8;
     }
 
-    /* شبكة تفاصيل البيانات */
+    /* شبكة التفاصيل */
     .details-box {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -181,17 +219,30 @@
     .nav-item:hover .nav-icon, .nav-item.active .nav-icon {
       transform: translateY(-3px);
     }
+
+    #uploadStatus {
+      font-size: 0.8rem;
+      color: #38bdf8;
+      margin-top: 5px;
+    }
   </style>
 </head>
 <body>
 
   <div class="container">
 
-    <!-- الهيدر الشخصي -->
+    <!-- الهيدر الشخصي مع إمكانية التعديل على الصورة -->
     <div class="user-header-card">
-      <div class="avatar-circle">👤</div>
+      <div class="avatar-wrapper" onclick="document.getElementById('photoInput').click()">
+        <div class="avatar-circle" id="avatarContainer">👤</div>
+        <div class="camera-icon">📷</div>
+      </div>
+      <!-- مدخل اختيار الصورة الحقيقي (مخفي) -->
+      <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="uploadProfilePhoto(event)">
+      
       <div class="user-name" id="profileName">جاري التحميل...</div>
       <div class="user-email" id="profileEmail">...</div>
+      <div id="uploadStatus"></div>
     </div>
 
     <!-- التفاصيل والبيانات -->
@@ -281,9 +332,12 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // جلب بيانات البروفايل من الفايربيس
+    let currentUser = null;
+
+    // جلب البيانات مع الصورة
     auth.onAuthStateChanged(async (user) => {
       if (user) {
+        currentUser = user;
         document.getElementById('profileEmail').innerText = user.email || "";
 
         try {
@@ -298,7 +352,13 @@
             document.getElementById('address').innerText = data.address || "غير مسجل";
             document.getElementById('birthDate').innerText = data.birthDate || "غير مسجل";
 
-            // ترجمة المرحلة
+            // إظهار صورة البروفايل لو مخزنة
+            if (data.photoBase64) {
+              document.getElementById('avatarContainer').innerHTML = `<img src="${data.photoBase64}" alt="Profile">`;
+            } else if (user.photoURL) {
+              document.getElementById('avatarContainer').innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+            }
+
             let stageArabic = "غير مسجل";
             if(data.stage === "primary") stageArabic = "ابتدائي";
             else if(data.stage === "prep") stageArabic = "إعدادي";
@@ -308,6 +368,9 @@
             document.getElementById('grade').innerText = data.grade || "غير مسجل";
           } else {
             document.getElementById('profileName').innerText = user.displayName;
+            if (user.photoURL) {
+              document.getElementById('avatarContainer').innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+            }
           }
         } catch (error) {
           console.error("Error fetching profile:", error);
@@ -316,6 +379,39 @@
         window.location.href = "user.html";
       }
     });
+
+    // دالة رفع وتحويل الصورة إلى Base64 وحفظها في Firestore
+    function uploadProfilePhoto(event) {
+      const file = event.target.files[0];
+      if (!file || !currentUser) return;
+
+      const status = document.getElementById('uploadStatus');
+      status.style.color = "#38bdf8";
+      status.innerText = "جاري حفظ الصورة...";
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64Image = e.target.result;
+        
+        try {
+          await db.collection('servants').doc(currentUser.uid).update({
+            photoBase64: base64Image
+          });
+
+          document.getElementById('avatarContainer').innerHTML = `<img src="${base64Image}" alt="Profile">`;
+          status.style.color = "#4ade80";
+          status.innerText = "تم تحديث الصورة بنجاح! ✨";
+
+          setTimeout(() => status.innerText = "", 3000);
+        } catch (err) {
+          console.error(err);
+          status.style.color = "#f87171";
+          status.innerText = "حدث خطأ أثناء الحفظ.";
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
 
     // تسجيل الخروج
     document.getElementById('logoutBtn').addEventListener('click', () => {
