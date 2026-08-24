@@ -1,1751 +1,585 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-
 <head>
-
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>
-    معرض الهدايا - تطبيق الكنيسة
-  </title>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
-    rel="stylesheet"
-  >
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-
-  <style>
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Cairo', sans-serif;
-    }
-
-
-    body {
-
-      background-color: #0b0f19;
-
-      color: #ffffff;
-
-      min-height: 100vh;
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: center;
-
-      padding:
-        20px
-        20px
-        100px
-        20px;
-
-      overflow-x: hidden;
-
-    }
-
-
-    .container {
-
-      width: 100%;
-
-      max-width: 500px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      gap: 20px;
-
-    }
-
-
-    /* =========================
-       كارت النقاط
-    ========================= */
-
-    .top-points-card {
-
-      background:
-        linear-gradient(
-          135deg,
-          rgba(56,189,248,.15),
-          rgba(2,132,199,.05)
-        );
-
-      border:
-        1px solid
-        rgba(56,189,248,.3);
-
-      border-radius: 20px;
-
-      padding: 15px 20px;
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      backdrop-filter:
-        blur(15px);
-
-      box-shadow:
-        0 10px 25px
-        rgba(0,0,0,.4);
-
-    }
-
-
-    .points-info {
-
-      text-align: left;
-
-    }
-
-
-    .points-info h4 {
-
-      font-size: .9rem;
-
-      color: #94a3b8;
-
-      margin-bottom: 2px;
-
-    }
-
-
-    .points-info div {
-
-      font-size: 1.6rem;
-
-      font-weight: 900;
-
-      color: #38bdf8;
-
-      text-shadow:
-        0 0 10px
-        rgba(56,189,248,.4);
-
-    }
-
-
-    .store-title {
-
-      font-size: 1.2rem;
-
-      font-weight: 800;
-
-      color: #fff;
-
-      display: flex;
-
-      align-items: center;
-
-      gap: 8px;
-
-    }
-
-
-    /* =========================
-       رسالة الحظر
-    ========================= */
-
-    .blocked-box {
-
-      display: none;
-
-      background:
-        rgba(239,68,68,.1);
-
-      border:
-        1px solid
-        rgba(239,68,68,.4);
-
-      border-radius: 18px;
-
-      padding: 18px;
-
-      text-align: center;
-
-      color: #fca5a5;
-
-      line-height: 1.8;
-
-    }
-
-
-    .blocked-box strong {
-
-      display: block;
-
-      color: #ef4444;
-
-      font-size: 1.1rem;
-
-      margin-bottom: 5px;
-
-    }
-
-
-    /* =========================
-       شبكة الهدايا
-    ========================= */
-
-    .gifts-grid {
-
-      display: grid;
-
-      grid-template-columns:
-        repeat(
-          auto-fit,
-          minmax(140px, 1fr)
-        );
-
-      gap: 15px;
-
-    }
-
-
-    .gift-card {
-
-      background:
-        rgba(255,255,255,.04);
-
-      border:
-        1px solid
-        rgba(255,255,255,.12);
-
-      border-radius: 20px;
-
-      padding: 12px;
-
-      display: flex;
-
-      flex-direction: column;
-
-      justify-content: space-between;
-
-      backdrop-filter:
-        blur(12px);
-
-      transition:
-        all .3s ease;
-
-      position: relative;
-
-      overflow: hidden;
-
-    }
-
-
-    .gift-card:hover {
-
-      transform:
-        translateY(-5px);
-
-      border-color:
-        #38bdf8;
-
-      box-shadow:
-        0 10px 20px
-        rgba(56,189,248,.15);
-
-    }
-
-
-    .gift-img-box {
-
-      width: 100%;
-
-      height: 120px;
-
-      border-radius: 14px;
-
-      overflow: hidden;
-
-      background:
-        rgba(255,255,255,.05);
-
-      margin-bottom: 10px;
-
-      display: flex;
-
-      justify-content: center;
-
-      align-items: center;
-
-    }
-
-
-    .gift-img-box img {
-
-      width: 100%;
-
-      height: 100%;
-
-      object-fit: cover;
-
-    }
-
-
-    .gift-img-placeholder {
-
-      font-size: 40px;
-
-    }
-
-
-    .gift-name {
-
-      font-size: .95rem;
-
-      font-weight: 700;
-
-      color: #fff;
-
-      margin-bottom: 4px;
-
-      min-height: 25px;
-
-    }
-
-
-    .gift-details {
-
-      display: flex;
-
-      justify-content: space-between;
-
-      align-items: center;
-
-      margin-bottom: 10px;
-
-      font-size: .8rem;
-
-      gap: 5px;
-
-    }
-
-
-    .gift-price {
-
-      color: #38bdf8;
-
-      font-weight: 800;
-
-    }
-
-
-    .gift-qty {
-
-      color: #94a3b8;
-
-    }
-
-
-    .add-to-cart-btn {
-
-      background:
-        linear-gradient(
-          135deg,
-          #38bdf8,
-          #0284c7
-        );
-
-      color: #fff;
-
-      border: none;
-
-      border-radius: 12px;
-
-      padding: 9px;
-
-      font-size: .85rem;
-
-      font-weight: 700;
-
-      cursor: pointer;
-
-      transition: .2s;
-
-      width: 100%;
-
-    }
-
-
-    .add-to-cart-btn:hover {
-
-      opacity: .9;
-
-      transform:
-        translateY(-1px);
-
-    }
-
-
-    .add-to-cart-btn:disabled {
-
-      background: #334155;
-
-      color: #94a3b8;
-
-      cursor: not-allowed;
-
-      transform: none;
-
-    }
-
-
-    .empty-msg {
-
-      text-align: center;
-
-      color: #94a3b8;
-
-      grid-column: 1 / -1;
-
-      padding: 40px 0;
-
-      font-size: .95rem;
-
-    }
-
-
-    /* =========================
-       Loading
-    ========================= */
-
-    .loading {
-
-      text-align: center;
-
-      color: #38bdf8;
-
-      padding: 30px;
-
-      grid-column: 1 / -1;
-
-    }
-
-
-    /* =========================
-       الشريط السفلي
-    ========================= */
-
-    .bottom-nav {
-
-      position: fixed;
-
-      bottom: 15px;
-
-      left: 50%;
-
-      transform:
-        translateX(-50%);
-
-      width:
-        calc(100% - 30px);
-
-      max-width: 450px;
-
-      background:
-        rgba(15,23,42,.9);
-
-      backdrop-filter:
-        blur(20px);
-
-      -webkit-backdrop-filter:
-        blur(20px);
-
-      border:
-        1px solid
-        rgba(255,255,255,.15);
-
-      border-radius: 25px;
-
-      display: flex;
-
-      justify-content:
-        space-around;
-
-      align-items: center;
-
-      padding: 10px;
-
-      box-shadow:
-        0 20px 40px
-        rgba(0,0,0,.7);
-
-      z-index: 100;
-
-    }
-
-
-    .nav-item {
-
-      display: flex;
-
-      flex-direction: column;
-
-      align-items: center;
-
-      text-decoration: none;
-
-      color: #94a3b8;
-
-      font-size: .75rem;
-
-      font-weight: 600;
-
-      gap: 4px;
-
-      transition: .3s;
-
-      width: 23%;
-
-    }
-
-
-    .nav-icon {
-
-      font-size: 20px;
-
-      transition:
-        transform .3s;
-
-    }
-
-
-    .nav-item:hover,
-    .nav-item.active {
-
-      color: #38bdf8;
-
-    }
-
-
-    .nav-item:hover .nav-icon,
-    .nav-item.active .nav-icon {
-
-      transform:
-        translateY(-3px);
-
-    }
-
-
-    /* =========================
-       رسالة العملية
-    ========================= */
-
-    .toast {
-
-      position: fixed;
-
-      top: 20px;
-
-      left: 50%;
-
-      transform:
-        translateX(-50%)
-        translateY(-120px);
-
-      width:
-        calc(100% - 40px);
-
-      max-width: 450px;
-
-      padding: 14px 18px;
-
-      border-radius: 14px;
-
-      background: #0f172a;
-
-      border:
-        1px solid
-        rgba(255,255,255,.15);
-
-      box-shadow:
-        0 15px 35px
-        rgba(0,0,0,.5);
-
-      text-align: center;
-
-      font-weight: 700;
-
-      z-index: 9999;
-
-      transition:
-        transform .3s ease;
-
-    }
-
-
-    .toast.show {
-
-      transform:
-        translateX(-50%)
-        translateY(0);
-
-    }
-
-
-    .toast.success {
-
-      border-color:
-        rgba(34,197,94,.5);
-
-      color: #4ade80;
-
-    }
-
-
-    .toast.error {
-
-      border-color:
-        rgba(239,68,68,.5);
-
-      color: #f87171;
-
-    }
-
-
-    @media (max-width: 360px) {
-
-      .gifts-grid {
-
-        grid-template-columns:
-          repeat(2, 1fr);
-
-        gap: 10px;
-
-      }
-
-      .gift-img-box {
-
-        height: 100px;
-
-      }
-
-    }
-
-  </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>معرض الهدايا - تطبيق الكنيسة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Cairo', sans-serif;
+}
+
+body {
+  background-color: #0b0f19;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 20px 100px 20px;
+  overflow-x: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.top-points-card {
+  background: linear-gradient(135deg, rgba(56,189,248,.15), rgba(2,132,199,.05));
+  border: 1px solid rgba(56,189,248,.3);
+  border-radius: 20px;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 10px 25px rgba(0,0,0,.4);
+}
+
+.points-info {
+  text-align: left;
+}
+
+.points-info h4 {
+  font-size: .9rem;
+  color: #94a3b8;
+  margin-bottom: 2px;
+}
+
+.points-info div {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56,189,248,.4);
+}
+
+.store-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.blocked-box {
+  display: none;
+  background: rgba(239,68,68,.1);
+  border: 1px solid rgba(239,68,68,.4);
+  border-radius: 18px;
+  padding: 18px;
+  text-align: center;
+  color: #fca5a5;
+  line-height: 1.8;
+}
+
+.blocked-box strong {
+  display: block;
+  color: #ef4444;
+  font-size: 1.1rem;
+  margin-bottom: 5px;
+}
+
+.gifts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 15px;
+}
+
+.gift-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 20px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  transition: all .3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.gift-card:hover {
+  transform: translateY(-5px);
+  border-color: #38bdf8;
+  box-shadow: 0 10px 20px rgba(56,189,248,.15);
+}
+
+.gift-img-box {
+  width: 100%;
+  height: 120px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,.05);
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gift-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gift-img-placeholder {
+  font-size: 40px;
+}
+
+.gift-name {
+  font-size: .95rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+  min-height: 25px;
+}
+
+.gift-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: .8rem;
+  gap: 5px;
+}
+
+.gift-price {
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+.gift-qty {
+  color: #94a3b8;
+}
+
+.add-to-cart-btn {
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 9px;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+  width: 100%;
+}
+
+.add-to-cart-btn:hover {
+  opacity: .9;
+  transform: translateY(-1px);
+}
+
+.add-to-cart-btn:disabled {
+  background: #334155;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.empty-msg {
+  text-align: center;
+  color: #94a3b8;
+  grid-column: 1 / -1;
+  padding: 40px 0;
+  font-size: .95rem;
+}
+
+.loading {
+  text-align: center;
+  color: #38bdf8;
+  padding: 30px;
+  grid-column: 1 / -1;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 30px);
+  max-width: 450px;
+  background: rgba(15,23,42,.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 25px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+  box-shadow: 0 20px 40px rgba(0,0,0,.7);
+  z-index: 100;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #94a3b8;
+  font-size: .75rem;
+  font-weight: 600;
+  gap: 4px;
+  transition: .3s;
+  width: 23%;
+}
+
+.nav-icon {
+  font-size: 20px;
+  transition: transform .3s;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: #38bdf8;
+}
+
+.nav-item:hover .nav-icon,
+.nav-item.active .nav-icon {
+  transform: translateY(-3px);
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  width: calc(100% - 40px);
+  max-width: 450px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: #0f172a;
+  border: 1px solid rgba(255,255,255,.15);
+  box-shadow: 0 15px 35px rgba(0,0,0,.5);
+  text-align: center;
+  font-weight: 700;
+  z-index: 9999;
+  transition: transform .3s ease;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.success {
+  border-color: rgba(34,197,94,.5);
+  color: #4ade80;
+}
+
+.toast.error {
+  border-color: rgba(239,68,68,.5);
+  color: #f87171;
+}
+</style>
 </head>
-
-
 <body>
 
+<div id="toast" class="toast"></div>
 
-  <!-- رسالة -->
-  <div
-    id="toast"
-    class="toast"
-  ></div>
-
-
-  <div class="container">
-
-
-    <!-- =========================
-         النقاط
-    ========================= -->
-
-    <div class="top-points-card">
-
-      <div class="store-title">
-
-        🎁
-
-        <span>
-          معرض الهدايا
-        </span>
-
-      </div>
-
-
-      <div class="points-info">
-
-        <h4>
-          نقاطك الحالية
-        </h4>
-
-        <div id="userPoints">
-          0
-        </div>
-
-      </div>
-
+<div class="container">
+  <!-- النقاط -->
+  <div class="top-points-card">
+    <div class="store-title">
+      🎁 <span>معرض الهدايا</span>
     </div>
-
-
-    <!-- =========================
-         الحظر
-    ========================= -->
-
-    <div
-      id="blockedBox"
-      class="blocked-box"
-    >
-
-      <strong>
-        🚫 الحساب محظور
-      </strong>
-
-      لا يمكنك شراء الهدايا حالياً.
-      <br>
-      يرجى التواصل مع المسؤول.
-
+    <div class="points-info">
+      <h4>نقاطك الحالية</h4>
+      <div id="userPoints">0</div>
     </div>
-
-
-    <!-- =========================
-         الهدايا
-    ========================= -->
-
-    <div
-      class="gifts-grid"
-      id="giftsContainer"
-    >
-
-      <div class="loading">
-        جاري تحميل الهدايا...
-      </div>
-
-    </div>
-
-
   </div>
 
+  <!-- الحظر -->
+  <div id="blockedBox" class="blocked-box">
+    <strong>🚫 الحساب محظور</strong>
+    لا يمكنك شراء الهدايا حالياً.<br>يرجى التواصل مع المسؤول.
+  </div>
 
-  <!-- =========================
-       الشريط السفلي
-  ========================= -->
+  <!-- الهدايا -->
+  <div class="gifts-grid" id="giftsContainer">
+    <div class="loading">جاري تحميل الهدايا...</div>
+  </div>
+</div>
 
-  <nav class="bottom-nav">
+<!-- الشريط السفلي -->
+<nav class="bottom-nav">
+  <a href="home.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    <span>الرئيسية</span>
+  </a>
+  <a href="profile.html" class="nav-item">
+    <span class="nav-icon">👤</span>
+    <span>البروفايل</span>
+  </a>
+  <a href="store.html" class="nav-item active">
+    <span class="nav-icon">🎁</span>
+    <span>المعرض</span>
+  </a>
+  <a href="basket.html" class="nav-item">
+    <span class="nav-icon">🛒</span>
+    <span>السلة</span>
+  </a>
+</nav>
 
-    <a
-      href="home.html"
-      class="nav-item"
-    >
+<script>
+// Firebase Config
+const firebaseConfig = {
+  apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+  authDomain: "church-7afe1.firebaseapp.com",
+  projectId: "church-7afe1",
+  storageBucket: "church-7afe1.firebasestorage.app",
+  messagingSenderId: "1072334615357",
+  appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+  measurementId: "G-E7Q76Z53SB"
+};
 
-      <span class="nav-icon">
-        🏠
-      </span>
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-      <span>
-        الرئيسية
-      </span>
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-    </a>
+let currentUser = null;
+let currentUserPoints = 0;
+let currentUserBlocked = false;
+let userListener = null;
+let giftsListener = null;
 
+auth.onAuthStateChanged((user) => {
+  if (!user) {
+    window.location.href = "user.html";
+    return;
+  }
+  currentUser = user;
+  listenToUser(user.uid);
+  listenToGifts();
+});
 
-    <a
-      href="profile.html"
-      class="nav-item"
-    >
+function listenToUser(uid) {
+  if (userListener) {
+    userListener();
+    userListener = null;
+  }
 
-      <span class="nav-icon">
-        👤
-      </span>
-
-      <span>
-        البروفايل
-      </span>
-
-    </a>
-
-
-    <a
-      href="store.html"
-      class="nav-item active"
-    >
-
-      <span class="nav-icon">
-        🎁
-      </span>
-
-      <span>
-        المعرض
-      </span>
-
-    </a>
-
-
-    <a
-      href="basket.html"
-      class="nav-item"
-    >
-
-      <span class="nav-icon">
-        🛒
-      </span>
-
-      <span>
-        السلة
-      </span>
-
-    </a>
-
-  </nav>
-
-
-  <script>
-
-
-    /* =========================
-       Firebase
-    ========================= */
-
-    const firebaseConfig = {
-
-      apiKey:
-        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-
-      authDomain:
-        "church-7afe1.firebaseapp.com",
-
-      projectId:
-        "church-7afe1",
-
-      storageBucket:
-        "church-7afe1.firebasestorage.app",
-
-      messagingSenderId:
-        "1072334615357",
-
-      appId:
-        "1:1072334615357:web:c03b199f00ea9d19d40b54",
-
-      measurementId:
-        "G-E7Q76Z53SB"
-
-    };
-
-
-    if (!firebase.apps.length) {
-
-      firebase.initializeApp(
-        firebaseConfig
-      );
-
+  userListener = db.collection("servants").doc(uid).onSnapshot((doc) => {
+    if (!doc.exists) {
+      currentUserPoints = 0;
+      currentUserBlocked = false;
+      updateUserUI();
+      return;
     }
-
-
-    const auth =
-      firebase.auth();
-
-    const db =
-      firebase.firestore();
-
-
-    /* =========================
-       المتغيرات
-    ========================= */
-
-    let currentUser = null;
-
-    let currentUserPoints = 0;
-
-    let currentUserBlocked = false;
-
-    let userListener = null;
-
-    let giftsListener = null;
-
-
-    /* =========================
-       تسجيل الدخول
-    ========================= */
-
-    auth.onAuthStateChanged(
-      (user) => {
-
-        if (!user) {
-
-          window.location.href =
-            "user.html";
-
-          return;
-
-        }
-
-
-        currentUser = user;
-
-
-        listenToUser(user.uid);
-
-        listenToGifts();
-
-      }
-    );
-
-
-    /* =========================
-       متابعة بيانات المستخدم
-    ========================= */
-
-    function listenToUser(uid) {
-
-      if (userListener) {
-
-        userListener();
-
-        userListener = null;
-
-      }
-
-
-      userListener =
-        db
-          .collection("servants")
-          .doc(uid)
-          .onSnapshot(
-
-            (doc) => {
-
-              if (!doc.exists) {
-
-                currentUserPoints = 0;
-
-                currentUserBlocked = false;
-
-                updateUserUI();
-
-                return;
-
-              }
-
-
-              const data =
-                doc.data();
-
-
-              currentUserPoints =
-                Number(data.points) || 0;
-
-
-              currentUserBlocked =
-                data.isBlocked === true;
-
-
-              updateUserUI();
-
-
-              /*
-                إعادة رسم الهدايا
-                حتى تتغير الأزرار عند الحظر
-              */
-
-              if (giftsListener) {
-
-                /*
-                  onSnapshot سيعيد البيانات
-                  تلقائياً، فلا نحتاج استدعاء
-                  إضافي هنا.
-                */
-
-              }
-
-            },
-
-            (error) => {
-
-              console.error(
-                "User listener error:",
-                error
-              );
-
-              showToast(
-                "تعذر تحميل بيانات حسابك",
-                "error"
-              );
-
-            }
-
-          );
-
-    }
-
-
-    /* =========================
-       تحديث واجهة المستخدم
-    ========================= */
-
-    function updateUserUI() {
-
-      document
-        .getElementById(
-          "userPoints"
-        )
-        .innerText =
-        currentUserPoints;
-
-
-      const blockedBox =
-        document.getElementById(
-          "blockedBox"
-        );
-
-
-      if (currentUserBlocked) {
-
-        blockedBox.style.display =
-          "block";
-
-      }
-
-      else {
-
-        blockedBox.style.display =
-          "none";
-
-      }
-
-    }
-
-
-    /* =========================
-       تحميل الهدايا
-    ========================= */
-
-    function listenToGifts() {
-
-      const container =
-        document.getElementById(
-          "giftsContainer"
-        );
-
-
-      if (giftsListener) {
-
-        giftsListener();
-
-        giftsListener = null;
-
-      }
-
-
-      giftsListener =
-        db
-          .collection("gifts")
-          .onSnapshot(
-
-            (snapshot) => {
-
-              container.innerHTML = "";
-
-              let availableCount = 0;
-
-
-              snapshot.forEach(
-                (doc) => {
-
-                  const gift =
-                    doc.data();
-
-
-                  const giftId =
-                    doc.id;
-
-
-                  const quantity =
-                    Number(
-                      gift.quantity
-                    ) || 0;
-
-
-                  const points =
-                    Number(
-                      gift.points
-                    ) || 0;
-
-
-                  const name =
-                    gift.name ||
-                    "هدية";
-
-
-                  /*
-                    لا نعرض الهدايا
-                    التي نفدت
-                  */
-
-                  if (
-                    quantity <= 0
-                  ) {
-
-                    return;
-
-                  }
-
-
-                  availableCount++;
-
-
-                  const card =
-                    document
-                      .createElement(
-                        "div"
-                      );
-
-
-                  card.className =
-                    "gift-card";
-
-
-                  /*
-                    الصورة
-                  */
-
-                  let imageHTML =
-                    `
-                    <div
-                      class="gift-img-placeholder"
-                    >
-                      🎁
-                    </div>
-                    `;
-
-
-                  if (gift.image) {
-
-                    imageHTML =
-                      `
-                      <img
-                        src="${escapeHtml(
-                          gift.image
-                        )}"
-                        alt="${escapeHtml(
-                          name
-                        )}"
-                        loading="lazy"
-                      >
-                      `;
-
-                  }
-
-
-                  /*
-                    زر الشراء
-                  */
-
-                  const disabled =
-                    currentUserBlocked
-                      ? "disabled"
-                      : "";
-
-
-                  const buttonText =
-                    currentUserBlocked
-                      ? "الحساب محظور 🚫"
-                      : "إضافة للسلة 🛒";
-
-
-                  card.innerHTML =
-                    `
-                    <div
-                      class="gift-img-box"
-                    >
-                      ${imageHTML}
-                    </div>
-
-
-                    <div
-                      class="gift-name"
-                    >
-                      ${escapeHtml(
-                        name
-                      )}
-                    </div>
-
-
-                    <div
-                      class="gift-details"
-                    >
-
-                      <span
-                        class="gift-price"
-                      >
-                        ⭐ ${points} نقطة
-                      </span>
-
-                      <span
-                        class="gift-qty"
-                      >
-                        المتاح:
-                        ${quantity}
-                      </span>
-
-                    </div>
-
-
-                    <button
-                      class="add-to-cart-btn"
-                      ${disabled}
-                      data-gift-id="${escapeHtml(
-                        giftId
-                      )}"
-                    >
-                      ${buttonText}
-                    </button>
-                    `;
-
-
-                  /*
-                    ربط الزر بالهدية
-                  */
-
-                  const button =
-                    card.querySelector(
-                      ".add-to-cart-btn"
-                    );
-
-
-                  button.addEventListener(
-                    "click",
-                    () => {
-
-                      addToBasket(
-                        giftId
-                      );
-
-                    }
-                  );
-
-
-                  container
-                    .appendChild(card);
-
-                }
-              );
-
-
-              if (
-                availableCount === 0
-              ) {
-
-                container.innerHTML =
-                  `
-                  <div class="empty-msg">
-                    لا توجد هدايا متاحة
-                    حالياً 🎁
-                  </div>
-                  `;
-
-              }
-
-            },
-
-            (error) => {
-
-              console.error(
-                "Gifts error:",
-                error
-              );
-
-
-              container.innerHTML =
-                `
-                <div class="empty-msg">
-                  ⚠️ حدث خطأ أثناء تحميل الهدايا
-                </div>
-                `;
-
-            }
-
-          );
-
-    }
-
-
-    /* =========================
-       شراء / إضافة للسلة
-       Transaction
-    ========================= */
-
-    async function addToBasket(
-      giftId
-    ) {
-
-      if (!currentUser) {
-
-        showToast(
-          "برجاء تسجيل الدخول أولاً",
-          "error"
-        );
-
+    const data = doc.data();
+    currentUserPoints = Number(data.points) || 0;
+    currentUserBlocked = data.isBlocked === true;
+    updateUserUI();
+  }, (error) => {
+    console.error("User listener error:", error);
+    showToast("تعذر تحميل بيانات حسابك", "error");
+  });
+}
+
+function updateUserUI() {
+  document.getElementById("userPoints").innerText = currentUserPoints;
+  const blockedBox = document.getElementById("blockedBox");
+  if (currentUserBlocked) {
+    blockedBox.style.display = "block";
+  } else {
+    blockedBox.style.display = "none";
+  }
+}
+
+function listenToGifts() {
+  const container = document.getElementById("giftsContainer");
+  if (giftsListener) {
+    giftsListener();
+    giftsListener = null;
+  }
+
+  giftsListener = db.collection("gifts").onSnapshot((snapshot) => {
+    container.innerHTML = "";
+    let availableCount = 0;
+
+    snapshot.forEach((doc) => {
+      const gift = doc.data();
+      const giftId = doc.id;
+      const quantity = Number(gift.quantity) || 0;
+      const points = Number(gift.points) || 0;
+      const name = gift.name || "هدية";
+
+      // إذا وصلت الكمية إلى صفر أو أقل، يتم إخفاؤها من المعرض تلقائياً
+      if (quantity <= 0) {
         return;
-
       }
 
+      availableCount++;
 
-      /*
-        فحص سريع قبل بدء العملية
-      */
+      const card = document.createElement("div");
+      card.className = "gift-card";
 
-      if (currentUserBlocked) {
-
-        showToast(
-          "حسابك محظور ولا يمكنك شراء الهدايا 🚫",
-          "error"
-        );
-
-        return;
-
+      let imageHTML = `<div class="gift-img-placeholder">🎁</div>`;
+      if (gift.image) {
+        imageHTML = `<img src="${escapeHtml(gift.image)}" alt="${escapeHtml(name)}" loading="lazy">`;
       }
 
-
-      const userRef =
-        db
-          .collection("servants")
-          .doc(currentUser.uid);
-
-
-      const giftRef =
-        db
-          .collection("gifts")
-          .doc(giftId);
-
-
-      const basketRef =
-        userRef
-          .collection("basket")
-          .doc(giftId);
-
-
-      try {
-
-        await db.runTransaction(
-          async (transaction) => {
-
-            /*
-              مهم:
-              نقرأ كل البيانات أولاً
-              قبل الكتابة.
-            */
-
-            const userDoc =
-              await transaction.get(
-                userRef
-              );
-
-
-            const giftDoc =
-              await transaction.get(
-                giftRef
-              );
-
-
-            const basketDoc =
-              await transaction.get(
-                basketRef
-              );
-
-
-            /* =====================
-               التأكد من المستخدم
-            ===================== */
-
-            if (!userDoc.exists) {
-
-              throw new Error(
-                "USER_NOT_FOUND"
-              );
-
-            }
-
-
-            const userData =
-              userDoc.data();
-
-
-            /* =====================
-               التأكد من الحظر
-            ===================== */
-
-            if (
-              userData.isBlocked === true
-            ) {
-
-              throw new Error(
-                "USER_BLOCKED"
-              );
-
-            }
-
-
-            /* =====================
-               التأكد من الهدية
-            ===================== */
-
-            if (!giftDoc.exists) {
-
-              throw new Error(
-                "GIFT_NOT_FOUND"
-              );
-
-            }
-
-
-            const gift =
-              giftDoc.data();
-
-
-            const giftPoints =
-              Number(
-                gift.points
-              ) || 0;
-
-
-            const giftQuantity =
-              Number(
-                gift.quantity
-              ) || 0;
-
-
-            const userPoints =
-              Number(
-                userData.points
-              ) || 0;
-
-
-            /* =====================
-               الكمية
-            ===================== */
-
-            if (
-              giftQuantity <= 0
-            ) {
-
-              throw new Error(
-                "OUT_OF_STOCK"
-              );
-
-            }
-
-
-            /* =====================
-               النقاط
-            ===================== */
-
-            if (
-              userPoints < giftPoints
-            ) {
-
-              throw new Error(
-                "NOT_ENOUGH_POINTS"
-              );
-
-            }
-
-
-            /* =====================
-               بيانات السلة
-            ===================== */
-
-            const oldCount =
-              basketDoc.exists
-                ? Number(
-                    basketDoc.data()
-                      .count
-                  ) || 0
-                : 0;
-
-
-            /* =====================
-               خصم النقاط
-            ===================== */
-
-            transaction.update(
-              userRef,
-              {
-
-                points:
-                  userPoints -
-                  giftPoints,
-
-                updatedAt:
-                  firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
-
-              }
-            );
-
-
-            /* =====================
-               تقليل المخزون
-            ===================== */
-
-            transaction.update(
-              giftRef,
-              {
-
-                quantity:
-                  giftQuantity - 1,
-
-                updatedAt:
-                  firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
-
-              }
-            );
-
-
-            /* =====================
-               السلة
-            ===================== */
-
-            const basketData = {
-
-              giftId:
-                giftId,
-
-              name:
-                gift.name || "هدية",
-
-              points:
-                giftPoints,
-
-              image:
-                gift.image || "",
-
-              count:
-                oldCount + 1,
-
-              updatedAt:
-                firebase.firestore
-                  .FieldValue
-                  .serverTimestamp()
-
-            };
-
-
-            if (basketDoc.exists) {
-
-              transaction.update(
-                basketRef,
-                basketData
-              );
-
-            }
-
-            else {
-
-              transaction.set(
-                basketRef,
-                {
-
-                  ...basketData,
-
-                  addedAt:
-                    firebase.firestore
-                      .FieldValue
-                      .serverTimestamp()
-
-                }
-              );
-
-            }
-
-          }
-        );
-
-
-        /*
-          نجحت العملية بالكامل
-        */
-
-        showToast(
-          "تم شراء الهدية وإضافتها للسلة بنجاح! 🛒✨",
-          "success"
-        );
-
-
-      }
-
-      catch (error) {
-
-        console.error(
-          "Purchase error:",
-          error
-        );
-
-
-        switch (error.message) {
-
-          case "USER_BLOCKED":
-
-            showToast(
-              "حسابك محظور ولا يمكنك شراء الهدايا 🚫",
-              "error"
-            );
-
-            break;
-
-
-          case "USER_NOT_FOUND":
-
-            showToast(
-              "لم يتم العثور على بيانات حسابك",
-              "error"
-            );
-
-            break;
-
-
-          case "GIFT_NOT_FOUND":
-
-            showToast(
-              "هذه الهدية لم تعد موجودة",
-              "error"
-            );
-
-            break;
-
-
-          case "OUT_OF_STOCK":
-
-            showToast(
-              "عذراً، نفدت كمية هذه الهدية ❌",
-              "error"
-            );
-
-            break;
-
-
-          case "NOT_ENOUGH_POINTS":
-
-            showToast(
-              "النقاط غير كافية لشراء هذه الهدية ⭐",
-              "error"
-            );
-
-            break;
-
-
-          default:
-
-            showToast(
-              "حدث خطأ أثناء تنفيذ العملية ❌",
-              "error"
-            );
-
-        }
-
-      }
-
+      const disabled = currentUserBlocked ? "disabled" : "";
+      const buttonText = currentUserBlocked ? "الحساب محظور 🚫" : "إضافة للسلة 🛒";
+
+      card.innerHTML = `
+        <div class="gift-img-box">${imageHTML}</div>
+        <div class="gift-name">${escapeHtml(name)}</div>
+        <div class="gift-details">
+          <span class="gift-price">⭐ ${points} نقطة</span>
+          <span class="gift-qty">المتاح: ${quantity}</span>
+        </div>
+        <button class="add-to-cart-btn" ${disabled} data-gift-id="${escapeHtml(giftId)}">
+          ${buttonText}
+        </button>
+      `;
+
+      const button = card.querySelector(".add-to-cart-btn");
+      button.addEventListener("click", () => {
+        addToBasket(giftId);
+      });
+
+      container.appendChild(card);
+    });
+
+    if (availableCount === 0) {
+      container.innerHTML = `<div class="empty-msg">لا توجد هدايا متاحة حالياً 🎁</div>`;
     }
+  }, (error) => {
+    console.error("Gifts error:", error);
+    container.innerHTML = `<div class="empty-msg">⚠️ حدث خطأ أثناء تحميل الهدايا</div>`;
+  });
+}
 
+async function addToBasket(giftId) {
+  if (!currentUser) {
+    showToast("برجاء تسجيل الدخول أولاً", "error");
+    return;
+  }
 
-    /* =========================
-       Toast
-    ========================= */
+  if (currentUserBlocked) {
+    showToast("حسابك محظور ولا يمكنك شراء الهدايا 🚫", "error");
+    return;
+  }
 
-    let toastTimer = null;
+  const userRef = db.collection("servants").doc(currentUser.uid);
+  const giftRef = db.collection("gifts").doc(giftId);
+  const basketRef = userRef.collection("basket").doc(giftId);
 
+  try {
+    await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      const giftDoc = await transaction.get(giftRef);
+      const basketDoc = await transaction.get(basketRef);
 
-    function showToast(
-      message,
-      type
-    ) {
+      if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
+      const userData = userDoc.data();
+      if (userData.isBlocked === true) throw new Error("USER_BLOCKED");
 
-      const toast =
-        document.getElementById(
-          "toast"
-        );
+      if (!giftDoc.exists) throw new Error("GIFT_NOT_FOUND");
+      const gift = giftDoc.data();
+      const giftPoints = Number(gift.points) || 0;
+      const giftQuantity = Number(gift.quantity) || 0;
+      const userPoints = Number(userData.points) || 0;
 
+      if (giftQuantity <= 0) throw new Error("OUT_OF_STOCK");
+      if (userPoints < giftPoints) throw new Error("NOT_ENOUGH_POINTS");
 
-      toast.innerText =
-        message;
+      const oldCount = basketDoc.exists ? Number(basketDoc.data().count) || 0 : 0;
 
+      // خصم النقاط من المستخدم
+      transaction.update(userRef, {
+        points: userPoints - giftPoints,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-      toast.className =
-        "toast " +
-        type +
-        " show";
+      // تقليل كمية الهدية بمقدار 1 (وعندما تصل لصفر تختفي تلقائياً)
+      transaction.update(giftRef, {
+        quantity: giftQuantity - 1,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
+      const basketData = {
+        giftId: giftId,
+        name: gift.name || "هدية",
+        points: giftPoints,
+        image: gift.image || "",
+        count: oldCount + 1,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-      if (toastTimer) {
-
-        clearTimeout(
-          toastTimer
-        );
-
+      if (basketDoc.exists) {
+        transaction.update(basketRef, basketData);
+      } else {
+        transaction.set(basketRef, {
+          ...basketData,
+          addedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
       }
+    });
 
+    showToast("تم شراء الهدية وإضافتها للسلة بنجاح! 🛒✨", "success");
 
-      toastTimer =
-        setTimeout(
-          () => {
-
-            toast.classList.remove(
-              "show"
-            );
-
-          },
-          3000
-        );
-
+  } catch (error) {
+    console.error("Purchase error:", error);
+    switch (error.message) {
+      case "USER_BLOCKED":
+        showToast("حسابك محظور ولا يمكنك شراء الهدايا 🚫", "error");
+        break;
+      case "USER_NOT_FOUND":
+        showToast("لم يتم العثور على بيانات حسابك", "error");
+        break;
+      case "GIFT_NOT_FOUND":
+        showToast("هذه الهدية لم تعد موجودة", "error");
+        break;
+      case "OUT_OF_STOCK":
+        showToast("عذراً، نفدت كمية هذه الهدية ❌", "error");
+        break;
+      case "NOT_ENOUGH_POINTS":
+        showToast("النقاط غير كافية لشراء هذه الهدية ⭐", "error");
+        break;
+      default:
+        showToast("حدث خطأ أثناء تنفيذ العملية ❌", "error");
     }
+  }
+}
 
+let toastTimer = null;
+function showToast(message, type) {
+  const toast = document.getElementById("toast");
+  toast.innerText = message;
+  toast.className = "toast " + type + " show";
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("show");
+  }, 3000);
+}
 
-    /* =========================
-       حماية النصوص
-    ========================= */
-
-    function escapeHtml(value) {
-
-      return String(value)
-
-        .replaceAll(
-          "&",
-          "&amp;"
-        )
-
-        .replaceAll(
-          "<",
-          "&lt;"
-        )
-
-        .replaceAll(
-          ">",
-          "&gt;"
-        )
-
-        .replaceAll(
-          '"',
-          "&quot;"
-        )
-
-        .replaceAll(
-          "'",
-          "&#039;"
-        );
-
-    }
-
-
-  </script>
-
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+</script>
 </body>
-
 </html>
