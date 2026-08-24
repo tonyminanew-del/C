@@ -235,7 +235,7 @@
       </div>
     </div>
 
-    <!-- شبكة الهدايا المضافة من الخادم -->
+    <!-- شبكة المنتجات والهدايا -->
     <div class="gifts-grid" id="giftsContainer">
       <div class="empty-msg">جاري تحميل الهدايا...</div>
     </div>
@@ -303,7 +303,7 @@
       });
     }
 
-    // جلب الهدايا المضافة من مجموعة 'gifts'
+    // جلب الهدايا المضافة
     function loadGifts() {
       const giftsContainer = document.getElementById('giftsContainer');
 
@@ -347,36 +347,42 @@
       });
     }
 
-    // إضافة الهدية للسلة وتقليل الكمية المتاحة في قاعدة البيانات
+    // شراء الهدية (خصم النقاط، تقليل الكمية، والإضافة للسلة)
     async function addToBasket(giftId, name, points, quantity, image) {
       if (!currentUser) return;
 
-      // 1. التحقق من النقاط
+      // 1. التحقق من رصيد النقاط
       if (currentUserPoints < points) {
-        alert("النقاط غير كافية ❌");
+        alert("النقاط غير كافية للشراء ❌");
         return;
       }
 
-      // 2. التحقق من وجود كمية
+      // 2. التحقق من توفر الكمية
       if (quantity <= 0) {
         alert("عذراً، نفدت الكمية! ❌");
         return;
       }
 
       try {
-        const basketRef = db.collection('servants').doc(currentUser.uid).collection('basket').doc(giftId);
+        const userRef = db.collection('servants').doc(currentUser.uid);
+        const basketRef = userRef.collection('basket').doc(giftId);
         const giftRef = db.collection('gifts').doc(giftId);
+
         const doc = await basketRef.get();
 
+        // أ) خصم النقاط من حساب المخدوم
+        await userRef.update({
+          points: firebase.firestore.FieldValue.increment(-points)
+        });
+
+        // ب) تقليل الكمية المتاحة من الهدية في المخزن
+        await giftRef.update({
+          quantity: firebase.firestore.FieldValue.increment(-1)
+        });
+
+        // ج) إضافة الهدية أو زيادة العدد في السلة
         if (doc.exists) {
           const currentCount = doc.data().count || 1;
-          const totalPointsNeeded = (currentCount + 1) * points;
-
-          if (currentUserPoints < totalPointsNeeded) {
-            alert("النقاط غير كافية لزيادة الكمية ❌");
-            return;
-          }
-
           await basketRef.update({ count: currentCount + 1 });
         } else {
           await basketRef.set({
@@ -389,16 +395,11 @@
           });
         }
 
-        // 3. تقليل الكمية المتاحة بمقدار 1 فوراً
-        await giftRef.update({
-          quantity: firebase.firestore.FieldValue.increment(-1)
-        });
-
-        alert("تمت الإضافة إلى السلة بنجاح! 🛒✨");
+        alert("تم الخصم والإضافة إلى السلة بنجاح! 🛒✨");
 
       } catch (err) {
         console.error("Error adding to basket:", err);
-        alert("حدث خطأ أثناء الإضافة للسلة");
+        alert("حدث خطأ أثناء تنفيذ العملية!");
       }
     }
   </script>
