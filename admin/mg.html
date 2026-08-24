@@ -229,6 +229,33 @@
       background: #1e293b;
     }
 
+    /* أزرار تعديل النقاط */
+    .points-control {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .points-control input {
+      text-align: center;
+      font-weight: 900;
+    }
+
+    .point-btn {
+      width: 40px;
+      height: 42px;
+      border-radius: 10px;
+      background: #38bdf8;
+      color: #0b0f19;
+      font-weight: 900;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .point-btn:hover {
+      opacity: 0.9;
+    }
+
     .block-action-btn {
       width: 100%;
       padding: 12px;
@@ -261,7 +288,7 @@
 
   <div id="message" class="message"></div>
 
-  <!-- ==================== الشاشة الأولى: اختيار المرحلة والباسورد ==================== -->
+  <!-- الشاشة الأولى: اختيار المرحلة والباسورد -->
   <div id="stageSection" class="card">
     <div class="form-group">
       <label>اختر المرحلة الدراسية:</label>
@@ -282,7 +309,7 @@
     </div>
   </div>
 
-  <!-- ==================== الشاشة الثانية: قائمة المخدومين والبحث ==================== -->
+  <!-- الشاشة الثانية: قائمة المخدومين والبحث -->
   <div id="dashboardSection" style="display:none;">
     <div class="card">
       <div class="form-group">
@@ -304,7 +331,7 @@
     <div id="servantsList" class="servants-list"></div>
   </div>
 
-  <!-- ==================== الشاشة الثالثة: بروفايل المخدوم مع زر التعديل ==================== -->
+  <!-- الشاشة الثالثة: بروفايل المخدوم مع أزرار التحكم في النقاط وصورة المعرض -->
   <div id="profileSection" style="display:none;">
     <button class="back-btn" onclick="backToDashboard()">⬅ العودة للقائمة</button>
     
@@ -315,8 +342,8 @@
       </div>
 
       <div class="form-group">
-        <label>رابط الصورة الشخصية (Image URL)</label>
-        <input type="text" id="editAvatar" placeholder="ضع رابط الصورة هنا">
+        <label>🖼️ اختيار صورة من المعرض (Gallery)</label>
+        <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)">
       </div>
 
       <div class="form-group">
@@ -331,7 +358,13 @@
 
       <div class="form-group">
         <label>النقاط</label>
-        <input type="number" id="editPoints" min="0">
+        <div class="points-control">
+          <button class="point-btn" onclick="changePoints(-5)">-5</button>
+          <button class="point-btn" onclick="changePoints(-1)">-1</button>
+          <input type="number" id="editPoints" min="0">
+          <button class="point-btn" onclick="changePoints(1)">+1</button>
+          <button class="point-btn" onclick="changePoints(5)">+5</button>
+        </div>
       </div>
 
       <button class="main-btn" onclick="saveServantProfile()">حفظ التعديلات 💾</button>
@@ -371,6 +404,7 @@
   let servants = [];
   let unsubscribe = null;
   let currentSelectedServantId = null;
+  let newImageBase64 = "";
 
   auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -460,7 +494,6 @@
     list.forEach((servant) => {
       const card = document.createElement("div");
       card.className = "servant-card" + (servant.isBlocked ? " blocked" : "");
-      // عند النقر على المخدوم يتم الانتقال لصفحة البروفايل الخاصة به مباشرة
       card.onclick = () => openServantProfile(servant);
       card.innerHTML = `
         <div>
@@ -476,9 +509,10 @@
     });
   }
 
-  // فتح بروفايل المخدوم المختار
   function openServantProfile(servant) {
     currentSelectedServantId = servant.id;
+    newImageBase64 = servant.image || "";
+
     document.getElementById("dashboardSection").style.display = "none";
     document.getElementById("profileSection").style.display = "block";
 
@@ -488,7 +522,7 @@
     document.getElementById("editName").value = servant.fullName || "";
     document.getElementById("editPhone").value = servant.userPhone || "";
     document.getElementById("editPoints").value = Number(servant.points) || 0;
-    document.getElementById("editAvatar").value = servant.image || "";
+    document.getElementById("imageInput").value = "";
 
     const blockContainer = document.getElementById("blockButtonContainer");
     if (servant.isBlocked) {
@@ -498,20 +532,40 @@
     }
   }
 
+  // دالة لتعديل النقاط بسرعة عبر الأزرار (+5, +1, -1, -5)
+  function changePoints(value) {
+    const input = document.getElementById("editPoints");
+    let points = parseInt(input.value) || 0;
+    points += value;
+    if (points < 0) points = 0;
+    input.value = points;
+  }
+
+  function previewImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      newImageBase64 = e.target.result;
+      document.getElementById("viewAvatar").src = newImageBase64;
+    };
+    reader.readAsDataURL(file);
+  }
+
   function backToDashboard() {
     document.getElementById("profileSection").style.display = "none";
     document.getElementById("dashboardSection").style.display = "block";
     currentSelectedServantId = null;
+    newImageBase64 = "";
   }
 
-  // حفظ التعديلات على بيانات المخدوم بما فيها الصورة
   async function saveServantProfile() {
     if (!currentSelectedServantId) return;
 
     const name = document.getElementById("editName").value.trim();
     const phone = document.getElementById("editPhone").value.trim();
     const points = Math.max(0, parseInt(document.getElementById("editPoints").value) || 0);
-    const image = document.getElementById("editAvatar").value.trim();
 
     if (!name) {
       alert("برجاء كتابة اسم المخدوم.");
@@ -523,12 +577,10 @@
         fullName: name,
         userPhone: phone,
         points: points,
-        image: image,
+        image: newImageBase64,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      alert("تم حفظ بيانات المخدوم وصورته بنجاح ✅");
-      document.getElementById("viewNameTitle").innerText = name;
-      document.getElementById("viewAvatar").src = image;
+      alert("تم حفظ بيانات المخدوم وتحديث النقاط والصورة بنجاح ✅");
     } catch (error) {
       console.error("Save Error:", error);
       alert("❌ لم يتم الحفظ:\n" + error.message);
