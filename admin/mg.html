@@ -4,13 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>لوحة التحكم - تطبيق الكنيسة</title>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
-    rel="stylesheet"
-  >
+  <title>لوحة إدارة المخدومين - تطبيق الكنيسة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -30,12 +25,14 @@
       color: #fff;
       min-height: 100vh;
       padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .container {
       width: 100%;
-      max-width: 650px;
-      margin: auto;
+      max-width: 500px;
     }
 
     .card {
@@ -47,8 +44,7 @@
       backdrop-filter: blur(12px);
     }
 
-    h1,
-    h2 {
+    h1, h2 {
       text-align: center;
       color: #38bdf8;
       margin-bottom: 10px;
@@ -72,8 +68,7 @@
       font-weight: 600;
     }
 
-    select,
-    input {
+    select, input {
       width: 100%;
       padding: 12px;
       border-radius: 12px;
@@ -84,14 +79,8 @@
       font-size: 1rem;
     }
 
-    select:focus,
-    input:focus {
+    select:focus, input:focus {
       border-color: #38bdf8;
-    }
-
-    select option {
-      background: #0f172a;
-      color: #fff;
     }
 
     .password-box {
@@ -128,14 +117,23 @@
       opacity: 0.9;
     }
 
+    .back-btn {
+      background: #334155;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 10px;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
     .logout-btn {
       background: #ef4444;
       color: white;
-      padding: 9px 15px;
+      padding: 8px 15px;
       border-radius: 10px;
       font-weight: 700;
       display: block;
-      margin: 12px auto 0;
+      margin: 10px auto 0;
     }
 
     .search-box {
@@ -204,115 +202,43 @@
 
     .message {
       text-align: center;
-      padding: 15px;
+      padding: 12px;
       border-radius: 12px;
       margin-bottom: 15px;
       display: none;
       font-weight: 700;
     }
 
-    .message.show {
-      display: block;
-    }
+    .message.show { display: block; }
+    .message.error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
+    .message.success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
 
-    .message.error {
-      background: rgba(239, 68, 68, 0.1);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.25);
-    }
-
-    .message.success {
-      background: rgba(34, 197, 94, 0.1);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.25);
-    }
-
-    /* Modal */
-    .modal {
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      z-index: 1000;
-    }
-
-    .modal.show {
-      display: flex;
-    }
-
-    .modal-content {
-      width: 100%;
-      max-width: 450px;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: #0f172a;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      padding: 20px;
-      position: relative;
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      background: transparent;
-      color: #94a3b8;
-      font-size: 1.5rem;
-    }
-
-    .modal-title {
-      color: #38bdf8;
-      margin-bottom: 20px;
-      font-size: 1.2rem;
-    }
-
-    .points-control {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .points-control input {
+    /* بروفايل المخدوم */
+    .profile-header {
       text-align: center;
-      font-weight: 900;
+      margin-bottom: 20px;
     }
 
-    .point-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
-      background: #38bdf8;
-      color: #000;
-      font-weight: 900;
-      font-size: 0.9rem;
+    .profile-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #38bdf8;
+      margin-bottom: 10px;
+      background: #1e293b;
     }
 
-    .save-btn {
+    .block-action-btn {
       width: 100%;
-      margin-top: 10px;
       padding: 12px;
       border-radius: 12px;
-      background: #38bdf8;
-      color: #000;
       font-weight: 900;
-    }
-
-    .block-btn,
-    .unblock-btn {
-      width: 100%;
       margin-top: 10px;
-      padding: 12px;
-      border-radius: 12px;
       color: #fff;
-      font-weight: 900;
     }
-
-    .block-btn { background: #ef4444; }
-    .unblock-btn { background: #22c55e; }
+    .btn-block { background: #ef4444; }
+    .btn-unblock { background: #22c55e; }
 
     .loading, .empty {
       text-align: center;
@@ -328,51 +254,37 @@
 
   <!-- Header -->
   <div class="card">
-    <h1>⚙️ لوحة التحكم والإدارة</h1>
+    <h1>⚙️ لوحة إدارة الكنيسة</h1>
     <div id="adminInfo" class="admin-info">جاري التحقق من الحساب...</div>
     <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
   </div>
 
-  <!-- الرسائل -->
   <div id="message" class="message"></div>
 
-  <!-- اختيار نوع الجزء (خادم أم مخدوم) -->
-  <div class="card">
+  <!-- ==================== الشاشة الأولى: اختيار المرحلة والباسورد ==================== -->
+  <div id="stageSection" class="card">
     <div class="form-group">
-      <label>اختر نوع لوحة التحكم:</label>
-      <select id="roleSelect" onchange="roleChanged()">
-        <option value="">-- اختر القسم --</option>
-        <option value="servant_part">جزء الخادم (إدارة المخدومين)</option>
-        <option value="served_part">جزء المخدوم (عرض وتعديل البروفايل)</option>
+      <label>اختر المرحلة الدراسية:</label>
+      <select id="stageSelect" onchange="stageChanged()">
+        <option value="">-- اختر المرحلة --</option>
+        <option value="primary">ابتدائي</option>
+        <option value="prep">إعدادي</option>
+        <option value="sec">ثانوي</option>
       </select>
+    </div>
+
+    <div id="passwordBox" class="password-box">
+      <div class="form-group">
+        <label>🔒 كلمة سر المرحلة</label>
+        <input type="password" id="stagePassword" placeholder="أدخل كلمة السر" onkeydown="passwordEnter(event)">
+      </div>
+      <button class="main-btn" onclick="verifyStage()">فتح المرحلة 🔓</button>
     </div>
   </div>
 
-  <!-- ==================== جزء الخادم ==================== -->
-  <div id="servantSection" style="display:none;">
+  <!-- ==================== الشاشة الثانية: قائمة المخدومين والبحث ==================== -->
+  <div id="dashboardSection" style="display:none;">
     <div class="card">
-      <div class="form-group">
-        <label>اختر المرحلة الدراسية:</label>
-        <select id="stageSelect" onchange="stageChanged()">
-          <option value="">-- اختر المرحلة --</option>
-          <option value="primary">ابتدائي</option>
-          <option value="prep">إعدادي</option>
-          <option value="sec">ثانوي</option>
-        </select>
-      </div>
-
-      <!-- كلمة السر -->
-      <div id="passwordBox" class="password-box">
-        <div class="form-group">
-          <label>🔒 كلمة سر المرحلة</label>
-          <input type="password" id="stagePassword" placeholder="أدخل كلمة السر" onkeydown="passwordEnter(event)">
-        </div>
-        <button class="main-btn" onclick="verifyStage()">فتح المرحلة 🔓</button>
-      </div>
-    </div>
-
-    <!-- البحث والتحكم -->
-    <div id="controlPanel" class="card" style="display:none;">
       <div class="form-group">
         <label>اختر الصف:</label>
         <select id="gradeSelect" onchange="loadServants()">
@@ -389,61 +301,44 @@
       </div>
     </div>
 
-    <!-- القائمة -->
     <div id="servantsList" class="servants-list"></div>
   </div>
 
-  <!-- ==================== جزء المخدوم ==================== -->
-  <div id="servedSection" class="card" style="display:none;">
-    <h2>👤 بروفايل المخدوم</h2>
-    <div class="form-group">
-      <label>الاسم بالكامل</label>
-      <input type="text" id="profileName">
-    </div>
-    <div class="form-group">
-      <label>رقم التليفون الشخصي</label>
-      <input type="tel" id="profilePhone">
-    </div>
-    <div class="form-group">
-      <label>النقاط الحالية</label>
-      <input type="number" id="profilePoints" readonly style="color: #38bdf8; font-weight: 900;">
-    </div>
-    <button class="main-btn" onclick="saveProfile()">حفظ تعديلات البروفايل 💾</button>
-  </div>
-
-</div>
-
-<!-- Modal للتعديل في جزء الخادم -->
-<div id="editModal" class="modal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeModal()">✕</button>
-    <h2 class="modal-title">تعديل بيانات المخدوم</h2>
-    <input type="hidden" id="editUserId">
-
-    <div class="form-group">
-      <label>الاسم بالكامل</label>
-      <input type="text" id="editName">
-    </div>
-
-    <div class="form-group">
-      <label>رقم التليفون الشخصي</label>
-      <input type="tel" id="editPhone">
-    </div>
-
-    <div class="form-group">
-      <label>النقاط</label>
-      <div class="points-control">
-        <button class="point-btn" onclick="changePoints(-5)">-5</button>
-        <button class="point-btn" onclick="changePoints(-1)">-1</button>
-        <input type="number" id="editPoints" min="0">
-        <button class="point-btn" onclick="changePoints(1)">+1</button>
-        <button class="point-btn" onclick="changePoints(5)">+5</button>
+  <!-- ==================== الشاشة الثالثة: بروفايل المخدوم مع زر التعديل ==================== -->
+  <div id="profileSection" style="display:none;">
+    <button class="back-btn" onclick="backToDashboard()">⬅ العودة للقائمة</button>
+    
+    <div class="card">
+      <div class="profile-header">
+        <img id="viewAvatar" src="" class="profile-avatar" alt="صورة المخدوم" onerror="this.src='https://via.placeholder.com/90?text=👤'">
+        <h2 id="viewNameTitle" style="margin:0;">اسم المخدوم</h2>
       </div>
-    </div>
 
-    <button class="save-btn" onclick="saveServant()">حفظ التعديلات 💾</button>
-    <div id="blockContainer"></div>
+      <div class="form-group">
+        <label>رابط الصورة الشخصية (Image URL)</label>
+        <input type="text" id="editAvatar" placeholder="ضع رابط الصورة هنا">
+      </div>
+
+      <div class="form-group">
+        <label>الاسم بالكامل</label>
+        <input type="text" id="editName">
+      </div>
+
+      <div class="form-group">
+        <label>رقم التليفون الشخصي</label>
+        <input type="tel" id="editPhone">
+      </div>
+
+      <div class="form-group">
+        <label>النقاط</label>
+        <input type="number" id="editPoints" min="0">
+      </div>
+
+      <button class="main-btn" onclick="saveServantProfile()">حفظ التعديلات 💾</button>
+      <div id="blockButtonContainer"></div>
+    </div>
   </div>
+
 </div>
 
 <script>
@@ -475,79 +370,22 @@
   let selectedStage = "";
   let servants = [];
   let unsubscribe = null;
+  let currentSelectedServantId = null;
 
   auth.onAuthStateChanged((user) => {
     if (!user) {
       document.getElementById("adminInfo").innerText = "غير مسجل الدخول.";
-      showMessage("يجب تسجيل الدخول أولاً.", "error");
       setTimeout(() => { window.location.href = "user.html"; }, 1500);
       return;
     }
     currentAdmin = user;
-    document.getElementById("adminInfo").innerText = "تم تسجيل الدخول: " + (user.email || "حساب مستخدم");
+    document.getElementById("adminInfo").innerText = "تم تسجيل الدخول بحساب الخادم";
   });
 
-  // التبديل بين جزء الخادم وجزء المخدوم
-  function roleChanged() {
-    const role = document.getElementById("roleSelect").value;
-    document.getElementById("servantSection").style.display = (role === "servant_part") ? "block" : "none";
-    document.getElementById("servedSection").style.display = (role === "served_part") ? "block" : "none";
-    
-    if (role === "served_part") {
-      loadMyProfile();
-    }
-  }
-
-  // تحميل بيانات المخدوم الحالي لنفسه
-  async function loadMyProfile() {
-    if (!currentAdmin) return;
-    try {
-      const doc = await db.collection("servants").doc(currentAdmin.uid).get();
-      if (doc.exists) {
-        const data = doc.data();
-        document.getElementById("profileName").value = data.fullName || "";
-        document.getElementById("profilePhone").value = data.userPhone || "";
-        document.getElementById("profilePoints").value = Number(data.points) || 0;
-      }
-    } catch (error) {
-      console.error("Error loading profile:", error);
-    }
-  }
-
-  // حفظ تعديلات المخدوم لنفسه
-  async function saveProfile() {
-    if (!currentAdmin) return;
-    const name = document.getElementById("profileName").value.trim();
-    const phone = document.getElementById("profilePhone").value.trim();
-
-    if (!name) {
-      alert("برجاء كتابة الاسم.");
-      return;
-    }
-
-    try {
-      await db.collection("servants").doc(currentAdmin.uid).update({
-        fullName: name,
-        userPhone: phone,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      alert("تم حفظ بيانات البروفايل بنجاح ✅");
-    } catch (error) {
-      console.error("Error saving profile:", error);
-      alert("حدث خطأ أثناء الحفظ ❌");
-    }
-  }
-
-  // وظائف جزء الخادم الأصلية
   function stageChanged() {
-    const stage = document.getElementById("stageSelect").value;
-    selectedStage = stage;
-    stopListener();
-    document.getElementById("servantsList").innerHTML = "";
-    document.getElementById("searchInput").value = "";
-    document.getElementById("controlPanel").style.display = "none";
+    selectedStage = document.getElementById("stageSelect").value;
     const passwordBox = document.getElementById("passwordBox");
-    if (!stage) {
+    if (!selectedStage) {
       passwordBox.classList.remove("show");
       return;
     }
@@ -562,8 +400,8 @@
   function verifyStage() {
     const password = document.getElementById("stagePassword").value;
     if (stagePasswords[selectedStage] === password) {
-      document.getElementById("passwordBox").classList.remove("show");
-      document.getElementById("controlPanel").style.display = "block";
+      document.getElementById("stageSection").style.display = "none";
+      document.getElementById("dashboardSection").style.display = "block";
       populateGrades(selectedStage);
       showMessage("تم فتح المرحلة بنجاح 🔓", "success");
     } else {
@@ -583,19 +421,18 @@
   }
 
   function loadServants() {
-    const stage = document.getElementById("stageSelect").value;
     const grade = document.getElementById("gradeSelect").value;
     const list = document.getElementById("servantsList");
-    stopListener();
+    if (unsubscribe) unsubscribe();
 
-    if (!stage || !grade) {
+    if (!grade) {
       list.innerHTML = "";
       return;
     }
 
     list.innerHTML = `<div class="loading">جاري تحميل المخدومين...</div>`;
 
-    unsubscribe = db.collection("servants").where("stage", "==", stage).where("grade", "==", grade).onSnapshot((snapshot) => {
+    unsubscribe = db.collection("servants").where("stage", "==", selectedStage).where("grade", "==", grade).onSnapshot((snapshot) => {
       servants = [];
       snapshot.forEach((doc) => {
         servants.push({ id: doc.id, ...doc.data() });
@@ -607,20 +444,9 @@
     });
   }
 
-  function stopListener() {
-    if (unsubscribe) {
-      unsubscribe();
-      unsubscribe = null;
-    }
-  }
-
   function searchServants() {
     const query = document.getElementById("searchInput").value.trim().toLowerCase();
-    if (!query) {
-      renderServants(servants);
-      return;
-    }
-    const filtered = servants.filter((s) => (s.fullName || "").toLowerCase().includes(query));
+    const filtered = query ? servants.filter(s => (s.fullName || "").toLowerCase().includes(query)) : servants;
     renderServants(filtered);
   }
 
@@ -632,74 +458,77 @@
       return;
     }
     list.forEach((servant) => {
-      const name = servant.fullName || "بدون اسم";
-      const phone = servant.userPhone || "لا يوجد رقم";
-      const points = Number(servant.points) || 0;
-
       const card = document.createElement("div");
       card.className = "servant-card" + (servant.isBlocked ? " blocked" : "");
-      card.onclick = () => openModal(servant);
+      // عند النقر على المخدوم يتم الانتقال لصفحة البروفايل الخاصة به مباشرة
+      card.onclick = () => openServantProfile(servant);
       card.innerHTML = `
         <div>
           <div class="servant-name">
-            ${escapeHTML(name)}
+            ${escapeHTML(servant.fullName || "بدون اسم")}
             ${servant.isBlocked ? `<span class="blocked-badge">محظور</span>` : ""}
           </div>
-          <div class="servant-phone">📞 ${escapeHTML(phone)}</div>
+          <div class="servant-phone">📞 ${escapeHTML(servant.userPhone || "لا يوجد رقم")}</div>
         </div>
-        <div class="points">⭐ ${points}</div>
+        <div class="points">⭐ ${Number(servant.points) || 0}</div>
       `;
       container.appendChild(card);
     });
   }
 
-  function openModal(servant) {
-    document.getElementById("editUserId").value = servant.id;
+  // فتح بروفايل المخدوم المختار
+  function openServantProfile(servant) {
+    currentSelectedServantId = servant.id;
+    document.getElementById("dashboardSection").style.display = "none";
+    document.getElementById("profileSection").style.display = "block";
+
+    document.getElementById("viewNameTitle").innerText = servant.fullName || "مخدوم";
+    document.getElementById("viewAvatar").src = servant.image || "";
+    
     document.getElementById("editName").value = servant.fullName || "";
     document.getElementById("editPhone").value = servant.userPhone || "";
     document.getElementById("editPoints").value = Number(servant.points) || 0;
+    document.getElementById("editAvatar").value = servant.image || "";
 
-    const blockContainer = document.getElementById("blockContainer");
+    const blockContainer = document.getElementById("blockButtonContainer");
     if (servant.isBlocked) {
-      blockContainer.innerHTML = `<button class="unblock-btn" onclick="toggleBlock(false)">إزالة الحظر 🔓</button>`;
+      blockContainer.innerHTML = `<button class="block-action-btn btn-unblock" onclick="toggleBlock(false)">إزالة الحظر 🔓</button>`;
     } else {
-      blockContainer.innerHTML = `<button class="block-btn" onclick="toggleBlock(true)">حظر المخدوم 🚫</button>`;
+      blockContainer.innerHTML = `<button class="block-action-btn btn-block" onclick="toggleBlock(true)">حظر المخدوم 🚫</button>`;
     }
-    document.getElementById("editModal").classList.add("show");
   }
 
-  function closeModal() {
-    document.getElementById("editModal").classList.remove("show");
+  function backToDashboard() {
+    document.getElementById("profileSection").style.display = "none";
+    document.getElementById("dashboardSection").style.display = "block";
+    currentSelectedServantId = null;
   }
 
-  function changePoints(value) {
-    const input = document.getElementById("editPoints");
-    let points = parseInt(input.value) || 0;
-    points += value;
-    if (points < 0) points = 0;
-    input.value = points;
-  }
+  // حفظ التعديلات على بيانات المخدوم بما فيها الصورة
+  async function saveServantProfile() {
+    if (!currentSelectedServantId) return;
 
-  async function saveServant() {
-    const id = document.getElementById("editUserId").value;
     const name = document.getElementById("editName").value.trim();
     const phone = document.getElementById("editPhone").value.trim();
     const points = Math.max(0, parseInt(document.getElementById("editPoints").value) || 0);
+    const image = document.getElementById("editAvatar").value.trim();
 
-    if (!id || !name) {
-      alert("برجاء التأكد من البيانات.");
+    if (!name) {
+      alert("برجاء كتابة اسم المخدوم.");
       return;
     }
 
     try {
-      await db.collection("servants").doc(id).update({
+      await db.collection("servants").doc(currentSelectedServantId).update({
         fullName: name,
         userPhone: phone,
         points: points,
+        image: image,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-      alert("تم حفظ التعديلات بنجاح ✅");
-      closeModal();
+      alert("تم حفظ بيانات المخدوم وصورته بنجاح ✅");
+      document.getElementById("viewNameTitle").innerText = name;
+      document.getElementById("viewAvatar").src = image;
     } catch (error) {
       console.error("Save Error:", error);
       alert("❌ لم يتم الحفظ:\n" + error.message);
@@ -707,17 +536,16 @@
   }
 
   async function toggleBlock(status) {
-    const id = document.getElementById("editUserId").value;
-    if (!id) return;
-    if (!confirm(status ? "هل تريد حظر هذا المخدوم؟" : "هل تريد إزالة الحظر؟")) return;
+    if (!currentSelectedServantId) return;
+    if (!confirm(status ? "هل تريد حظر هذا المخدوم؟" : "هل تريد إزالة الحظر عنه؟")) return;
 
     try {
-      await db.collection("servants").doc(id).update({
+      await db.collection("servants").doc(currentSelectedServantId).update({
         isBlocked: status,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
       alert(status ? "تم حظر المخدوم 🚫" : "تم إزالة الحظر 🔓");
-      closeModal();
+      backToDashboard();
     } catch (error) {
       console.error("Block Error:", error);
       alert("❌ حدث خطأ:\n" + error.message);
@@ -725,14 +553,9 @@
   }
 
   async function logout() {
-    try {
-      stopListener();
-      await auth.signOut();
-      window.location.href = "user.html";
-    } catch (error) {
-      console.error(error);
-      alert("حدث خطأ أثناء تسجيل الخروج.");
-    }
+    if (unsubscribe) unsubscribe();
+    await auth.signOut();
+    window.location.href = "user.html";
   }
 
   function showMessage(text, type) {
@@ -750,10 +573,6 @@
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
   }
-
-  document.getElementById("editModal").addEventListener("click", (event) => {
-    if (event.target.id === "editModal") closeModal();
-  });
 </script>
 
 </body>
