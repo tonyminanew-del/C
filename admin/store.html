@@ -37,7 +37,6 @@
       gap: 20px;
     }
 
-    /* نافذة القفل واختيار المرحلة */
     .lock-card {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 255, 255, 0.12);
@@ -108,7 +107,6 @@
       font-size: 0.85rem;
     }
 
-    /* قسم إضافة الهدايا والملاحة بعد الفتح */
     #storeContent {
       display: none;
       flex-direction: column;
@@ -145,7 +143,6 @@
       font-weight: 600;
     }
 
-    /* معاينة الكارت Live Preview */
     .preview-box {
       border: 2px dashed rgba(56, 189, 248, 0.4);
       border-radius: 20px;
@@ -210,7 +207,6 @@
       text-align: center;
     }
 
-    /* الشريط السفلي للتنقل */
     .bottom-nav {
       position: fixed;
       bottom: 15px;
@@ -250,7 +246,7 @@
 
   <div class="container">
 
-    <!-- خطوة التحقق وفتح المرحلة -->
+    <!-- قفل المرحلة -->
     <div class="lock-card" id="lockCard">
       <div class="lock-icon" id="lockIcon">🔒</div>
       <div class="lock-title">اختر المرحلة والأمان</div>
@@ -266,27 +262,24 @@
       <div class="error-msg" id="lockError"></div>
     </div>
 
-    <!-- محتوى إضافة الهدية والمعاينة (يظهر بعد الفتح) -->
+    <!-- محتوى الإضافة والمعاينة -->
     <div id="storeContent">
       
-      <!-- إضافة هدية -->
       <div class="section-card">
         <div class="section-title">🎁 إضافة هدية جديدة</div>
         
         <div class="form-group">
           <label class="form-label">مستهدف الهدية (الصف الدراسي):</label>
-          <select id="targetGrade" class="select-box">
-            <!-- تتغير ديناميكياً بحسب المرحلة -->
-          </select>
+          <select id="targetGrade" class="select-box"></select>
 
           <label class="form-label">اسم الهدية:</label>
           <input type="text" id="giftName" class="input-box" placeholder="مثال: كتاب مقدس / لعبة" oninput="updatePreview()">
 
-          <label class="form-label">عدد النقاط (السعر):</label>
+          <label class="form-label">سعر الهدية (النقاط المطلوبة):</label>
           <input type="number" id="giftPoints" class="input-box" placeholder="مثال: 50" oninput="updatePreview()">
 
-          <label class="form-label">الكمية المتاحة:</label>
-          <input type="number" id="giftQty" class="input-box" placeholder="مثال: 10" oninput="updatePreview()">
+          <label class="form-label">الكمية المتاحة من هذه الهدية:</label>
+          <input type="number" id="giftQty" class="input-box" placeholder="مثال: 3" oninput="updatePreview()">
 
           <label class="form-label">صورة الهدية:</label>
           <input type="file" id="giftImageInput" class="input-box" accept="image/*" onchange="handleImageUpload(event)">
@@ -295,7 +288,6 @@
         <button class="btn-main" style="margin-top: 15px;" onclick="uploadGift()">نشر الهدية في المعرض 🚀</button>
       </div>
 
-      <!-- معاينة شكل الهدية للمخدوم (Preview) -->
       <div class="section-card">
         <div class="section-title">👁️ معاينة الهدية (شكلها للمخدوم)</div>
         <div class="preview-box">
@@ -304,7 +296,7 @@
             <div class="preview-name" id="previewName">اسم الهدية</div>
             <div class="preview-details">
               <span class="preview-price" id="previewPoints">⭐ 0 نقطة</span>
-              <span class="preview-qty" id="previewQty">المتاح: 0</span>
+              <span class="preview-qty" id="previewQty">الكمية: 0</span>
             </div>
             <div class="preview-btn">إضافة للسلة 🛒</div>
           </div>
@@ -375,7 +367,6 @@
       }
     });
 
-    // تحديث خيارات الصفوف الدراسية حسب المرحلة
     function updateGradeOptions() {
       const stage = document.getElementById('stageSelect').value;
       const targetGradeSelect = document.getElementById('targetGrade');
@@ -398,7 +389,6 @@
       });
     }
 
-    // التحقق من كلمة السر والفتح
     async function verifyStage() {
       const stage = document.getElementById('stageSelect').value;
       const pass = document.getElementById('stagePassword').value;
@@ -408,10 +398,8 @@
         selectedStage = stage;
         lockError.innerText = "";
         
-        // تغيير القفل إلى مفتوح
         document.getElementById('lockIcon').innerText = "🔓";
         
-        // حفظ المرحلة في البروفايل الخاص بالخادم
         if (currentUser) {
           let stageName = stage === 'primary' ? 'ابتدائي' : stage === 'prep' ? 'إعدادي' : 'ثانوي';
           await db.collection('admins').doc(currentUser.uid).set({
@@ -429,7 +417,6 @@
       }
     }
 
-    // المعاينة الحية
     function updatePreview() {
       const name = document.getElementById('giftName').value || "اسم الهدية";
       const points = document.getElementById('giftPoints').value || "0";
@@ -437,10 +424,9 @@
 
       document.getElementById('previewName').innerText = name;
       document.getElementById('previewPoints').innerText = `⭐ ${points} نقطة`;
-      document.getElementById('previewQty').innerText = `المتاح: ${qty}`;
+      document.getElementById('previewQty').innerText = `الكمية: ${qty}`;
     }
 
-    // رفع المعاينة والصورة
     function handleImageUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -453,7 +439,6 @@
       reader.readAsDataURL(file);
     }
 
-    // رفع الهدية لفايربيس
     async function uploadGift() {
       const targetGrade = document.getElementById('targetGrade').value;
       const name = document.getElementById('giftName').value.trim();
@@ -478,12 +463,8 @@
 
         alert("تم إضافة الهدية بنجاح إلى المعرض! ✨");
         
-        // تفريغ الحقول
-        document.getElementById('giftName').value = "";
-        document.getElementById('giftPoints').value = "";
-        document.getElementById('giftQty').value = "";
-        document.getElementById('previewImgBox').innerHTML = "🎁";
-        updatePreview();
+        // إعادة تحميل الصفحة لتصفير البيانات تماماً
+        location.reload();
 
       } catch (err) {
         console.error("Error uploading gift:", err);
