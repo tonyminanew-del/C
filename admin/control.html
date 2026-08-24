@@ -213,7 +213,7 @@
     .message.error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.25); }
     .message.success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
 
-    /* بروفايل المخدوم */
+    /* بروفايل المخدوم في الخادم */
     .profile-header {
       text-align: center;
       margin-bottom: 20px;
@@ -229,7 +229,6 @@
       background: #1e293b;
     }
 
-    /* أزرار تعديل النقاط */
     .points-control {
       display: flex;
       align-items: center;
@@ -331,7 +330,7 @@
     <div id="servantsList" class="servants-list"></div>
   </div>
 
-  <!-- الشاشة الثالثة: بروفايل المخدوم مع أزرار التحكم في النقاط وصورة المعرض -->
+  <!-- الشاشة الثالثة: تعديل بيانات المخدوم من الخادم -->
   <div id="profileSection" style="display:none;">
     <button class="back-btn" onclick="backToDashboard()">⬅ العودة للقائمة</button>
     
@@ -342,7 +341,7 @@
       </div>
 
       <div class="form-group">
-        <label>🖼️ اختيار صورة جديدة من المعرض (Gallery)</label>
+        <label>🖼️ تغيير صورة المخدوم من جهازك:</label>
         <input type="file" id="imageInput" accept="image/*" onchange="compressAndPreviewImage(event)">
       </div>
 
@@ -495,13 +494,18 @@
       const card = document.createElement("div");
       card.className = "servant-card" + (servant.isBlocked ? " blocked" : "");
       card.onclick = () => openServantProfile(servant);
+      
+      const servantImg = servant.image || servant.photoBase64 || "";
       card.innerHTML = `
-        <div>
-          <div class="servant-name">
-            ${escapeHTML(servant.fullName || "بدون اسم")}
-            ${servant.isBlocked ? `<span class="blocked-badge">محظور</span>` : ""}
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <img src="${servantImg}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover; background: #1e293b;" onerror="this.src='https://via.placeholder.com/45?text=👤'">
+          <div>
+            <div class="servant-name">
+              ${escapeHTML(servant.fullName || "بدون اسم")}
+              ${servant.isBlocked ? `<span class="blocked-badge">محظور</span>` : ""}
+            </div>
+            <div class="servant-phone">📞 ${escapeHTML(servant.userPhone || "لا يوجد رقم")}</div>
           </div>
-          <div class="servant-phone">📞 ${escapeHTML(servant.userPhone || "لا يوجد رقم")}</div>
         </div>
         <div class="points">⭐ ${Number(servant.points) || 0}</div>
       `;
@@ -511,13 +515,14 @@
 
   function openServantProfile(servant) {
     currentSelectedServantId = servant.id;
-    newImageBase64 = servant.image || "";
+    newImageBase64 = servant.image || servant.photoBase64 || "";
 
     document.getElementById("dashboardSection").style.display = "none";
     document.getElementById("profileSection").style.display = "block";
 
     document.getElementById("viewNameTitle").innerText = servant.fullName || "مخدوم";
-    document.getElementById("viewAvatar").src = servant.image || "";
+    document.getElementById("viewAvatar.src"] = "";
+    document.getElementById("viewAvatar").src = newImageBase64;
     
     document.getElementById("editName").value = servant.fullName || "";
     document.getElementById("editPhone").value = servant.userPhone || "";
@@ -540,7 +545,7 @@
     input.value = points;
   }
 
-  // ضغط الصورة وتصغيرها لضمان تخزينها بدون مشاكل في الحجم وظهورها للجميع فوراً
+  // ضغط الصورة ومعالجتها في الخادم قبل حفظها
   function compressAndPreviewImage(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -572,7 +577,7 @@
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, width, height);
 
-        newImageBase64 = canvas.toDataURL("image/jpeg", 0.7); // جودة مقبولة وحجم صغير
+        newImageBase64 = canvas.toDataURL("image/jpeg", 0.7);
         document.getElementById("viewAvatar").src = newImageBase64;
       };
       img.src = e.target.result;
@@ -600,17 +605,24 @@
     }
 
     try {
-      await db.collection("servants").doc(currentSelectedServantId).update({
+      // إرسال البيانات وتحديث الحقلين معاً في قاعدة البيانات
+      const updateData = {
         fullName: name,
         userPhone: phone,
         points: points,
-        image: newImageBase64,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      };
+
+      if (newImageBase64) {
+        updateData.image = newImageBase64;
+        updateData.photoBase64 = newImageBase64;
+      }
+
+      await db.collection("servants").doc(currentSelectedServantId).update(updateData);
       alert("تم حفظ بيانات المخدوم وتحديث الصورة والنقاط بنجاح ✅");
     } catch (error) {
       console.error("Save Error:", error);
-      alert("❌ لم يتم الحفظ (ربما حجم الصورة كبير جداً):\n" + error.message);
+      alert("❌ لم يتم الحفظ:\n" + error.message);
     }
   }
 
