@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل دخول المستخدم - 3D Experience</title>
+  <link rel="stylesheet" href="user.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="dark-body">
+
+  <!-- خلفية أسود عميق مع إضاءات ثلاثية الأبعاد -->
+  <div class="dark-background">
+    <div class="glow-orb orb-1 animate-orb"></div>
+    <div class="glow-orb orb-2 animate-orb-delay"></div>
+    <div class="grid-pattern"></div>
+  </div>
+
+  <main class="main-container auth-container 3d-perspective">
+    
+    
+
+    <!-- الكارت المجسم (3D Card) -->
+    <div class="card-3d-wrapper" id="cardWrapper">
+      <div class="glass-auth-card-3d fall-down-3d">
+        
+        <!-- طبقة الشعار ثلاثية الأبعاد -->
+        <div class="layer-3d logo-layer">
+          <div class="logo-badge-3d">⛪</div>
+        </div>
+
+        <!-- طبقة النصوص -->
+        <div class="layer-3d text-layer">
+          <h1>بوابة المستخدم / الخادم</h1>
+          <p>سجل دخولك بحساب Google للمتابعة للخدمة والافتقاد</p>
+        </div>
+
+        <!-- طبقة الزرار المرتفعة -->
+        <div class="layer-3d button-layer">
+          <button id="googleLoginBtn" class="google-btn-3d">
+            <svg class="google-icon" viewBox="0 0 24 24" width="22" height="22">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.19v3.15C3.17 21.36 7.22 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.49-.38-2.25s.13-1.53.38-2.25V6.6H1.19C.43 8.15 0 9.89 0 12s.43 3.85 1.19 5.4l4.09-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.17 2.64 1.19 6.6l4.09 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/>
+            </svg>
+            <span>تسجيل الدخول باستخدام Google</span>
+          </button>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase.app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase.auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const loginBtn = document.getElementById('googleLoginBtn');
+    const statusMsg = document.getElementById('statusMessage');
+
+    // تأثير حركة الماوس ثلاثية الأبعاد (3D Parallax Tilt)
+    const card = document.querySelector('.glass-auth-card-3d');
+    const wrapper = document.getElementById('cardWrapper');
+
+    wrapper.addEventListener('mousemove', (e) => {
+      const rect = wrapper.getBoundingClientRect();
+      const x = e.clientX - rect.left - rect.width / 2;
+      const y = e.clientY - rect.top - rect.height / 2;
+      
+      const rotateX = (-y / rect.height) * 30; // دوران محور X
+      const rotateY = (x / rect.width) * 30;  // دوران محور Y
+
+      card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    });
+
+    wrapper.addEventListener('mouseleave', () => {
+      card.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    });
+
+    loginBtn.addEventListener('click', async () => {
+      try {
+        statusMsg.style.color = "#38bdf8";
+        statusMsg.innerText = "جاري فتح نافذة جوجل...";
+        
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+
+        statusMsg.style.color = "#4ade80";
+        statusMsg.innerText = `أهلاً بك يا ${user.displayName}! جاري توجيهك...`;
+        
+      } catch (error) {
+        console.error(error);
+        statusMsg.style.color = "#f87171";
+        statusMsg.innerText = "حدث خطأ في التسجيل، تأكد من تفعيل Google Provider في Firebase Console.";
+      }
+    });
+  </script>
+
+</body>
+</html>
