@@ -1,1 +1,942 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>طلبات الهدايا - الخادم</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"
+    rel="stylesheet"
+  >
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
+
+    body {
+      background: #0b0f19;
+      color: #fff;
+      min-height: 100vh;
+      padding: 20px 20px 100px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .header {
+      background: linear-gradient(
+        135deg,
+        rgba(56, 189, 248, .15),
+        rgba(2, 132, 199, .05)
+      );
+
+      border: 1px solid rgba(56, 189, 248, .3);
+      border-radius: 22px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      color: #38bdf8;
+      font-size: 1.4rem;
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      color: #94a3b8;
+      font-size: .85rem;
+    }
+
+    .box {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    label {
+      display: block;
+      color: #94a3b8;
+      font-size: .85rem;
+      margin-bottom: 7px;
+    }
+
+    select {
+      width: 100%;
+      padding: 13px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.15);
+      background: #0f172a;
+      color: #fff;
+      outline: none;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+
+    select option {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .orders-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .orders-title h2 {
+      font-size: 1rem;
+    }
+
+    .count {
+      background: #38bdf8;
+      color: #07111d;
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: .75rem;
+      font-weight: 900;
+    }
+
+    .order-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 18px;
+      padding: 15px;
+      margin-bottom: 12px;
+    }
+
+    .order-card.delivered {
+      border-color: rgba(74,222,128,.35);
+      background: rgba(74,222,128,.04);
+    }
+
+    .servant-name {
+      color: #38bdf8;
+      font-size: 1rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+
+    .order-info {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .gift-image {
+      width: 70px;
+      height: 70px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-shrink: 0;
+      font-size: 30px;
+    }
+
+    .gift-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gift-info {
+      flex: 1;
+    }
+
+    .gift-name {
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .gift-meta {
+      color: #94a3b8;
+      font-size: .78rem;
+      line-height: 1.8;
+    }
+
+    .status {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 4px 10px;
+      border-radius: 9px;
+      font-size: .75rem;
+      font-weight: 800;
+    }
+
+    .pending {
+      color: #fbbf24;
+      background: rgba(251,191,36,.12);
+      border: 1px solid rgba(251,191,36,.25);
+    }
+
+    .delivered-status {
+      color: #4ade80;
+      background: rgba(74,222,128,.12);
+      border: 1px solid rgba(74,222,128,.25);
+    }
+
+    .deliver-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg,#22c55e,#16a34a);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      font-size: .9rem;
+    }
+
+    .deliver-btn:disabled {
+      background: #334155;
+      cursor: not-allowed;
+      opacity: .7;
+    }
+
+    .empty {
+      text-align: center;
+      color: #94a3b8;
+      padding: 40px 10px;
+      font-size: .9rem;
+    }
+
+    .loading {
+      text-align: center;
+      color: #38bdf8;
+      padding: 30px;
+    }
+
+    .error {
+      text-align: center;
+      color: #ef4444;
+      padding: 20px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 30px);
+      max-width: 450px;
+
+      background: rgba(15,23,42,.92);
+      backdrop-filter: blur(20px);
+
+      border: 1px solid rgba(255,255,255,.15);
+      border-radius: 25px;
+
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+
+      z-index: 100;
+    }
+
+    .nav-item {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: .72rem;
+      text-align: center;
+    }
+
+    .nav-icon {
+      display: block;
+      font-size: 19px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item.active {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <h1>🛒 طلبات الهدايا</h1>
+    <p>إدارة وتسليم طلبات المخدومين</p>
+  </div>
+
+  <div class="box">
+
+    <label>اختر المرحلة:</label>
+
+    <select id="stageSelect">
+      <option value="">-- اختر المرحلة --</option>
+      <option value="primary">ابتدائي</option>
+      <option value="prep">إعدادي</option>
+      <option value="sec">ثانوي</option>
+    </select>
+
+    <label>اختر الصف:</label>
+
+    <select id="gradeSelect" disabled>
+      <option value="">-- اختر الصف --</option>
+    </select>
+
+  </div>
+
+  <div class="box">
+
+    <div class="orders-title">
+      <h2>📦 الطلبات</h2>
+      <span class="count" id="ordersCount">0</span>
+    </div>
+
+    <div id="ordersList">
+      <div class="empty">
+        اختر المرحلة والصف لعرض الطلبات.
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<nav class="bottom-nav">
+
+  <a href="home.html" class="nav-item">
+    <span class="nav-icon">🏠</span>
+    الرئيسية
+  </a>
+
+  <a href="control.html" class="nav-item">
+    <span class="nav-icon">⚙️</span>
+    الإدارة
+  </a>
+
+  <a href="servant-basket.html" class="nav-item active">
+    <span class="nav-icon">🛒</span>
+    الطلبات
+  </a>
+
+  <a href="profile.html" class="nav-item">
+    <span class="nav-icon">👤</span>
+    البروفايل
+  </a>
+
+</nav>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+  authDomain: "church-7afe1.firebaseapp.com",
+  projectId: "church-7afe1",
+  storageBucket: "church-7afe1.firebasestorage.app",
+  messagingSenderId: "1072334615357",
+  appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+  measurementId: "G-E7Q76Z53SB"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let currentAdmin = null;
+let servants = [];
+let basketListeners = [];
+
+
+/* =========================
+   الصفوف
+========================= */
+
+const stageGrades = {
+
+  primary: [
+    "الصف الأول الابتدائي",
+    "الصف الثاني الابتدائي",
+    "الصف الثالث الابتدائي",
+    "الصف الرابع الابتدائي",
+    "الصف الخامس الابتدائي",
+    "الصف السادس الابتدائي"
+  ],
+
+  prep: [
+    "الصف الأول الإعدادي",
+    "الصف الثاني الإعدادي",
+    "الصف الثالث الإعدادي"
+  ],
+
+  sec: [
+    "الصف الأول الثانوي",
+    "الصف الثاني الثانوي",
+    "الصف الثالث الثانوي"
+  ]
+
+};
+
+
+/* =========================
+   تسجيل دخول الخادم
+========================= */
+
+auth.onAuthStateChanged(async (user) => {
+
+  if (!user) {
+    window.location.href = "../admin.html";
+    return;
+  }
+
+  try {
+
+    const adminDoc =
+      await db.collection("admins")
+      .doc(user.uid)
+      .get();
+
+    if (!adminDoc.exists) {
+
+      alert("هذا الحساب ليس حساب خادم.");
+
+      await auth.signOut();
+
+      return;
+    }
+
+    currentAdmin = user;
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    document.getElementById("ordersList").innerHTML =
+      `<div class="error">
+        ⚠️ تعذر التحقق من حساب الخادم.
+      </div>`;
+
+  }
+
+});
+
+
+/* =========================
+   تغيير المرحلة
+========================= */
+
+document.getElementById("stageSelect")
+.addEventListener("change", function() {
+
+  const stage = this.value;
+
+  const gradeSelect =
+    document.getElementById("gradeSelect");
+
+  gradeSelect.innerHTML =
+    `<option value="">-- اختر الصف --</option>`;
+
+  stopBasketListeners();
+
+  document.getElementById("ordersList").innerHTML =
+    `<div class="empty">
+      اختر الصف لعرض الطلبات.
+    </div>`;
+
+  document.getElementById("ordersCount").innerText = "0";
+
+  if (!stage) {
+
+    gradeSelect.disabled = true;
+    return;
+
+  }
+
+  gradeSelect.disabled = false;
+
+  stageGrades[stage].forEach(grade => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = grade;
+    option.textContent = grade;
+
+    gradeSelect.appendChild(option);
+
+  });
+
+});
+
+
+/* =========================
+   تغيير الصف
+========================= */
+
+document.getElementById("gradeSelect")
+.addEventListener("change", function() {
+
+  const stage =
+    document.getElementById("stageSelect").value;
+
+  const grade = this.value;
+
+  stopBasketListeners();
+
+  if (!stage || !grade) {
+
+    document.getElementById("ordersList").innerHTML =
+      `<div class="empty">
+        اختر المرحلة والصف.
+      </div>`;
+
+    return;
+  }
+
+  loadServants(stage, grade);
+
+});
+
+
+/* =========================
+   جلب المخدومين
+========================= */
+
+async function loadServants(stage, grade) {
+
+  const list =
+    document.getElementById("ordersList");
+
+  list.innerHTML =
+    `<div class="loading">
+      جاري تحميل المخدومين والطلبات...
+    </div>`;
+
+  try {
+
+    const snapshot =
+      await db.collection("servants")
+      .where("stage", "==", stage)
+      .where("grade", "==", grade)
+      .get();
+
+    servants = [];
+
+    snapshot.forEach(doc => {
+
+      servants.push({
+        id: doc.id,
+        ...doc.data()
+      });
+
+    });
+
+    if (servants.length === 0) {
+
+      list.innerHTML =
+        `<div class="empty">
+          لا يوجد مخدومين في هذا الصف.
+        </div>`;
+
+      return;
+    }
+
+    listenToBaskets();
+
+  }
+
+  catch (error) {
+
+    console.error("Servants error:", error);
+
+    list.innerHTML =
+      `<div class="error">
+        ⚠️ تعذر جلب المخدومين.
+        <br>
+        تأكد من صلاحيات Firestore.
+      </div>`;
+
+  }
+
+}
+
+
+/* =========================
+   متابعة السلات
+========================= */
+
+function listenToBaskets() {
+
+  stopBasketListeners();
+
+  const orders = [];
+
+  servants.forEach(servant => {
+
+    const listener =
+      db.collection("servants")
+      .doc(servant.id)
+      .collection("basket")
+      .onSnapshot(
+
+        snapshot => {
+
+          snapshot.forEach(doc => {
+
+            const data = doc.data();
+
+            const existingIndex =
+              orders.findIndex(
+                x =>
+                  x.servantId === servant.id &&
+                  x.orderId === doc.id
+              );
+
+            const order = {
+
+              servantId: servant.id,
+
+              orderId: doc.id,
+
+              servantName:
+                servant.fullName ||
+                "بدون اسم",
+
+              servantPhone:
+                servant.userPhone ||
+                "",
+
+              ...data
+
+            };
+
+            if (existingIndex >= 0) {
+
+              orders[existingIndex] = order;
+
+            }
+
+            else {
+
+              orders.push(order);
+
+            }
+
+          });
+
+          /*
+            إعادة الرسم بعد أي تغيير
+          */
+
+          renderOrders(orders);
+
+        },
+
+        error => {
+
+          console.error(
+            "Basket listener error:",
+            error
+          );
+
+        }
+
+      );
+
+    basketListeners.push(listener);
+
+  });
+
+}
+
+
+/* =========================
+   إيقاف المستمعين
+========================= */
+
+function stopBasketListeners() {
+
+  basketListeners.forEach(unsubscribe => {
+
+    try {
+      unsubscribe();
+    }
+
+    catch (e) {}
+
+  });
+
+  basketListeners = [];
+
+}
+
+
+/* =========================
+   عرض الطلبات
+========================= */
+
+function renderOrders(orders) {
+
+  const list =
+    document.getElementById("ordersList");
+
+  list.innerHTML = "";
+
+  document.getElementById("ordersCount")
+    .innerText = orders.length;
+
+  if (orders.length === 0) {
+
+    list.innerHTML =
+      `<div class="empty">
+        لا توجد طلبات في هذا الصف.
+      </div>`;
+
+    return;
+
+  }
+
+  /*
+    الطلبات غير المسلّمة أولاً
+  */
+
+  orders.sort((a,b) => {
+
+    if (a.isDelivered === b.isDelivered) {
+      return 0;
+    }
+
+    return a.isDelivered ? 1 : -1;
+
+  });
+
+
+  orders.forEach(order => {
+
+    const card =
+      document.createElement("div");
+
+    card.className =
+      "order-card" +
+      (order.isDelivered ? " delivered" : "");
+
+
+    let imageHTML =
+      `<div class="gift-image">🎁</div>`;
+
+    if (order.image) {
+
+      imageHTML =
+        `<div class="gift-image">
+          <img
+            src="${escapeHtml(order.image)}"
+            alt="هدية"
+          >
+        </div>`;
+
+    }
+
+
+    let dateText = "غير محدد";
+
+    if (
+      order.addedAt &&
+      order.addedAt.toDate
+    ) {
+
+      const date =
+        order.addedAt.toDate();
+
+      dateText =
+        date.toLocaleDateString("ar-EG") +
+        " - " +
+        date.toLocaleTimeString(
+          "ar-EG",
+          {
+            hour: "2-digit",
+            minute: "2-digit"
+          }
+        );
+
+    }
+
+
+    const delivered =
+      order.isDelivered === true;
+
+
+    card.innerHTML = `
+
+      <div class="servant-name">
+        👤 ${escapeHtml(order.servantName)}
+      </div>
+
+      <div class="order-info">
+
+        ${imageHTML}
+
+        <div class="gift-info">
+
+          <div class="gift-name">
+            ${escapeHtml(order.name || "هدية")}
+          </div>
+
+          <div class="gift-meta">
+
+            ⭐ النقاط:
+            ${Number(order.points) || 0}
+
+            <br>
+
+            📦 الكمية:
+            ${Number(order.count) || 1}
+
+            <br>
+
+            🕒 ${dateText}
+
+          </div>
+
+          <span class="status ${
+            delivered
+              ? "delivered-status"
+              : "pending"
+          }">
+
+            ${
+              delivered
+                ? "تم التسليم ✔️"
+                : "قيد الانتظار ⏳"
+            }
+
+          </span>
+
+        </div>
+
+      </div>
+
+      ${
+        delivered
+
+        ? ""
+
+        : `
+
+          <button
+            class="deliver-btn"
+            onclick="markDelivered(
+              '${order.servantId}',
+              '${order.orderId}'
+            )"
+          >
+            تم التسليم ✅
+          </button>
+
+        `
+      }
+
+    `;
+
+    list.appendChild(card);
+
+  });
+
+}
+
+
+/* =========================
+   تسليم الطلب
+========================= */
+
+async function markDelivered(
+  servantId,
+  orderId
+) {
+
+  if (!confirm("هل تم تسليم الهدية للمخدوم؟")) {
+    return;
+  }
+
+  try {
+
+    await db
+      .collection("servants")
+      .doc(servantId)
+      .collection("basket")
+      .doc(orderId)
+      .update({
+
+        isDelivered: true,
+
+        deliveredAt:
+          firebase.firestore
+          .FieldValue
+          .serverTimestamp(),
+
+        deliveredBy:
+          currentAdmin.uid
+
+      });
+
+    alert("تم تسجيل التسليم بنجاح ✅");
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Delivery error:",
+      error
+    );
+
+    alert(
+      "حدث خطأ أثناء تسجيل التسليم.\n" +
+      "تأكد من صلاحيات Firestore."
+    );
+
+  }
+
+}
+
+
+/* =========================
+   حماية النصوص
+========================= */
+
+function escapeHtml(value) {
+
+  return String(value)
+
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+</script>
+
+</body>
+</html>
