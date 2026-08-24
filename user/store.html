@@ -280,6 +280,7 @@
     const db = firebase.firestore();
 
     let currentUser = null;
+    let currentUserPoints = 0;
 
     // متابعة المستخدم وجلب نقاطه والهدايا
     auth.onAuthStateChanged((user) => {
@@ -298,7 +299,8 @@
         const doc = await db.collection('servants').doc(uid).get();
         if (doc.exists) {
           const data = doc.data();
-          document.getElementById('userPoints').innerText = data.points || 0;
+          currentUserPoints = data.points || 0;
+          document.getElementById('userPoints').innerText = currentUserPoints;
         }
       } catch (err) {
         console.error("Error loading points:", err);
@@ -349,9 +351,15 @@
       });
     }
 
-    // إضافة الهدية للسلة (في Firestore)
+    // إضافة الهدية للسلة
     async function addToBasket(giftId, name, points, quantity, image) {
       if (!currentUser) return;
+
+      // التحقق من كفاية النقاط أولاً
+      if (currentUserPoints < points) {
+        alert("النقاط غير كافية ❌");
+        return;
+      }
 
       try {
         const basketRef = db.collection('servants').doc(currentUser.uid).collection('basket').doc(giftId);
@@ -359,6 +367,14 @@
 
         if (doc.exists) {
           const currentCount = doc.data().count || 1;
+          const totalPointsNeeded = (currentCount + 1) * points;
+
+          // التحقق من النقاط في حال زيادة الكمية
+          if (currentUserPoints < totalPointsNeeded) {
+            alert("النقاط غير كافية لزيادة الكمية ❌");
+            return;
+          }
+
           if (currentCount < quantity) {
             await basketRef.update({ count: currentCount + 1 });
             alert("تمت زيادة الكمية في السلة! 🛒");
