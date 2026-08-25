@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -141,6 +142,12 @@
       box-shadow: 0 15px 25px rgba(2,132,199,.5);
     }
 
+    .submit-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .status-msg {
       text-align: center;
       margin-top: 15px;
@@ -155,7 +162,10 @@
   <div class="main-card">
 
     <div class="header-box">
-      <div class="icon-badge">📋</div>
+
+      <div class="icon-badge">
+        📋
+      </div>
 
       <h2 id="welcomeText">
         أهلاً بك...
@@ -164,13 +174,18 @@
       <p class="sub-title">
         رجاء تسجيل البيانات الخاصة بك لتحديث قاعدة البيانات
       </p>
+
     </div>
+
 
     <form id="userDataForm">
 
       <!-- الاسم -->
       <div class="input-group">
-        <label>الاسم بالكامل:</label>
+
+        <label>
+          الاسم بالكامل:
+        </label>
 
         <input
           type="text"
@@ -179,13 +194,18 @@
           placeholder="أدخل اسمك"
           required
         >
+
       </div>
+
 
       <!-- أرقام التليفونات -->
       <div class="row">
 
         <div class="input-group">
-          <label>رقم التليفون الشخصي:</label>
+
+          <label>
+            رقم التليفون الشخصي:
+          </label>
 
           <input
             type="tel"
@@ -194,10 +214,15 @@
             placeholder="01XXXXXXXXX"
             required
           >
+
         </div>
 
+
         <div class="input-group">
-          <label>رقم تليفون الأب:</label>
+
+          <label>
+            رقم تليفون الأب:
+          </label>
 
           <input
             type="tel"
@@ -206,12 +231,18 @@
             placeholder="01XXXXXXXXX"
             required
           >
+
         </div>
 
       </div>
 
+
+      <!-- تليفون الأم -->
       <div class="input-group">
-        <label>رقم تليفون الأم:</label>
+
+        <label>
+          رقم تليفون الأم:
+        </label>
 
         <input
           type="tel"
@@ -220,13 +251,18 @@
           placeholder="01XXXXXXXXX"
           required
         >
+
       </div>
+
 
       <!-- العنوان وتاريخ الميلاد -->
       <div class="row">
 
         <div class="input-group">
-          <label>العنوان بالكامل:</label>
+
+          <label>
+            العنوان بالكامل:
+          </label>
 
           <input
             type="text"
@@ -235,10 +271,15 @@
             placeholder="المنطقة - الشارع - رقم العقار"
             required
           >
+
         </div>
 
+
         <div class="input-group">
-          <label>تاريخ الميلاد:</label>
+
+          <label>
+            تاريخ الميلاد:
+          </label>
 
           <input
             type="date"
@@ -246,15 +287,20 @@
             class="custom-input"
             required
           >
+
         </div>
 
       </div>
+
 
       <!-- المرحلة والصف -->
       <div class="row">
 
         <div class="input-group">
-          <label>المرحلة الدراسية:</label>
+
+          <label>
+            المرحلة الدراسية:
+          </label>
 
           <select
             id="stage"
@@ -262,7 +308,12 @@
             required
             onchange="updateGrades()"
           >
-            <option value="" disabled selected>
+
+            <option
+              value=""
+              disabled
+              selected
+            >
               اختر المرحلة
             </option>
 
@@ -277,11 +328,17 @@
             <option value="sec">
               ثانوي
             </option>
+
           </select>
+
         </div>
 
+
         <div class="input-group">
-          <label>الصف الدراسي:</label>
+
+          <label>
+            الصف الدراسي:
+          </label>
 
           <select
             id="grade"
@@ -289,22 +346,32 @@
             required
             disabled
           >
-            <option value="" disabled selected>
+
+            <option
+              value=""
+              disabled
+              selected
+            >
               اختر المرحلة أولاً
             </option>
+
           </select>
+
         </div>
 
       </div>
 
+
       <button
         type="submit"
         class="submit-btn"
+        id="submitButton"
       >
         حفظ البيانات
       </button>
 
     </form>
+
 
     <div
       id="statusMessage"
@@ -313,170 +380,361 @@
 
   </div>
 
+
   <script>
 
-    /* =========================
+    /* =====================================================
        Firebase
-    ========================= */
+       ===================================================== */
 
     const firebaseConfig = {
-      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-      authDomain: "church-7afe1.firebaseapp.com",
-      projectId: "church-7afe1",
-      storageBucket: "church-7afe1.firebasestorage.app",
-      messagingSenderId: "1072334615357",
-      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
-      measurementId: "G-E7Q76Z53SB"
+
+      apiKey:
+        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+
+      authDomain:
+        "church-7afe1.firebaseapp.com",
+
+      projectId:
+        "church-7afe1",
+
+      storageBucket:
+        "church-7afe1.firebasestorage.app",
+
+      messagingSenderId:
+        "1072334615357",
+
+      appId:
+        "1:1072334615357:web:c03b199f00ea9d19d40b54",
+
+      measurementId:
+        "G-E7Q76Z53SB"
+
     };
 
+
     if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
+
+      firebase.initializeApp(
+        firebaseConfig
+      );
+
     }
 
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+
+    const auth =
+      firebase.auth();
+
+    const db =
+      firebase.firestore();
 
 
-    /* =========================
+    /* =====================================================
        العناصر
-    ========================= */
+       ===================================================== */
 
     const welcomeText =
-      document.getElementById("welcomeText");
+      document.getElementById(
+        "welcomeText"
+      );
+
 
     const fullNameInput =
-      document.getElementById("fullName");
+      document.getElementById(
+        "fullName"
+      );
+
 
     const statusMsg =
-      document.getElementById("statusMessage");
+      document.getElementById(
+        "statusMessage"
+      );
 
 
-    /* =========================
+    const submitButton =
+      document.getElementById(
+        "submitButton"
+      );
+
+
+    /* =====================================================
        تسجيل الدخول
-    ========================= */
+       ===================================================== */
 
-    auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(
+      async (user) => {
 
-      if (user) {
+        if (user) {
 
-        const name =
-          user.displayName ||
-          "المخدوم";
+          const name =
+            user.displayName ||
+            "المخدوم";
 
-        welcomeText.innerText =
-          `أهلاً يا ${name}`;
 
-        if (!fullNameInput.value) {
-          fullNameInput.placeholder = name;
+          welcomeText.innerText =
+            `أهلاً يا ${name}`;
+
+
+          if (!fullNameInput.value) {
+
+            fullNameInput.placeholder =
+              name;
+
+          }
+
+
+          /*
+             تحميل البيانات الموجودة مسبقًا
+             لو المخدوم سجل قبل كده
+          */
+
+          try {
+
+            const doc =
+              await db
+                .collection("servants")
+                .doc(user.uid)
+                .get();
+
+
+            if (doc.exists) {
+
+              const data =
+                doc.data();
+
+
+              document.getElementById(
+                "fullName"
+              ).value =
+                data.fullName || "";
+
+
+              document.getElementById(
+                "userPhone"
+              ).value =
+                data.userPhone || "";
+
+
+              document.getElementById(
+                "fatherPhone"
+              ).value =
+                data.fatherPhone || "";
+
+
+              document.getElementById(
+                "motherPhone"
+              ).value =
+                data.motherPhone || "";
+
+
+              document.getElementById(
+                "address"
+              ).value =
+                data.address || "";
+
+
+              document.getElementById(
+                "birthDate"
+              ).value =
+                data.birthDate || "";
+
+
+              if (data.stage) {
+
+                document.getElementById(
+                  "stage"
+                ).value =
+                  data.stage;
+
+
+                updateGrades();
+
+
+                document.getElementById(
+                  "grade"
+                ).value =
+                  data.grade || "";
+
+              }
+
+            }
+
+          } catch (error) {
+
+            console.error(
+              "Load Error:",
+              error
+            );
+
+          }
+
+        } else {
+
+          welcomeText.innerText =
+            "أهلاً بك...";
+
         }
 
-      } else {
-
-        welcomeText.innerText =
-          "أهلاً بك...";
-
       }
+    );
 
-    });
 
-
-    /* =========================
+    /* =====================================================
        الصفوف
-    ========================= */
+       ===================================================== */
 
     function updateGrades() {
 
       const stage =
-        document.getElementById("stage").value;
+        document.getElementById(
+          "stage"
+        ).value;
+
 
       const gradeSelect =
-        document.getElementById("grade");
+        document.getElementById(
+          "grade"
+        );
+
 
       gradeSelect.innerHTML =
         '<option value="" disabled selected>اختر الصف</option>';
 
-      gradeSelect.disabled = false;
+
+      gradeSelect.disabled =
+        false;
+
 
       let options = [];
+
 
       if (stage === "primary") {
 
         options = [
+
           "الصف الأول الابتدائي",
+
           "الصف الثاني الابتدائي",
+
           "الصف الثالث الابتدائي",
+
           "الصف الرابع الابتدائي",
+
           "الصف الخامس الابتدائي",
+
           "الصف السادس الابتدائي"
+
         ];
 
       }
+
 
       else if (stage === "prep") {
 
         options = [
+
           "الصف الأول الإعدادي",
+
           "الصف الثاني الإعدادي",
+
           "الصف الثالث الإعدادي"
+
         ];
 
       }
+
 
       else if (stage === "sec") {
 
         options = [
+
           "الصف الأول الثانوي",
+
           "الصف الثاني الثانوي",
+
           "الصف الثالث الثانوي"
+
         ];
 
       }
 
 
-      options.forEach((grade) => {
+      options.forEach(
+        (grade) => {
 
-        const option =
-          document.createElement("option");
+          const option =
+            document.createElement(
+              "option"
+            );
 
-        option.value = grade;
-        option.textContent = grade;
 
-        gradeSelect.appendChild(option);
+          option.value =
+            grade;
 
-      });
+
+          option.textContent =
+            grade;
+
+
+          gradeSelect.appendChild(
+            option
+          );
+
+        }
+      );
 
     }
 
 
-    /* =========================
+    /* =====================================================
        حفظ البيانات
-    ========================= */
+       ===================================================== */
 
     document
-      .getElementById("userDataForm")
+      .getElementById(
+        "userDataForm"
+      )
       .addEventListener(
         "submit",
         async (e) => {
 
           e.preventDefault();
 
+
           const user =
             auth.currentUser;
+
 
           if (!user) {
 
             statusMsg.style.color =
               "#f87171";
 
+
             statusMsg.innerText =
               "برجاء تسجيل الدخول أولاً!";
 
+
             return;
+
           }
+
+
+          /*
+             منع الضغط مرتين
+          */
+
+          submitButton.disabled =
+            true;
+
+
+          submitButton.innerText =
+            "جاري الحفظ...";
 
 
           statusMsg.style.color =
             "#38bdf8";
+
 
           statusMsg.innerText =
             "جاري حفظ البيانات...";
@@ -484,79 +742,150 @@
 
           try {
 
-            await db
-              .collection("servants")
-              .doc(user.uid)
-              .set({
+            const servantRef =
+              db
+                .collection("servants")
+                .doc(user.uid);
 
-                uid: user.uid,
+
+            /*
+               نتحقق هل الوثيقة موجودة
+            */
+
+            const servantDoc =
+              await servantRef.get();
+
+
+            /* =================================================
+               البيانات الأساسية
+               ================================================= */
+
+            const data = {
+
+              fullName:
+                fullNameInput.value.trim(),
+
+              userPhone:
+                document
+                  .getElementById(
+                    "userPhone"
+                  )
+                  .value
+                  .trim(),
+
+              fatherPhone:
+                document
+                  .getElementById(
+                    "fatherPhone"
+                  )
+                  .value
+                  .trim(),
+
+              motherPhone:
+                document
+                  .getElementById(
+                    "motherPhone"
+                  )
+                  .value
+                  .trim(),
+
+              address:
+                document
+                  .getElementById(
+                    "address"
+                  )
+                  .value
+                  .trim(),
+
+              birthDate:
+                document
+                  .getElementById(
+                    "birthDate"
+                  )
+                  .value,
+
+              stage:
+                document
+                  .getElementById(
+                    "stage"
+                  )
+                  .value,
+
+              grade:
+                document
+                  .getElementById(
+                    "grade"
+                  )
+                  .value,
+
+              updatedAt:
+                firebase.firestore
+                  .FieldValue
+                  .serverTimestamp()
+
+            };
+
+
+            /* =================================================
+               أول تسجيل
+               ================================================= */
+
+            if (!servantDoc.exists) {
+
+              await servantRef.set({
+
+                uid:
+                  user.uid,
 
                 email:
                   user.email || "",
 
-                fullName:
-                  fullNameInput.value.trim() ||
-                  user.displayName ||
-                  "",
+                ...data,
 
-                userPhone:
-                  document
-                    .getElementById("userPhone")
-                    .value
-                    .trim(),
+                points:
+                  0,
 
-                fatherPhone:
-                  document
-                    .getElementById("fatherPhone")
-                    .value
-                    .trim(),
-
-                motherPhone:
-                  document
-                    .getElementById("motherPhone")
-                    .value
-                    .trim(),
-
-                address:
-                  document
-                    .getElementById("address")
-                    .value
-                    .trim(),
-
-                birthDate:
-                  document
-                    .getElementById("birthDate")
-                    .value,
-
-                stage:
-                  document
-                    .getElementById("stage")
-                    .value,
-
-                grade:
-                  document
-                    .getElementById("grade")
-                    .value,
-
-                /* بيانات الإدارة */
-
-                points: 0,
-
-                isBlocked: false,
-
-                updatedAt:
-                  firebase.firestore
-                    .FieldValue
-                    .serverTimestamp()
+                isBlocked:
+                  false
 
               });
 
+            }
+
+
+            /* =================================================
+               تحديث بيانات موجودة
+               ================================================= */
+
+            else {
+
+              /*
+                 مهم جدًا:
+                 لا نرسل uid أو email
+                 في التحديث.
+
+                 لذلك الـ Rules تسمح بالتحديث.
+              */
+
+              await servantRef.update(
+                data
+              );
+
+            }
+
+
+            /* =================================================
+               نجاح
+               ================================================= */
 
             statusMsg.style.color =
               "#4ade80";
 
+
             statusMsg.innerText =
-              "تم الحفظ بنجاح! جاري التوجيه للرئيسية... ✨";
+              servantDoc.exists
+                ? "تم تحديث بياناتك بنجاح! ✨"
+                : "تم تسجيل بياناتك بنجاح! ✨";
 
 
             setTimeout(() => {
@@ -574,12 +903,26 @@
               error
             );
 
+
             statusMsg.style.color =
               "#f87171";
+
 
             statusMsg.innerText =
               "خطأ: " +
               error.message;
+
+
+            /*
+               إعادة الزر للعمل
+            */
+
+            submitButton.disabled =
+              false;
+
+
+            submitButton.innerText =
+              "حفظ البيانات";
 
           }
 
