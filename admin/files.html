@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>أرشيف الدروس الشامل - مع نظام الحماية والبدائل</title>
+<title>أرشيف الدروس الشامل - مع مؤشر التحميل</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
         document.getElementById('firebaseDot').classList.add('online');
         document.getElementById('firebaseStatus').innerText = 'قاعدة البيانات متصلة';
         document.getElementById('storageDot').classList.add('online');
-        document.getElementById('storageStatus').innerText = 'التخزين السحابي متصل';
+        document.getElementById('storageStatus').innerText = 'التخزين السحابي مؤمن';
         loadLessonsData();
       } else {
         document.getElementById('firebaseStatus').innerText = 'فشل الاتصال بـ Firebase';
@@ -68,10 +68,9 @@ button,input,select{font-family:inherit;cursor:pointer;}
 .logo-text h1{font-size:23px;font-weight:900;}
 .logo-text p{color:var(--muted);font-size:12px;}
 .connections-bar{display:flex;gap:10px;flex-wrap:wrap;}
-.connection{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:14px;background:rgba(13,27,46,.8);border:1px solid var(--border);font-size:12px;cursor:pointer;}
+.connection{display:flex;align-items:center;gap:8px;padding:9px 14px;border-radius:14px;background:rgba(13,27,46,.8);border:1px solid var(--border);font-size:12px;}
 .status-dot{width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);}
 .status-dot.online{background:var(--green);box-shadow:0 0 10px var(--green);}
-.status-dot.warning{background:var(--orange);box-shadow:0 0 10px var(--orange);}
 .container{width:min(1450px,94%);margin:30px auto;}
 .service-box{margin-bottom:20px;padding:20px;border-radius:24px;background:rgba(19,40,67,.95);border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;}
 .service-buttons{display:flex;gap:8px;}
@@ -116,6 +115,13 @@ input,select{width:100%;height:46px;border-radius:12px;background:#091727;color:
 .viewer-header{padding:15px 20px;background:#11243d;display:flex;justify-content:space-between;align-items:center;}
 .viewer-body{padding:20px;display:grid;place-items:center;overflow:auto;flex:1;}
 .viewer-body img, .viewer-body video{max-width:100%;max-height:70vh;border-radius:10px;}
+
+/* تصميم شريط التحميل الاحترافي */
+.progress-container{margin-top:15px;display:none;}
+.progress-bar-bg{width:100%;height:10px;background:#091727;border-radius:5px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-bottom:6px;}
+.progress-bar-fill{width:0%;height:100%;background:linear-gradient(90deg, #00d9ff, #21e58c);transition:width .2s ease;}
+.progress-text{font-size:12px;color:var(--muted);text-align:left;}
+
 .toast-container{position:fixed;bottom:20px;left:20px;z-index:2000;display:flex;flex-direction:column;gap:10px;}
 .toast{min-width:250px;padding:12px 16px;border-radius:12px;background:#10243b;font-size:12px;border-right:4px solid var(--green);}
 .toast.error{border-right-color:var(--red);}
@@ -129,7 +135,7 @@ input,select{width:100%;height:46px;border-radius:12px;background:#091727;color:
         <div class="logo">📚</div>
         <div class="logo-text">
             <h1>أرشيف الدروس الشامل</h1>
-            <p>نظام ذكي مع مراقبة التخزين والبدائل</p>
+            <p>نظام ذكي مع تخزين سحابي مؤمن ومؤشر تحميل</p>
         </div>
     </div>
     <div class="connections-bar">
@@ -137,9 +143,9 @@ input,select{width:100%;height:46px;border-radius:12px;background:#091727;color:
             <span class="status-dot" id="firebaseDot"></span>
             <span id="firebaseStatus">قاعدة البيانات</span>
         </div>
-        <div class="connection" onclick="openSettingsModal()" title="انقر لإدارة إعدادات التخزين و الـ API">
+        <div class="connection">
             <span class="status-dot" id="storageDot"></span>
-            <span id="storageStatus">التخزين الاحتياطي (Cloudinary)</span>
+            <span id="storageStatus">التخزين السحابي مؤمن</span>
         </div>
         <button onclick="loadLessonsData()" style="border:0;background:#182c47;color:white;padding:7px 12px;border-radius:10px;cursor:pointer;">🔄 تحديث</button>
     </div>
@@ -206,32 +212,6 @@ input,select{width:100%;height:46px;border-radius:12px;background:#091727;color:
     </section>
 </main>
 
-<!-- نافذة إعدادات التخزين والبدائل (API & Cloudinary Settings) -->
-<div class="modal-overlay" id="settingsModal">
-    <div class="modal">
-        <h3 style="margin-bottom:10px;font-size:18px;">⚙️ إعدادات التخزين والبديل (API / Cloudinary)</h3>
-        <p style="font-size:12px;color:var(--muted);margin-bottom:15px;">إذا توقف نظام التخزين الأساسي أو واجهت خطأ في الرفع، يرجى ضبط مفاتيح المساحة الاحتياطية هنا:</p>
-        
-        <div class="field" style="margin-bottom:12px;">
-            <label>Cloud Name (اسم حساب السحابة):</label>
-            <input type="text" id="settingCloudName" placeholder="مثال: zy9tcll7">
-        </div>
-        <div class="field" style="margin-bottom:12px;">
-            <label>Upload Preset (اسم إعداد الرفع):</label>
-            <input type="text" id="settingUploadPreset" placeholder="مثال: lesson_backup">
-        </div>
-        <div class="field" style="margin-bottom:15px;">
-            <label>حالة الاتصال الحالية:</label>
-            <div id="apiStatusMessage" style="padding:10px;background:#091727;border-radius:10px;font-size:12px;color:var(--green);">التخزين الاحتياطي جاهز للعمل</div>
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button onclick="closeSettingsModal()" style="border:0;background:#182c47;color:white;padding:10px 18px;border-radius:10px;">إغلاق</button>
-            <button onclick="saveSettings()" style="border:0;background:var(--cyan);color:#00131e;padding:10px 18px;border-radius:10px;font-weight:bold;">حفظ واختبار الاتصال</button>
-        </div>
-    </div>
-</div>
-
 <!-- نافذة المعاينة -->
 <div class="modal-overlay" id="viewerModal">
     <div class="viewer-modal">
@@ -255,9 +235,16 @@ input,select{width:100%;height:46px;border-radius:12px;background:#091727;color:
             <label>اختر المجلد:</label>
             <input type="file" id="folderInput" webkitdirectory directory multiple style="background:transparent;border:1px dashed rgba(255,255,255,.2);padding:10px;">
         </div>
-        <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button onclick="closeFolderUploadModal()" style="border:0;background:#182c47;color:white;padding:10px 18px;border-radius:10px;">إلغاء</button>
-            <button onclick="startUploadingFolder()" style="border:0;background:var(--cyan);color:#00131e;padding:10px 18px;border-radius:10px;font-weight:bold;">رفع المجلد ومحتواه</button>
+
+        <!-- شريط التقدم -->
+        <div class="progress-container" id="folderProgressContainer">
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="folderProgressBar"></div></div>
+            <div class="progress-text" id="folderProgressText">جاري الرفع... (0%)</div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+            <button onclick="closeFolderUploadModal()" id="folderCancelBtn" style="border:0;background:#182c47;color:white;padding:10px 18px;border-radius:10px;">إلغاء</button>
+            <button onclick="startUploadingFolder()" id="folderSubmitBtn" style="border:0;background:var(--cyan);color:#00131e;padding:10px 18px;border-radius:10px;font-weight:bold;">رفع المجلد ومحتواه</button>
         </div>
     </div>
 </div>
@@ -274,9 +261,16 @@ input,select{width:100%;height:46px;border-radius:12px;background:#091727;color:
             <label>اختر الملفات:</label>
             <input type="file" id="fileInput" multiple style="background:transparent;border:1px dashed rgba(255,255,255,.2);padding:10px;">
         </div>
-        <div style="display:flex;justify-content:flex-end;gap:10px;">
-            <button onclick="closeUploadModal()" style="border:0;background:#182c47;color:white;padding:10px 18px;border-radius:10px;">إلغاء</button>
-            <button onclick="startUploadingFiles()" style="border:0;background:linear-gradient(135deg, #21e58c, #00d9ff);color:#00131e;padding:10px 18px;border-radius:10px;font-weight:bold;">رفع وحفظ</button>
+
+        <!-- شريط التقدم -->
+        <div class="progress-container" id="fileProgressContainer">
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="fileProgressBar"></div></div>
+            <div class="progress-text" id="fileProgressText">جاري الرفع... (0%)</div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+            <button onclick="closeUploadModal()" id="fileCancelBtn" style="border:0;background:#182c47;color:white;padding:10px 18px;border-radius:10px;">إلغاء</button>
+            <button onclick="startUploadingFiles()" id="fileSubmitBtn" style="border:0;background:linear-gradient(135deg, #21e58c, #00d9ff);color:#00131e;padding:10px 18px;border-radius:10px;font-weight:bold;">رفع وحفظ</button>
         </div>
     </div>
 </div>
@@ -320,9 +314,10 @@ let currentCategory = 'all';
 let allLoadedItems = [];
 let editingItemId = null;
 
-let cloudConfig = {
-    cloudName: localStorage.getItem('cloudName') || "zy9tcll7",
-    uploadPreset: localStorage.getItem('uploadPreset') || "lesson_backup"
+// التخزين السحابي مؤمن وثابت تماماً ولا يمكن للمستخدم تعديله
+const cloudConfig = {
+    cloudName: "zy9tcll7",
+    uploadPreset: "lesson_backup"
 };
 
 function selectService(service) {
@@ -358,47 +353,20 @@ function showToast(msg, type = 'success') {
     setTimeout(() => t.remove(), 4500);
 }
 
-function openSettingsModal() {
-    document.getElementById('settingCloudName').value = cloudConfig.cloudName;
-    document.getElementById('settingUploadPreset').value = cloudConfig.uploadPreset;
-    document.getElementById('settingsModal').classList.add('show');
-}
-function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('show'); }
-
-function saveSettings() {
-    const cName = document.getElementById('settingCloudName').value.trim();
-    const uPreset = document.getElementById('settingUploadPreset').value.trim();
-
-    if(!cName || !uPreset) {
-        showToast("يرجى إدخال البيانات بشكل صحيح", "error");
-        return;
-    }
-
-    cloudConfig.cloudName = cName;
-    cloudConfig.uploadPreset = uPreset;
-    localStorage.setItem('cloudName', cName);
-    localStorage.setItem('uploadPreset', uPreset);
-
-    document.getElementById('storageDot').className = "status-dot online";
-    document.getElementById('storageStatus').innerText = "التخزين الاحتياطي جاهز";
-    showToast("تم تحديث إعدادات التخزين بنجاح!", "success");
-    closeSettingsModal();
-}
-
-function setStorageErrorState(errorMsg) {
-    document.getElementById('storageDot').className = "status-dot warning";
-    document.getElementById('storageStatus').innerText = "مشكلة في الرفع (تطلب API جديد)";
-    showToast(`⚠️ ${errorMsg} - يرجى مراجعة إعدادات الـ API والمساحة الاحتياطية`, "error");
-}
-
 function openUploadModal() {
     document.getElementById('uploadDateInput').value = document.getElementById('filterDate').value || new Date().toISOString().split('T')[0];
+    document.getElementById('fileProgressContainer').style.display = 'none';
+    document.getElementById('fileProgressBar').style.width = '0%';
+    document.getElementById('fileSubmitBtn').disabled = false;
     document.getElementById('uploadModal').classList.add('show');
 }
 function closeUploadModal() { document.getElementById('uploadModal').classList.remove('show'); }
 
 function openFolderUploadModal() {
     document.getElementById('folderUploadDateInput').value = document.getElementById('filterDate').value || new Date().toISOString().split('T')[0];
+    document.getElementById('folderProgressContainer').style.display = 'none';
+    document.getElementById('folderProgressBar').style.width = '0%';
+    document.getElementById('folderSubmitBtn').disabled = false;
     document.getElementById('folderUploadModal').classList.add('show');
 }
 function closeFolderUploadModal() { document.getElementById('folderUploadModal').classList.remove('show'); }
@@ -574,6 +542,107 @@ function resetToRootView() {
     renderFiles();
 }
 
+// دالة رفع الملفات مع دعم مؤشر التحقيق الحقيقي (XHR Progress)
+function uploadFileWithProgress(file, folderPath, onProgress) {
+    return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", cloudConfig.uploadPreset);
+        formData.append("folder", folderPath);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudConfig.cloudName}/auto/upload`, true);
+
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                onProgress(percent);
+            }
+        };
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                try {
+                    const data = JSON.parse(xhr.responseText);
+                    resolve(data);
+                } catch(err) {
+                    reject("خطأ في معالجة استجابة الخادم");
+                }
+            } else {
+                reject("فشل الرفع السحابي، يرجى التأكد من الاتصال.");
+            }
+        };
+
+        xhr.onerror = function() {
+            reject("خطأ في شبكة الإنترنت أثناء الرفع.");
+        };
+
+        xhr.send(formData);
+    });
+}
+
+async function startUploadingFiles() {
+    const lessonDate = document.getElementById('uploadDateInput').value;
+    const fileInput = document.getElementById('fileInput');
+    
+    if(!lessonDate || fileInput.files.length === 0) {
+        showToast("اختر التاريخ والملفات أولاً", "error");
+        return;
+    }
+
+    const progressContainer = document.getElementById('fileProgressContainer');
+    const progressBar = document.getElementById('fileProgressBar');
+    const progressText = document.getElementById('fileProgressText');
+    const submitBtn = document.getElementById('fileSubmitBtn');
+
+    progressContainer.style.display = 'block';
+    submitBtn.disabled = true;
+
+    const files = fileInput.files;
+    let totalFiles = files.length;
+
+    for (let i = 0; i < totalFiles; i++) {
+        let file = files[i];
+        progressText.innerText = `جاري رفع (${i + 1} من ${totalFiles}): ${file.name} (0%)`;
+
+        try {
+            const data = await uploadFileWithProgress(file, `${currentService}/${lessonDate}`, (percent) => {
+                progressBar.style.width = percent + '%';
+                progressText.innerText = `جاري رفع (${i + 1} من ${totalFiles}): ${file.name} (${percent}%)`;
+            });
+
+            if (!data.secure_url) {
+                throw new Error("فشل الحصول على رابط السحابة");
+            }
+
+            let fType = 'other';
+            if (file.type.startsWith('image/')) fType = 'image';
+            else if (file.type.startsWith('video/')) fType = 'video';
+            else if (file.type.includes('pdf')) fType = 'pdf';
+
+            const { collection, addDoc, serverTimestamp } = window.FirebaseModules;
+            await addDoc(collection(window.db, "lessonFiles"), {
+                service: currentService,
+                parentId: activeFolderId,
+                lessonDate: lessonDate,
+                fileName: file.name,
+                fileUrl: data.secure_url,
+                fileType: fType,
+                createdAt: serverTimestamp()
+            });
+
+        } catch (e) {
+            showToast(e.message || "حدث خطأ أثناء الرفع", "error");
+            submitBtn.disabled = false;
+            return;
+        }
+    }
+
+    showToast("تم رفع جميع الملفات بنجاح!", "success");
+    closeUploadModal();
+    loadLessonsData();
+}
+
 async function startUploadingFolder() {
     const lessonDate = document.getElementById('folderUploadDateInput').value;
     const folderInput = document.getElementById('folderInput');
@@ -583,23 +652,33 @@ async function startUploadingFolder() {
         return;
     }
 
-    showToast("جاري رفع المجلد عبر التخزين الاحتياطي...", "info");
-    const folderMap = new Map();
+    const progressContainer = document.getElementById('folderProgressContainer');
+    const progressBar = document.getElementById('folderProgressBar');
+    const progressText = document.getElementById('folderProgressText');
+    const submitBtn = document.getElementById('folderSubmitBtn');
 
-    for (let file of folderInput.files) {
+    progressContainer.style.display = 'block';
+    submitBtn.disabled = true;
+
+    const folderMap = new Map();
+    const files = folderInput.files;
+    let totalFiles = files.length;
+
+    for (let i = 0; i < totalFiles; i++) {
+        let file = files[i];
         try {
             let relativePath = file.webkitRelativePath;
             let pathParts = relativePath.split('/');
             
             let currentParent = 'root';
-            for (let i = 0; i < pathParts.length - 1; i++) {
-                let folderNamePath = pathParts.slice(0, i + 1).join('/');
+            for (let j = 0; j < pathParts.length - 1; j++) {
+                let folderNamePath = pathParts.slice(0, j + 1).join('/');
                 if (!folderMap.has(folderNamePath)) {
                     const { collection, addDoc, serverTimestamp } = window.FirebaseModules;
                     const folderDocRef = await addDoc(collection(window.db, "lessonFiles"), {
                         service: currentService,
                         parentId: currentParent,
-                        fileName: pathParts[i],
+                        fileName: pathParts[j],
                         fileUrl: '',
                         fileType: 'folder',
                         lessonDate: lessonDate,
@@ -610,20 +689,15 @@ async function startUploadingFolder() {
                 currentParent = folderMap.get(folderNamePath);
             }
 
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", cloudConfig.uploadPreset);
-            formData.append("folder", `${currentService}/${lessonDate}`);
+            progressText.innerText = `رفع ملف (${i + 1} من ${totalFiles}): ${file.name} (0%)`;
 
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudConfig.cloudName}/auto/upload`, {
-                method: "POST",
-                body: formData
+            const data = await uploadFileWithProgress(file, `${currentService}/${lessonDate}`, (percent) => {
+                progressBar.style.width = percent + '%';
+                progressText.innerText = `رفع ملف (${i + 1} من ${totalFiles}): ${file.name} (${percent}%)`;
             });
-            const data = await res.json();
-            
+
             if (!data.secure_url) {
-                setStorageErrorState("فشل الاتصال بمساحة التخزين أو خطأ في الـ API");
-                return;
+                throw new Error("فشل الرفع السحابي للملف");
             }
 
             let fType = 'other';
@@ -643,69 +717,14 @@ async function startUploadingFolder() {
             });
 
         } catch (e) {
-            console.error(e);
-            setStorageErrorState("خطأ شبكة أو انتهت صلاحية مفتاح الـ API");
+            showToast(e.message || "خطأ أثناء رفع المجلد", "error");
+            submitBtn.disabled = false;
             return;
         }
     }
 
     showToast("تم رفع المجلد ومحتواه بنجاح!", "success");
     closeFolderUploadModal();
-    loadLessonsData();
-}
-
-async function startUploadingFiles() {
-    const lessonDate = document.getElementById('uploadDateInput').value;
-    const fileInput = document.getElementById('fileInput');
-    
-    if(!lessonDate || fileInput.files.length === 0) {
-        showToast("اختر التاريخ والملفات أولاً", "error");
-        return;
-    }
-
-    showToast("جاري الرفع...", "info");
-
-    for (let file of fileInput.files) {
-        try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", cloudConfig.uploadPreset);
-            formData.append("folder", `${currentService}/${lessonDate}`);
-
-            const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudConfig.cloudName}/auto/upload`, {
-                method: "POST",
-                body: formData
-            });
-            const data = await res.json();
-            
-            if (!data.secure_url) {
-                setStorageErrorState("فشل الرفع - يرجى التحقق من إعدادات الـ API");
-                return;
-            }
-
-            let fType = 'other';
-            if (file.type.startsWith('image/')) fType = 'image';
-            else if (file.type.startsWith('video/')) fType = 'video';
-            else if (file.type.includes('pdf')) fType = 'pdf';
-
-            const { collection, addDoc, serverTimestamp } = window.FirebaseModules;
-            await addDoc(collection(window.db, "lessonFiles"), {
-                service: currentService,
-                parentId: activeFolderId,
-                lessonDate: lessonDate,
-                fileName: file.name,
-                fileUrl: data.secure_url,
-                fileType: fType,
-                createdAt: serverTimestamp()
-            });
-        } catch (e) {
-            setStorageErrorState(`فشل رفع الملف ${file.name}`);
-            return;
-        }
-    }
-
-    showToast("تم الرفع بنجاح!", "success");
-    closeUploadModal();
     loadLessonsData();
 }
 
