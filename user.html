@@ -1,58 +1,346 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل دخول المستخدم - 3D Experience</title>
-  <link rel="stylesheet" href="user.css">
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-  
-  <!-- استدعاء فايربيس المباشر والمستقر -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-</head>
-<body class="dark-body">
+  <title>إنشاء حساب - بوابة الكنيسة</title>
 
-  <div class="dark-background">
-    <div class="glow-orb orb-1 animate-orb"></div>
-    <div class="glow-orb orb-2 animate-orb-delay"></div>
-    <div class="grid-pattern"></div>
+  <!-- GOOGLE FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- FIREBASE FIRESTORE ONLY -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Cairo", sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: radial-gradient(circle at 15% 20%, rgba(0, 140, 255, .20), transparent 35%),
+                  radial-gradient(circle at 85% 80%, rgba(125, 60, 255, .22), transparent 35%),
+                  #050816;
+    }
+
+    .background {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: -10;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: .45;
+      animation: floatOrb 7s ease-in-out infinite;
+    }
+
+    .orb1 { width: 320px; height: 320px; background: #0077ff; left: -120px; top: -120px; }
+    .orb2 { width: 360px; height: 360px; background: #7c3aed; right: -130px; bottom: -130px; animation-delay: 2s; }
+    .orb3 { width: 180px; height: 180px; background: #06b6d4; right: 30%; top: 5%; opacity: .18; animation-delay: 4s; }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-35px) scale(1.08); }
+    }
+
+    .scene {
+      width: 430px;
+      max-width: 92vw;
+      height: 620px;
+      perspective: 1800px;
+      position: relative;
+    }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform .9s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .side {
+      position: absolute;
+      inset: 0;
+      padding: 34px 35px;
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      box-shadow: 0 40px 100px rgba(0,0,0,.55), inset 0 1px 1px rgba(255,255,255,.2);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .signup { transform: rotateY(0deg); }
+    .signin { transform: rotateY(180deg); }
+
+    .logo {
+      width: 82px;
+      height: 82px;
+      border-radius: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 15px 35px rgba(0,0,0,.35), inset 0 2px 5px rgba(255,255,255,.2);
+      transform: translateZ(40px);
+      margin-bottom: 18px;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 27px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 5px;
+      transform: translateZ(25px);
+    }
+
+    .subtitle {
+      color: #aeb8d0;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 22px;
+    }
+
+    .input-box {
+      width: 100%;
+      margin-bottom: 13px;
+    }
+
+    .input-box label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .input-box input {
+      width: 100%;
+      height: 51px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.12);
+      outline: none;
+      background: rgba(0,0,0,.25);
+      color: white;
+      padding: 0 17px;
+      font-family: inherit;
+      font-size: 14px;
+      transition: .3s;
+    }
+
+    .input-box input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56,189,248,.1), 0 8px 25px rgba(0,0,0,.25);
+      transform: translateY(-2px);
+    }
+
+    .input-box input::placeholder {
+      color: #667085;
+    }
+
+    .main-btn {
+      width: 100%;
+      height: 55px;
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      box-shadow: 0 12px 30px rgba(14,165,233,.25), 0 5px 0 rgba(0,0,0,.25);
+      transition: .25s;
+      margin-top: 4px;
+    }
+
+    .main-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(14,165,233,.35), 0 5px 0 rgba(0,0,0,.25);
+    }
+
+    .main-btn:active {
+      transform: translateY(2px);
+    }
+
+    .main-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .switch {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .switch button {
+      border: none;
+      background: none;
+      color: #38bdf8;
+      font-family: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      font-size: 13px;
+      margin-right: 5px;
+    }
+
+    .switch button:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      width: 100%;
+      min-height: 25px;
+      margin-top: 9px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .floating {
+      position: absolute;
+      width: 75px;
+      height: 75px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.25);
+      animation: floating 5s ease-in-out infinite;
+    }
+
+    .floating1 { left: -105px; top: 80px; transform: rotate(15deg); }
+    .floating2 { right: -105px; bottom: 90px; transform: rotate(-20deg); animation-delay: 1.5s; }
+
+    @keyframes floating {
+      0%, 100% { margin-top: 0; }
+      50% { margin-top: -20px; }
+    }
+
+    @media(max-width:600px) {
+      .scene { width: 92vw; height: 610px; }
+      .side { padding: 30px 25px; }
+      h1 { font-size: 24px; }
+      .floating { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- BACKGROUND -->
+  <div class="background">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
   </div>
 
-  <main class="main-container auth-container 3d-perspective">
+  <!-- 3D SCENE -->
+  <div class="scene">
+    <div class="floating floating1"></div>
+    <div class="floating floating2"></div>
 
-    <div class="card-3d-wrapper" id="cardWrapper">
-      <div class="glass-auth-card-3d fall-down-3d">
-        
-        <div class="layer-3d logo-layer">
-          <div class="logo-badge-3d">⛪</div>
+    <div class="card" id="card">
+
+      <!-- SIGN UP -->
+      <section class="side signup">
+        <div class="logo">✨</div>
+        <h1>إنشاء حساب جديد</h1>
+        <p class="subtitle">أنشئ حسابك في البرنامج 🚀<br>وابدأ رحلتك معنا</p>
+
+        <div class="input-box">
+          <label>اسم المستخدم</label>
+          <input type="text" id="signupUsername" placeholder="مثال: توني" maxlength="30" autocomplete="username">
         </div>
 
-        <div class="layer-3d text-layer">
-          <h1>بوابة المستخدم / الخادم</h1>
-          <p>سجل دخولك بحساب Google للمتابعة للخدمة والافتقاد</p>
+        <div class="input-box">
+          <label>كلمة المرور</label>
+          <input type="password" id="signupPassword" placeholder="6 أحرف على الأقل" autocomplete="new-password">
         </div>
 
-        <div class="layer-3d button-layer">
-          <button id="googleLoginBtn" class="google-btn-3d">
-            <svg class="google-icon" viewBox="0 0 24 24" width="22" height="22">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.19v3.15C3.17 21.36 7.22 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.49-.38-2.25s.13-1.53.38-2.25V6.6H1.19C.43 8.15 0 9.89 0 12s.43 3.85 1.19 5.4l4.09-3.15z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.22 0 3.17 2.64 1.19 6.6l4.09 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/>
-            </svg>
-            <span>تسجيل الدخول باستخدام Google</span>
-          </button>
+        <div class="input-box">
+          <label>إعادة كتابة كلمة المرور</label>
+          <input type="password" id="confirmPassword" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password">
         </div>
 
-        <div id="statusMessage" class="status-message"></div>
+        <button class="main-btn" id="signupBtn" type="button">✨ Sign Up</button>
 
-      </div>
+        <div class="switch">
+          لديك حساب بالفعل؟
+          <button id="goLogin" type="button">Sign In</button>
+        </div>
+
+        <div class="status" id="signupStatus"></div>
+      </section>
+
+      <!-- SIGN IN -->
+      <section class="side signin">
+        <div class="logo">🔐</div>
+        <h1>تسجيل الدخول</h1>
+        <p class="subtitle">أهلاً بك مرة أخرى 👋<br>ادخل إلى حسابك</p>
+
+        <div class="input-box">
+          <label>اسم المستخدم</label>
+          <input type="text" id="loginUsername" placeholder="مثال: توني" autocomplete="username">
+        </div>
+
+        <div class="input-box">
+          <label>كلمة المرور</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button class="main-btn" id="loginBtn" type="button">🔐 Sign In</button>
+
+        <div class="switch">
+          ليس لديك حساب؟
+          <button id="goSignup" type="button">Sign Up</button>
+        </div>
+
+        <div class="status" id="loginStatus"></div>
+      </section>
+
     </div>
-
-  </main>
+  </div>
 
   <script>
+    /* FIREBASE CONFIG */
     const firebaseConfig = {
       apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
       authDomain: "church-7afe1.firebaseapp.com",
@@ -66,59 +354,198 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
 
-    const loginBtn = document.getElementById('googleLoginBtn');
-    const statusMsg = document.getElementById('statusMessage');
+    const db = firebase.firestore();
 
-    // تأثير حركة الماوس 3D
-    const card = document.querySelector('.glass-auth-card-3d');
-    const wrapper = document.getElementById('cardWrapper');
+    const card = document.getElementById("card");
+    const goLogin = document.getElementById("goLogin");
+    const goSignup = document.getElementById("goSignup");
+    const signupBtn = document.getElementById("signupBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const signupStatus = document.getElementById("signupStatus");
+    const loginStatus = document.getElementById("loginStatus");
 
-    if (wrapper && card) {
-      wrapper.addEventListener('mousemove', (e) => {
-        const rect = wrapper.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        card.style.transform = `rotateX(${(-y / rect.height) * 25}deg) rotateY(${(x / rect.width) * 25}deg)`;
-      });
-
-      wrapper.addEventListener('mouseleave', () => {
-        card.style.transform = `rotateX(0deg) rotateY(0deg)`;
-      });
-    }
-
-    // دالة التوجيه بعد نجاح تسجيل الدخول
-    function handleSuccessfulLogin(userName) {
-      statusMsg.style.color = "#4ade80";
-      statusMsg.innerText = `👋 Hello ${userName}! جاري توجيهك للأسئلة...`;
-      
-      setTimeout(() => {
-        window.location.href = "user/question.html";
-      }, 1500);
-    }
-
-    // متابعة حالة تسجيل الدخول تلقائياً (لو المستخدم مسجل من قبل)
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        handleSuccessfulLogin(user.displayName);
-      }
+    /* 3D FLIP */
+    goLogin.addEventListener("click", () => {
+      card.classList.add("flipped");
+      signupStatus.innerText = "";
     });
 
-    // عند الضغط على زر تسجيل الدخول
-    loginBtn.addEventListener('click', () => {
-      statusMsg.style.color = "#38bdf8";
-      statusMsg.innerText = "جاري الاتصال بـ Google...";
+    goSignup.addEventListener("click", () => {
+      card.classList.remove("flipped");
+      loginStatus.innerText = "";
+    });
 
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          handleSuccessfulLogin(result.user.displayName);
-        })
-        .catch((error) => {
-          console.warn("Popup blocked/failed, trying redirect...", error);
-          auth.signInWithRedirect(provider);
+    /* 3D MOUSE EFFECT */
+    const scene = document.querySelector(".scene");
+    scene.addEventListener("mousemove", (e) => {
+      const rect = scene.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const rotateY = ((x / rect.width) - .5) * 7;
+      const rotateX = ((y / rect.height) - .5) * -7;
+      const base = card.classList.contains("flipped") ? 180 : 0;
+      card.style.transform = `rotateX(${rotateX}deg) rotateY(${base + rotateY}deg)`;
+    });
+
+    scene.addEventListener("mouseleave", () => {
+      card.style.transform = card.classList.contains("flipped") ? "rotateY(180deg)" : "rotateY(0deg)";
+    });
+
+    function normalizeUsername(username) {
+      return username.trim().toLowerCase();
+    }
+
+    /* SIGN UP (Direct Firestore Check) */
+    signupBtn.addEventListener("click", async () => {
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      signupStatus.innerText = "";
+
+      if (!username || !password || !confirmPassword) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "⚠️ من فضلك املأ جميع البيانات";
+        return;
+      }
+
+      if (username.length < 2) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ اسم المستخدم قصير جدًا";
+        return;
+      }
+
+      if (password.length < 6) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ كلمتا المرور غير متطابقتين";
+        return;
+      }
+
+      signupBtn.disabled = true;
+      signupBtn.innerText = "⏳ جاري إنشاء الحساب...";
+
+      try {
+        const cleanUsername = normalizeUsername(username);
+        const userRef = db.collection("users").doc(cleanUsername);
+        const userDoc = await userRef.get();
+
+        if (userDoc.exists) {
+          signupStatus.style.color = "#f87171";
+          signupStatus.innerText = "❌ اسم المستخدم مستخدم بالفعل";
+          signupBtn.disabled = false;
+          signupBtn.innerText = "✨ Sign Up";
+          return;
+        }
+
+        // حفظ بيانات الحساب الأساسية في Firestore
+        await userRef.set({
+          username: username,
+          usernameLower: cleanUsername,
+          password: password,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
+
+        // حفظ اسم المستخدم في الـ localStorage لتستعمله صفحة الأسئلة/البيانات
+        localStorage.setItem("currentUsername", cleanUsername);
+
+        signupStatus.style.color = "#4ade80";
+        signupStatus.innerText = "🎉 تم إنشاء الحساب بنجاح!";
+
+        setTimeout(() => {
+          window.location.href = "user/question.html"; // توجيه لصفحة إدخال البيانات عند التسجيل لأول مرة
+        }, 900);
+
+      } catch (error) {
+        console.error("SIGN UP ERROR:", error);
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ حدث خطأ أثناء إنشاء الحساب";
+      }
+
+      signupBtn.disabled = false;
+      signupBtn.innerText = "✨ Sign Up";
+    });
+
+    /* SIGN IN (Direct Firestore Check) */
+    loginBtn.addEventListener("click", async () => {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      loginStatus.innerText = "";
+
+      if (!username || !password) {
+        loginStatus.style.color = "#f87171";
+        loginStatus.innerText = "⚠️ اكتب اسم المستخدم وكلمة المرور";
+        return;
+      }
+
+      loginBtn.disabled = true;
+      loginBtn.innerText = "⏳ جاري تسجيل الدخول...";
+
+      try {
+        const cleanUsername = normalizeUsername(username);
+        const userRef = db.collection("users").doc(cleanUsername);
+        const userDoc = await userRef.get();
+
+        if (!userDoc.exists) {
+          loginStatus.style.color = "#f87171";
+          loginStatus.innerText = "❌ اسم المستخدم غير موجود";
+          loginBtn.disabled = false;
+          loginBtn.innerText = "🔐 Sign In";
+          return;
+        }
+
+        const userData = userDoc.data();
+
+        if (userData.password !== password) {
+          loginStatus.style.color = "#f87171";
+          loginStatus.innerText = "❌ كلمة المرور غير صحيحة";
+          loginBtn.disabled = false;
+          loginBtn.innerText = "🔐 Sign In";
+          return;
+        }
+
+        // حفظ اسم المستخدم في الـ localStorage للجلسة الحالية
+        localStorage.setItem("currentUsername", cleanUsername);
+
+        loginStatus.style.color = "#4ade80";
+        loginStatus.innerText = "✅ تم تسجيل الدخول بنجاح!";
+
+        // التحقق الذكي: هل سجل بياناته من قبل في القاعدة أم لا؟
+        setTimeout(() => {
+          if (userData.fullName && userData.userPhone && userData.stage) {
+            // إذا كانت بياناته كاملة مسبقاً، اذهب للـ home مباشرة
+            window.location.href = "user/home.html";
+          } else {
+            // إذا لم يكمل بياناته بعد، اذهب لصفحة البيانات (question.html)
+            window.location.href = "user/question.html";
+          }
+        }, 900);
+
+      } catch (error) {
+        console.error("LOGIN ERROR:", error);
+        loginStatus.style.color = "#f87171";
+        loginStatus.innerText = "❌ حدث خطأ أثناء تسجيل الدخول";
+      }
+
+      loginBtn.disabled = false;
+      loginBtn.innerText = "🔐 Sign In";
+    });
+
+    /* ENTER KEY */
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      if (card.classList.contains("flipped")) {
+        loginBtn.click();
+      } else {
+        signupBtn.click();
+      }
     });
   </script>
 
