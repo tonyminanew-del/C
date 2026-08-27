@@ -6,9 +6,8 @@
   <title>الملف الشخصي - تطبيق الكنيسة</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   
-  <!-- استدعاء فايربيس -->
+  <!-- استدعاء فايربيس Firestore فقط -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -105,12 +104,26 @@
       font-size: 1.4rem;
       font-weight: 800;
       color: #ffffff;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
-    .user-email {
+    /* بديل الإيميل: عرض اسم المستخدم وكلمة المرور */
+    .credentials-box {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
       font-size: 0.85rem;
       color: #94a3b8;
+      background: rgba(255, 255, 255, 0.04);
+      padding: 8px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-top: 5px;
+    }
+
+    .credentials-box span span {
+      color: #38bdf8;
+      font-weight: 600;
     }
 
     /* شبكة التفاصيل */
@@ -189,7 +202,7 @@
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 10px 10px;
+      padding: 10px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
       z-index: 100;
     }
@@ -241,7 +254,13 @@
       <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="uploadProfilePhoto(event)">
       
       <div class="user-name" id="profileName">جاري التحميل...</div>
-      <div class="user-email" id="profileEmail">...</div>
+      
+      <!-- عرض اسم المستخدم وكلمة المرور بدلاً من الإيميل -->
+      <div class="credentials-box">
+        <span>👤 اسم المستخدم: <span id="displayUsername">-</span></span>
+        <span>🔑 الباسورد: <span id="displayPassword">-</span></span>
+      </div>
+
       <div id="uploadStatus"></div>
     </div>
 
@@ -329,66 +348,66 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const auth = firebase.auth();
+    
     const db = firebase.firestore();
+    const currentUsername = localStorage.getItem("currentUsername");
 
-    let currentUser = null;
-    let unsubscribeProfile = null;
-
-    // جلب البيانات بشكل لحظي (Real-time) لتظهر تعديلات الخادم فوراً
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        currentUser = user;
-        document.getElementById('profileEmail').innerText = user.email || "";
-
-        if (unsubscribeProfile) unsubscribeProfile();
-
-        unsubscribeProfile = db.collection('servants').doc(user.uid).onSnapshot((doc) => {
-          if (doc.exists) {
-            const data = doc.data();
-            
-            document.getElementById('profileName').innerText = data.fullName || user.displayName;
-            document.getElementById('userPhone').innerText = data.userPhone || "غير مسجل";
-            document.getElementById('fatherPhone').innerText = data.fatherPhone || "غير مسجل";
-            document.getElementById('motherPhone').innerText = data.motherPhone || "غير مسجل";
-            document.getElementById('address').innerText = data.address || "غير مسجل";
-            document.getElementById('birthDate').innerText = data.birthDate || "غير مسجل";
-
-            // فحص الحقلين لعرض الصورة أيهما تم تحديثه سواء من الخادم أو المخدوم
-            const userImg = data.photoBase64 || data.image;
-            if (userImg) {
-              document.getElementById('avatarContainer').innerHTML = `<img src="${userImg}" alt="Profile">`;
-            } else if (user.photoURL) {
-              document.getElementById('avatarContainer').innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
-            }
-
-            let stageArabic = "غير مسجل";
-            if(data.stage === "primary") stageArabic = "ابتدائي";
-            else if(data.stage === "prep") stageArabic = "إعدادي";
-            else if(data.stage === "sec") stageArabic = "ثانوي";
-
-            document.getElementById('stage').innerText = stageArabic;
-            document.getElementById('grade').innerText = data.grade || "غير مسجل";
-          } else {
-            document.getElementById('profileName').innerText = user.displayName;
-            if (user.photoURL) {
-              document.getElementById('avatarContainer').innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
-            }
-          }
-        }, (error) => {
-          console.error("Error fetching profile stream:", error);
-        });
-
-      } else {
-        if (unsubscribeProfile) unsubscribeProfile();
-        window.location.href = "user.html";
+    async function loadProfileData() {
+      if (!currentUsername) {
+        window.location.href = "../index.html";
+        return;
       }
-    });
 
-    // دالة رفع وتحويل الصورة وتحديث الحقلين معاً (photoBase64 و image)
+      // عرض اسم المستخدم وكلمة المرور فوراً من الذاكرة أو قاعدة البيانات
+      document.getElementById('displayUsername').innerText = currentUsername;
+
+      try {
+        const docRef = db.collection('users').doc(currentUsername);
+        const doc = await docRef.get();
+
+        if (doc.exists) {
+          const data = doc.data();
+
+          // عرض الاسم الكامل
+          document.getElementById('profileName').innerText = data.fullName || currentUsername;
+          
+          // عرض الباسورد لو متخزن في قاعدة البيانات
+          document.getElementById('displayPassword').innerText = data.password || "******";
+
+          // عرض باقي البيانات الشخصية
+          document.getElementById('userPhone').innerText = data.userPhone || "غير مسجل";
+          document.getElementById('fatherPhone').innerText = data.fatherPhone || "غير مسجل";
+          document.getElementById('motherPhone').innerText = data.motherPhone || "غير مسجل";
+          document.getElementById('address').innerText = data.address || "غير مسجل";
+          document.getElementById('birthDate').innerText = data.birthDate || "غير مسجل";
+
+          // عرض الصورة لو موجودة
+          const userImg = data.photoBase64 || data.image;
+          if (userImg) {
+            document.getElementById('avatarContainer').innerHTML = `<img src="${userImg}" alt="Profile">`;
+          }
+
+          // ترجمة المرحلة الدراسية
+          let stageArabic = "غير مسجل";
+          if (data.stage === "primary") stageArabic = "ابتدائي";
+          else if (data.stage === "prep") stageArabic = "إعدادي";
+          else if (data.stage === "sec") stageArabic = "ثانوي";
+
+          document.getElementById('stage').innerText = stageArabic;
+          document.getElementById('grade').innerText = data.grade || "غير مسجل";
+        } else {
+          document.getElementById('profileName').innerText = currentUsername;
+          document.getElementById('displayPassword').innerText = "******";
+        }
+      } catch (error) {
+        console.error("Error loading profile:", error);
+      }
+    }
+
+    // رفع وتحويل الصورة وتحديثها في قاعدة البيانات
     function uploadProfilePhoto(event) {
       const file = event.target.files[0];
-      if (!file || !currentUser) return;
+      if (!file || !currentUsername) return;
 
       const status = document.getElementById('uploadStatus');
       status.style.color = "#38bdf8";
@@ -399,11 +418,12 @@
         const base64Image = e.target.result;
         
         try {
-          await db.collection('servants').doc(currentUser.uid).update({
+          await db.collection('users').doc(currentUsername).update({
             photoBase64: base64Image,
             image: base64Image
           });
 
+          document.getElementById('avatarContainer').innerHTML = `<img src="${base64Image}" alt="Profile">`;
           status.style.color = "#4ade80";
           status.innerText = "تم تحديث الصورة بنجاح! ✨";
 
@@ -411,7 +431,7 @@
         } catch (err) {
           console.error(err);
           status.style.color = "#f87171";
-          status.innerText = "حدث خطأ أثناء الحفظ (ربما حجم الصورة كبير جداً).";
+          status.innerText = "حدث خطأ أثناء حفظ الصورة.";
         }
       };
 
@@ -420,11 +440,11 @@
 
     // تسجيل الخروج
     document.getElementById('logoutBtn').addEventListener('click', () => {
-      if (unsubscribeProfile) unsubscribeProfile();
-      auth.signOut().then(() => {
-        window.location.href = "user.html";
-      });
+      localStorage.removeItem("currentUsername");
+      window.location.href = "../index.html";
     });
+
+    loadProfileData();
   </script>
 
 </body>
