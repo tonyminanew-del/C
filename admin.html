@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم - الخادم</title>
+  <title>تسجيل دخول الخادم - لوحة التحكم</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   
   <!-- استدعاء فايربيس -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -93,15 +92,9 @@
       gap: 8px;
     }
 
-    .btn-pass {
+    .btn-main {
       background: linear-gradient(135deg, #38bdf8, #0284c7);
       color: #fff;
-    }
-
-    .btn-google {
-      background: #ffffff;
-      color: #0b0f19;
-      margin-top: 10px;
     }
 
     .btn:hover {
@@ -115,31 +108,40 @@
       margin-top: 10px;
     }
 
-    /* إخفاء شاشة جوجل حتى يتم التحقق من الرقم السري */
-    #googleStep {
-      display: none;
+    .switch-mode {
+      margin-top: 15px;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .switch-mode span {
+      color: #38bdf8;
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
   <div class="auth-card">
-    <div class="admin-icon">📋</div>
-    <div class="auth-title">لوحة الخادم (Admin)</div>
-    <div class="auth-sub" id="stepSub">يرجى إدخال كلمة السر للمتابعة</div>
+    <div class="admin-icon" id="formIcon">📝</div>
+    <div class="auth-title" id="formTitle">إنشاء حساب جديد</div>
+    <div class="auth-sub" id="formSub">أدخل بياناتك لإنشاء حساب خادم</div>
 
-    <!-- خطوة 1: كلمة السر -->
-    <div id="passwordStep">
-      <input type="password" id="adminPassword" class="input-box" placeholder="أدخل كلمة السر هنا">
-      <button class="btn btn-pass" onclick="verifyPassword()">تأكيد كلمة السر 🔒</button>
+    <div id="formFieldsContainer">
+      <input type="text" id="usernameInput" class="input-box" placeholder="اسم المستخدم (Username)">
+      <input type="password" id="passwordInput" class="input-box" placeholder="كلمة المرور (Password)">
+      
+      <div id="confirmPassBox">
+        <input type="password" id="confirmPasswordInput" class="input-box" placeholder="إعادة كتابة كلمة المرور">
+      </div>
+
+      <button class="btn btn-main" id="actionBtn" onclick="handleAuthAction()">إنشاء الحساب 🚀</button>
     </div>
 
-    <!-- خطوة 2: تسجيل الدخول بجوجل -->
-    <div id="googleStep">
-      <button class="btn btn-google" onclick="loginWithGoogle()">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google">
-        دخول عبر Google
-      </button>
+    <div class="switch-mode">
+      <span id="switchText" onclick="toggleAuthMode()">لديك حساب بالفعل؟ سجل دخولك</span>
     </div>
 
     <div class="error-msg" id="errorMsg"></div>
@@ -159,35 +161,94 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const auth = firebase.auth();
+    
+    const db = firebase.firestore();
+    let isLoginMode = false;
 
-    // التحقق من باسورد الخادم
-    function verifyPassword() {
-      const passInput = document.getElementById('adminPassword').value;
-      const errorMsg = document.getElementById('errorMsg');
+    function toggleAuthMode() {
+      isLoginMode = !isLoginMode;
+      const formTitle = document.getElementById('formTitle');
+      const formSub = document.getElementById('formSub');
+      const formIcon = document.getElementById('formIcon');
+      const confirmPassBox = document.getElementById('confirmPassBox');
+      const actionBtn = document.getElementById('actionBtn');
+      const switchText = document.getElementById('switchText');
+      document.getElementById('errorMsg').innerText = "";
 
-      if (passInput === "stmina") {
-        errorMsg.innerText = "";
-        document.getElementById('passwordStep').style.display = "none";
-        document.getElementById('googleStep').style.display = "block";
-        document.getElementById('stepSub').innerText = "تم تأكيد كلمة السر، سجل الآن بجوجل";
+      if (isLoginMode) {
+        formIcon.innerText = "🔑";
+        formTitle.innerText = "تسجيل الدخول";
+        formSub.innerText = "أدخل بيانات حسابك للمتابعة";
+        confirmPassBox.style.display = "none";
+        actionBtn.innerText = "تسجيل الدخول 🚪";
+        switchText.innerText = "ليس لديك حساب؟ إنشاء حساب جديد";
       } else {
-        errorMsg.innerText = "كلمة السر غير صحيحة ❌";
+        formIcon.innerText = "📝";
+        formTitle.innerText = "إنشاء حساب جديد";
+        formSub.innerText = "أدخل بياناتك لإنشاء حساب خادم";
+        confirmPassBox.style.display = "block";
+        actionBtn.innerText = "إنشاء الحساب 🚀";
+        switchText.innerText = "لديك حساب بالفعل؟ سجل دخولك";
       }
     }
 
-    // التسجيل بجوجل
-    function loginWithGoogle() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          // التوجيه لصفحة answer.html مباشرة
+    async function handleAuthAction() {
+      const username = document.getElementById('usernameInput').value.trim();
+      const password = document.getElementById('passwordInput').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (!username || !password) {
+        errorMsg.innerText = "يرجى ملء جميع الحقول المطلوبة ❌";
+        return;
+      }
+
+      const userRef = db.collection('users').doc(username);
+
+      try {
+        if (!isLoginMode) {
+          // حساب جديد -> answer.html
+          const confirmPassword = document.getElementById('confirmPasswordInput').value.trim();
+          if (password !== confirmPassword) {
+            errorMsg.innerText = "كلمتا المرور غير متطابقتين ❌";
+            return;
+          }
+
+          const docSnap = await userRef.get();
+          if (docSnap.exists) {
+            errorMsg.innerText = "اسم المستخدم هذا موجود بالفعل، سجل دخولك ❌";
+            return;
+          }
+
+          await userRef.set({
+            username: username,
+            password: password,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          localStorage.setItem("currentAdminUser", username);
           window.location.href = "answer.html";
-        })
-        .catch((error) => {
-          console.error(error);
-          document.getElementById('errorMsg').innerText = "فشل تسجيل الدخول بجوجل";
-        });
+
+        } else {
+          // لديك حساب بالفعل (تسجيل دخول) -> admin/home.html
+          const docSnap = await userRef.get();
+          if (!docSnap.exists) {
+            errorMsg.innerText = "اسم المستخدم غير مسجل ❌";
+            return;
+          }
+
+          const data = docSnap.data();
+          if (data.password !== password) {
+            errorMsg.innerText = "كلمة المرور غير صحيحة ❌";
+            return;
+          }
+
+          localStorage.setItem("currentAdminUser", username);
+          window.location.href = "admin/home.html";
+        }
+      } catch (err) {
+        console.error(err);
+        errorMsg.innerText = "حدث خطأ في الاتصال، حاول مرة أخرى.";
+      }
     }
   </script>
 
