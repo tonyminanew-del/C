@@ -29,6 +29,46 @@
       overflow-x: hidden;
     }
 
+    /* حاوية التنبيهات الفورية */
+    #notifications-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      width: 90%;
+      max-width: 450px;
+    }
+
+    .notif-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid #00b894;
+      border-right: 6px solid #00b894;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.4s ease;
+    }
+
+    .notif-box h4 {
+      margin: 0 0 5px 0;
+      color: #00b894;
+      font-size: 1rem;
+    }
+
+    .notif-box p {
+      margin: 0;
+      color: #e2e8f0;
+      font-size: 0.9rem;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .container {
       width: 100%;
       max-width: 500px;
@@ -148,11 +188,11 @@
       align-items: center;
       text-decoration: none;
       color: #94a3b8;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 600;
       gap: 3px;
       transition: all 0.3s ease;
-      width: 18%;
+      width: 16%;
     }
 
     .nav-item .nav-icon {
@@ -170,6 +210,9 @@
   </style>
 </head>
 <body>
+
+  <!-- حاوية عرض الإشعارات الفورية -->
+  <div id="notifications-container"></div>
 
   <div class="container">
 
@@ -199,9 +242,9 @@
         <span class="shortcut-title">السلة</span>
       </a>
 
-      <a href="profile.html" class="shortcut-card">
-        <span class="shortcut-icon">👤</span>
-        <span class="shortcut-title">البروفايل</span>
+      <a href="notifications.html" class="shortcut-card">
+        <span class="shortcut-icon">🔔</span>
+        <span class="shortcut-title">الإشعارات</span>
       </a>
     </div>
 
@@ -225,9 +268,9 @@
       <span class="nav-icon">🎁</span>
       <span>المعرض</span>
     </a>
-    <a href="basket.html" class="nav-item">
-      <span class="nav-icon">🛒</span>
-      <span>السلة</span>
+    <a href="notifications.html" class="nav-item">
+      <span class="nav-icon">🔔</span>
+      <span>الإشعارات</span>
     </a>
   </nav>
 
@@ -252,7 +295,6 @@
       const currentUsername = localStorage.getItem("currentAdminUser");
 
       if (!currentUsername) {
-        // لو لم يتم تسجيل الدخول، يرجع لصفحة الدخول الرئيسية
         window.location.href = "../admin.html";
         return;
       }
@@ -263,17 +305,15 @@
 
         if (docSnap.exists) {
           const data = docSnap.data();
-          const title = data.title || ""; // أخ، لا تسوني، أب كاهن
+          const title = data.title || ""; 
           const name = data.username || currentUsername;
           
-          // عرض اللقب واسم المستخدم في الكارت الترحيبي
           if (title) {
             document.getElementById('servantDisplayName').innerText = `${title} / ${name}`;
           } else {
             document.getElementById('servantDisplayName').innerText = name;
           }
 
-          // لو فيه صورة شخصية مخزنة
           if (data.photo) {
             document.getElementById('servantAvatar').innerHTML = `<img src="${data.photo}" alt="Servant">`;
           }
@@ -284,7 +324,49 @@
         console.error("Error fetching servant data:", err);
         document.getElementById('servantDisplayName').innerText = currentUsername;
       }
+
+      // تفعيل الاستماع الفوري للإشعارات باستخدام نظام الـ Compat
+      initRealtimeNotifications();
     });
+
+    // دالة الاستماع الفوري للإشعارات المتوافقة مع الكود
+    function initRealtimeNotifications() {
+      db.collection("servantNotifications")
+        .where("read", "==", false)
+        .onSnapshot((snapshot) => {
+          snapshot.docChanges().forEach(async (change) => {
+            if (change.type === "added") {
+              const data = change.doc.data();
+              showNotificationUI(data.title, data.body);
+
+              try {
+                await db.collection("servantNotifications").doc(change.doc.id).update({ read: true });
+              } catch (err) {
+                console.error("خطأ في تحديث حالة القراءة:", err);
+              }
+            }
+          });
+        });
+    }
+
+    // دالة عرض التنبيه بشكل جمالي على الشاشة
+    function showNotificationUI(title, body) {
+      const container = document.getElementById("notifications-container");
+      
+      const alertBox = document.createElement("div");
+      alertBox.className = "notif-box";
+      alertBox.innerHTML = `
+        <h4>🔔 ${title}</h4>
+        <p>${body}</p>
+      `;
+      
+      container.appendChild(alertBox);
+
+      // إخفاء التنبيه تلقائياً بعد 6 ثوانٍ
+      setTimeout(() => {
+        alertBox.remove();
+      }, 6000);
+    }
   </script>
 
 </body>
