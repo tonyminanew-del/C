@@ -8,7 +8,6 @@
   
   <!-- استدعاء فايربيس -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -246,37 +245,47 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-    const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // التحقق من تسجيل الدخول وجلب بيانات الخادم
-    auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        try {
-          const doc = await db.collection('admins').doc(user.uid).get();
-          if (doc.exists) {
-            const data = doc.data();
-            const title = data.title || "أخ";
-            const name = data.name || user.displayName || "خادم";
-            
-            document.getElementById('servantDisplayName').innerText = `${title} / ${name}`;
+    // التحقق من وجود المستخدم وجلب بياناته من قاعدة البيانات
+    window.addEventListener('DOMContentLoaded', async () => {
+      const currentUsername = localStorage.getItem("currentAdminUser");
 
-            if (data.photo) {
-              document.getElementById('servantAvatar').innerHTML = `<img src="${data.photo}" alt="Servant">`;
-            }
-          } else {
-            document.getElementById('servantDisplayName').innerText = user.displayName || "الخادم";
-          }
-        } catch (err) {
-          console.error("Error fetching servant data:", err);
-          document.getElementById('servantDisplayName').innerText = user.displayName || "الخادم";
-        }
-      } else {
+      if (!currentUsername) {
+        // لو لم يتم تسجيل الدخول، يرجع لصفحة الدخول الرئيسية
         window.location.href = "../admin.html";
+        return;
+      }
+
+      try {
+        const docRef = db.collection('users').doc(currentUsername);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+          const data = docSnap.data();
+          const title = data.title || ""; // أخ، لا تسوني، أب كاهن
+          const name = data.username || currentUsername;
+          
+          // عرض اللقب واسم المستخدم في الكارت الترحيبي
+          if (title) {
+            document.getElementById('servantDisplayName').innerText = `${title} / ${name}`;
+          } else {
+            document.getElementById('servantDisplayName').innerText = name;
+          }
+
+          // لو فيه صورة شخصية مخزنة
+          if (data.photo) {
+            document.getElementById('servantAvatar').innerHTML = `<img src="${data.photo}" alt="Servant">`;
+          }
+        } else {
+          document.getElementById('servantDisplayName').innerText = currentUsername;
+        }
+      } catch (err) {
+        console.error("Error fetching servant data:", err);
+        document.getElementById('servantDisplayName').innerText = currentUsername;
       }
     });
   </script>
 
 </body>
 </html>
-
