@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إرسال إشعار 3D</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #74b9ff, #0984e3);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      direction: rtl;
+    }
+    .card-3d {
+      background: #ffffff;
+      width: 100%;
+      max-width: 450px;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 
+                  0 10px 10px rgba(0, 0, 0, 0.1);
+      transform: perspective(1000px) rotateX(2deg);
+      transition: transform 0.3s ease;
+    }
+    .card-3d:hover {
+      transform: perspective(1000px) rotateX(0deg) scale(1.02);
+    }
+    h2 {
+      color: #2d3436;
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 24px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #dfe6e9;
+      border-radius: 10px;
+      box-sizing: border-box;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: #fdfdfd;
+    }
+    input:focus, textarea:focus {
+      border-color: #0984e3;
+      box-shadow: 0 0 10px rgba(9, 132, 227, 0.2);
+      outline: none;
+    }
+    button {
+      background: linear-gradient(135deg, #00b894, #00cec9);
+      color: white;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 17px;
+      font-weight: bold;
+      width: 100%;
+      box-shadow: 0 5px 15px rgba(0, 206, 201, 0.4);
+      transition: all 0.2s ease;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 20px rgba(0, 206, 201, 0.6);
+    }
+    button:active {
+      transform: translateY(1px);
+    }
+    #notifications-container {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 9999;
+      max-width: 300px;
+    }
+    .notif-box {
+      background: #fff;
+      border-right: 6px solid #00b894;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      animation: slideIn 0.4s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- حاوية التنبيهات -->
+  <div id="notifications-container"></div>
+
+  <!-- لوحة الإرسال بتصميم 3D -->
+  <div class="card-3d">
+    <h2>إرسال إشعار جديد</h2>
+    <div class="input-group">
+      <input type="text" id="notifTitle" placeholder="عنوان الرسالة...">
+    </div>
+    <div class="input-group">
+      <textarea id="notifBody" rows="4" placeholder="اكتب نص الرسالة هنا..."></textarea>
+    </div>
+    <button id="sendBtn">إرسال للكولكشن الآن</button>
+  </div>
+
+  <script type="module">
+    // تأكد من مسار ملف الـ config الخاص بك
+    import { db } from "./firebase-config.js"; 
+    import { 
+      collection, 
+      addDoc, 
+      serverTimestamp, 
+      query, 
+      where, 
+      onSnapshot, 
+      doc, 
+      updateDoc 
+    } from "https://www.gstatic.com/firebasejs/10.x.x/firebase-firestore.js";
+
+    // كود الإرسال المباشر للكولكشن "servantNotifications"
+    document.getElementById("sendBtn").addEventListener("click", async () => {
+      const title = document.getElementById("notifTitle").value.trim();
+      const body = document.getElementById("notifBody").value.trim();
+
+      if (!title || !body) {
+        alert("الرجاء كتابة العنوان والنص أولاً!");
+        return;
+      }
+
+      try {
+        await addDoc(collection(db, "servantNotifications"), {
+          receiverId: "all", // أو يمكنك تحديد معرف معين إذا أردت
+          title: title,
+          body: body,
+          timestamp: serverTimestamp(),
+          read: false
+        });
+        
+        alert("تم الإرسال بنجاح إلى الكولكشن!");
+        document.getElementById("notifTitle").value = "";
+        document.getElementById("notifBody").value = "";
+      } catch (error) {
+        console.error("خطأ في الإرسال: ", error);
+        alert("فشل الإرسال، تحقق من قواعد الفايربيس (Firestore Rules).");
+      }
+    });
+
+    // استماع للإشعارات الواردة
+    function initNotifications() {
+      const q = query(
+        collection(db, "servantNotifications"),
+        where("read", "==", false)
+      );
+
+      onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach(async (change) => {
+          if (change.type === "added") {
+            const data = change.doc.data();
+            showNotificationUI(data.title, data.body);
+
+            try {
+              await updateDoc(doc(db, "servantNotifications", change.doc.id), { read: true });
+            } catch (err) {
+              console.error("خطأ في تحديث حالة القراءة", err);
+            }
+          }
+        });
+      });
+    }
+
+    function showNotificationUI(title, body) {
+      const container = document.getElementById("notifications-container");
+      const box = document.createElement("div");
+      box.className = "notif-box";
+      box.innerHTML = `<h4 style="margin:0 0 5px 0; color:#00b894;">🔔 ${title}</h4><p style="margin:0; color:#333;">${body}</p>`;
+      container.appendChild(box);
+      setTimeout(() => box.remove(), 6000);
+    }
+
+    initNotifications();
+  </script>
+
+</body>
+</html>
