@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>البروفايل - لوحة الخادم</title>
 
   <link
@@ -13,7 +12,6 @@
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
@@ -29,25 +27,21 @@
       color: #fff;
       min-height: 100vh;
       padding: 20px 20px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .container {
       width: 100%;
       max-width: 500px;
-      margin: auto;
       display: flex;
       flex-direction: column;
       gap: 18px;
     }
 
     .profile-card {
-      background:
-        linear-gradient(
-          135deg,
-          rgba(56,189,248,.15),
-          rgba(15,23,42,.7)
-        );
-
+      background: linear-gradient(135deg, rgba(56,189,248,.15), rgba(15,23,42,.7));
       border: 1px solid rgba(56,189,248,.3);
       border-radius: 25px;
       padding: 25px 20px;
@@ -57,8 +51,8 @@
     }
 
     .avatar {
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       margin: auto;
       background: rgba(56,189,248,.15);
@@ -66,14 +60,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
-      font-size: 45px;
-    }
-
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      font-size: 35px;
     }
 
     .name {
@@ -97,10 +84,33 @@
       backdrop-filter: blur(12px);
     }
 
+    .data-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
     .data-card h3 {
       color: #38bdf8;
-      margin-bottom: 15px;
       font-size: 1.05rem;
+    }
+
+    .action-btn-sm {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 5px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn-sm:hover {
+      background: #38bdf8;
+      color: #0b0f19;
     }
 
     .data-row {
@@ -129,19 +139,67 @@
       word-break: break-word;
     }
 
-    .loading {
-      text-align: center;
-      color: #94a3b8;
-      padding: 40px 10px;
+    /* فورم التعديل المخفي افتراضياً */
+    .edit-form-container {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 15px;
     }
 
-    .error {
-      background: rgba(239,68,68,.1);
-      border: 1px solid rgba(239,68,68,.3);
-      color: #f87171;
-      padding: 15px;
-      border-radius: 15px;
-      text-align: center;
+    .input-group {
+      text-align: right;
+    }
+
+    .input-group label {
+      display: block;
+      color: #94a3b8;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #38bdf8;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .save-btn {
+      flex: 1;
+      background: #38bdf8;
+      color: #0b0f19;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .cancel-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
     }
 
     .logout-btn {
@@ -160,6 +218,31 @@
       opacity: .9;
     }
 
+    .message {
+      text-align: center;
+      font-size: 0.85rem;
+      margin-top: 5px;
+      font-weight: 600;
+    }
+    .message.success { color: #4ade80; }
+    .message.error { color: #f87171; }
+
+    .loading {
+      text-align: center;
+      color: #94a3b8;
+      padding: 30px 10px;
+    }
+
+    .error {
+      background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.3);
+      color: #f87171;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    /* الشريط السفلي */
     .bottom-nav {
       position: fixed;
       bottom: 15px;
@@ -167,22 +250,16 @@
       transform: translateX(-50%);
       width: calc(100% - 30px);
       max-width: 450px;
-
       background: rgba(15,23,42,.92);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-
       border: 1px solid rgba(255,255,255,.15);
       border-radius: 25px;
-
       display: flex;
       justify-content: space-around;
       align-items: center;
-
       padding: 10px 5px;
-
       box-shadow: 0 20px 40px rgba(0,0,0,.7);
-
       z-index: 100;
     }
 
@@ -190,13 +267,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-
       text-decoration: none;
       color: #94a3b8;
-
       font-size: .7rem;
       font-weight: 600;
-
       gap: 3px;
       width: 20%;
     }
@@ -215,430 +289,280 @@
 
   <div class="container">
 
-    <!-- البروفايل الرئيسي -->
+    <!-- البروفايل الرئيسي (أيقونة ثابتة) -->
     <div class="profile-card">
-
-      <div class="avatar" id="avatar">
-        👤
-      </div>
-
-      <div class="name" id="profileName">
-        جاري التحميل...
-      </div>
-
-      <div class="title" id="profileTitle">
-        ...
-      </div>
-
+      <div class="avatar">👤</div>
+      <div class="name" id="profileName">جاري التحميل...</div>
+      <div class="title" id="profileTitle">...</div>
     </div>
 
-    <!-- كل بيانات الخادم -->
+    <!-- كارت البيانات وتعديلها -->
     <div class="data-card">
-
-      <h3>📋 بيانات الخادم</h3>
-
-      <div id="profileData">
-        <div class="loading">
-          جاري تحميل البيانات...
-        </div>
+      <div class="data-card-header">
+        <h3>📋 بيانات الحساب</h3>
+        <button class="action-btn-sm" id="toggleEditBtn" onclick="toggleEditMode()">تعديل ✏️</button>
       </div>
 
+      <!-- عرض البيانات العادية -->
+      <div id="profileData">
+        <div class="loading">جاري تحميل البيانات...</div>
+      </div>
+
+      <!-- فورم التعديل داخل نفس الصفحة -->
+      <form id="editForm" class="edit-form-container" onsubmit="updateProfile(event)">
+        <div class="input-group">
+          <label>اسم المستخدم</label>
+          <input type="text" id="editUsername" required>
+        </div>
+
+        <div class="input-group">
+          <label>كلمة المرور</label>
+          <input type="text" id="editPassword" required>
+        </div>
+
+        <div class="input-group">
+          <label>الصفة / اللقب (مثل: أخ، أب كاهن)</label>
+          <input type="text" id="editTitle">
+        </div>
+
+        <div class="input-group">
+          <label>رقم الهاتف</label>
+          <input type="text" id="editPhone">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="save-btn" id="saveBtn">حفظ 💾</button>
+          <button type="button" class="cancel-btn" onclick="toggleEditMode()">إلغاء</button>
+        </div>
+
+        <div id="responseMessage" class="message"></div>
+      </form>
     </div>
 
     <!-- تسجيل الخروج -->
-    <button
-      class="logout-btn"
-      onclick="logout()"
-    >
-      تسجيل الخروج 🚪
-    </button>
+    <button class="logout-btn" onclick="logout()">تسجيل الخروج 🚪</button>
 
   </div>
 
   <!-- الشريط السفلي -->
   <nav class="bottom-nav">
-
     <a href="home.html" class="nav-item">
       <span class="nav-icon">🏠</span>
       <span>الرئيسية</span>
     </a>
-
     <a href="profile.html" class="nav-item active">
       <span class="nav-icon">👤</span>
       <span>البروفايل</span>
     </a>
-
-    <a href="control.html" class="nav-item">
-      <span class="nav-icon">⚙️</span>
-      <span>الإدارة</span>
-    </a>
-
     <a href="store.html" class="nav-item">
       <span class="nav-icon">🎁</span>
       <span>المعرض</span>
     </a>
-
     <a href="basket.html" class="nav-item">
       <span class="nav-icon">🛒</span>
       <span>السلة</span>
     </a>
-
   </nav>
 
   <script>
-
-    /* =========================
-       Firebase
-    ========================= */
-
     const firebaseConfig = {
-
-      apiKey:
-        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-
-      authDomain:
-        "church-7afe1.firebaseapp.com",
-
-      projectId:
-        "church-7afe1",
-
-      storageBucket:
-        "church-7afe1.firebasestorage.app",
-
-      messagingSenderId:
-        "1072334615357",
-
-      appId:
-        "1:1072334615357:web:c03b199f00ea9d19d40b54",
-
-      measurementId:
-        "G-E7Q76Z53SB"
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
     };
-
 
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
 
-
-    const auth = firebase.auth();
     const db = firebase.firestore();
-
-
-    /* =========================
-       تحويل البيانات إلى نص آمن
-    ========================= */
+    let currentUserData = {};
+    let isEditing = false;
 
     function escapeHtml(value) {
-
       return String(value)
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
-
     }
-
-
-    /* =========================
-       أسماء الحقول
-    ========================= */
 
     const fieldNames = {
-
-      name: "الاسم",
-
-      fullName: "الاسم الكامل",
-
-      title: "الصفة",
-
+      username: "اسم المستخدم",
+      password: "كلمة المرور",
+      title: "الصفة / اللقب",
       phone: "رقم الهاتف",
-
-      userPhone: "رقم الهاتف",
-
-      email: "البريد الإلكتروني",
-
+      points: "رصيد النقاط",
       stage: "المرحلة",
-
-      grade: "الصف",
-
-      role: "الصلاحية",
-
-      photo: "الصورة",
-
-      uid: "معرف الحساب",
-
-      createdAt: "تاريخ إنشاء الحساب",
-
-      updatedAt: "آخر تحديث",
-
-      isBlocked: "حالة الحساب"
-
+      role: "الصلاحية"
     };
 
-
-    /* =========================
-       تنسيق القيم
-    ========================= */
-
     function formatValue(key, value) {
-
-      if (value === null || value === undefined) {
-        return "غير موجود";
-      }
-
-
-      if (key === "isBlocked") {
-
-        return value === true
-          ? "محظور 🚫"
-          : "نشط ✅";
-
-      }
-
-
-      if (
-        value &&
-        typeof value.toDate === "function"
-      ) {
-
-        const date = value.toDate();
-
-        return date.toLocaleString(
-          "ar-EG",
-          {
-            dateStyle: "medium",
-            timeStyle: "short"
-          }
-        );
-
-      }
-
-
-      if (typeof value === "boolean") {
-        return value ? "نعم" : "لا";
-      }
-
-
-      if (typeof value === "object") {
-        return JSON.stringify(value);
-      }
-
-
+      if (value === null || value === undefined) return "غير موجود";
+      if (typeof value === "boolean") return value ? "نعم" : "لا";
+      if (typeof value === "object") return JSON.stringify(value);
       return String(value);
-
     }
 
+    window.addEventListener('DOMContentLoaded', async () => {
+      loadProfileData();
+    });
 
-    /* =========================
-       تحميل البروفايل
-    ========================= */
+    async function loadProfileData() {
+      const currentUsername = localStorage.getItem("currentAdminUser");
 
-    auth.onAuthStateChanged(async (user) => {
-
-      if (!user) {
-
+      if (!currentUsername) {
         window.location.href = "../admin.html";
-
         return;
-
       }
 
-
       try {
+        const docRef = db.collection("users").doc(currentUsername);
+        const docSnap = await docRef.get();
 
-        const doc = await db
-          .collection("admins")
-          .doc(user.uid)
-          .get();
-
-
-        if (!doc.exists) {
-
+        if (!docSnap.exists) {
           document.getElementById("profileData").innerHTML = `
-            <div class="error">
-              ⚠️ لا توجد بيانات لهذا الخادم في قاعدة البيانات.
-            </div>
+            <div class="error">⚠️ لا توجد بيانات لهذا المستخدم.</div>
           `;
-
-          document.getElementById("profileName").innerText =
-            user.displayName || "الخادم";
-
+          document.getElementById("profileName").innerText = currentUsername;
           return;
-
         }
 
+        currentUserData = docSnap.data();
 
-        const data = doc.data();
+        // تعيين الاسم واللقب في الكارت العلوي
+        document.getElementById("profileName").innerText = currentUserData.username || currentUsername;
+        document.getElementById("profileTitle").innerText = currentUserData.title || "مستخدم بالكنيسة";
 
+        // تعبئة حقول الفورم للتعديل لاحقاً
+        document.getElementById("editUsername").value = currentUserData.username || currentUsername;
+        document.getElementById("editPassword").value = currentUserData.password || "";
+        document.getElementById("editTitle").value = currentUserData.title || "";
+        document.getElementById("editPhone").value = currentUserData.phone || "";
 
-        /* الصورة */
-
-        if (data.photo) {
-
-          document.getElementById("avatar").innerHTML = `
-            <img
-              src="${escapeHtml(data.photo)}"
-              alt="صورة الخادم"
-            >
-          `;
-
-        }
-
-
-        /* الاسم */
-
-        const name =
-          data.name ||
-          data.fullName ||
-          user.displayName ||
-          "الخادم";
-
-
-        document.getElementById("profileName")
-          .innerText = name;
-
-
-        /* الصفة */
-
-        document.getElementById("profileTitle")
-          .innerText =
-            data.title ||
-            data.role ||
-            "خادم";
-
-
-        /* عرض كل البيانات */
-
-        const profileData =
-          document.getElementById("profileData");
-
+        // بناء قائمة البيانات (مع استبعاد الصورة و createdAt والـ photo)
+        const profileData = document.getElementById("profileData");
         profileData.innerHTML = "";
 
+        const priorityKeys = ["username", "password", "title", "phone", "points"];
+        const allKeys = Object.keys(currentUserData);
+        const sortedKeys = [...new Set([...priorityKeys, ...allKeys])];
 
-        Object.keys(data).forEach((key) => {
+        sortedKeys.forEach((key) => {
+          if (key === "photo" || key === "createdAt") return;
+          if (currentUserData[key] === undefined) return;
 
-          /* لا نعرض الصورة داخل البيانات */
-          if (key === "photo") {
+          const row = document.createElement("div");
+          row.className = "data-row";
+          row.innerHTML = `
+            <div class="data-label">${escapeHtml(fieldNames[key] || key)}</div>
+            <div class="data-value">${escapeHtml(formatValue(key, currentUserData[key]))}</div>
+          `;
+          profileData.appendChild(row);
+        });
+
+      } catch (error) {
+        console.error("Error:", error);
+        document.getElementById("profileData").innerHTML = `<div class="error">⚠️ تعذر تحميل البيانات.</div>`;
+      }
+    }
+
+    function toggleEditMode() {
+      isEditing = !isEditing;
+      const dataRows = document.getElementById("profileData");
+      const editForm = document.getElementById("editForm");
+      const toggleBtn = document.getElementById("toggleEditBtn");
+
+      if (isEditing) {
+        dataRows.style.display = "none";
+        editForm.style.display = "flex";
+        toggleBtn.innerText = "إلغاء";
+      } else {
+        dataRows.style.display = "block";
+        editForm.style.display = "none";
+        toggleBtn.innerText = "تعديل ✏️";
+        document.getElementById("responseMessage").innerText = "";
+      }
+    }
+
+    async function updateProfile(event) {
+      event.preventDefault();
+      const currentUsername = localStorage.getItem("currentAdminUser");
+
+      const newUsername = document.getElementById("editUsername").value.trim();
+      const password = document.getElementById("editPassword").value.trim();
+      const title = document.getElementById("editTitle").value.trim();
+      const phone = document.getElementById("editPhone").value.trim();
+      
+      const msgDiv = document.getElementById("responseMessage");
+      const saveBtn = document.getElementById("saveBtn");
+
+      saveBtn.disabled = true;
+      saveBtn.innerText = "جاري الحفظ...";
+
+      try {
+        const userRef = db.collection("users").doc(currentUsername);
+
+        if (newUsername !== currentUsername) {
+          const newUserRef = db.collection("users").doc(newUsername);
+          const checkSnap = await newUserRef.get();
+          
+          if (checkSnap.exists) {
+            msgDiv.className = "message error";
+            msgDiv.innerText = "❌ اسم المستخدم مستخدم بالفعل.";
+            saveBtn.disabled = false;
+            saveBtn.innerText = "حفظ 💾";
             return;
           }
 
+          // نقل البيانات للمستند الجديد بالاسم الجديد
+          await newUserRef.set({
+            ...currentUserData,
+            username: newUsername,
+            password,
+            title,
+            phone
+          });
 
-          const row =
-            document.createElement("div");
-
-          row.className = "data-row";
-
-
-          const label =
-            fieldNames[key] || key;
-
-
-          const value =
-            formatValue(key, data[key]);
-
-
-          row.innerHTML = `
-
-            <div class="data-label">
-              ${escapeHtml(label)}
-            </div>
-
-            <div class="data-value">
-              ${escapeHtml(value)}
-            </div>
-
-          `;
-
-
-          profileData.appendChild(row);
-
-        });
-
-
-        /* إضافة UID حتى لو غير موجود في Firestore */
-
-        if (!data.uid) {
-
-          const row =
-            document.createElement("div");
-
-          row.className = "data-row";
-
-          row.innerHTML = `
-
-            <div class="data-label">
-              معرف الحساب
-            </div>
-
-            <div class="data-value">
-              ${escapeHtml(user.uid)}
-            </div>
-
-          `;
-
-          profileData.appendChild(row);
-
+          await userRef.delete();
+          localStorage.setItem("currentAdminUser", newUsername);
+        } else {
+          // تحديث عادي لنفس المستند
+          await userRef.update({
+            password,
+            title,
+            phone
+          });
         }
 
+        msgDiv.className = "message success";
+        msgDiv.innerText = "✅ تم الحفظ بنجاح!";
+        
+        setTimeout(() => {
+          saveBtn.disabled = false;
+          saveBtn.innerText = "حفظ 💾";
+          toggleEditMode();
+          loadProfileData();
+        }, 1000);
 
+      } catch (error) {
+        console.error("Update error:", error);
+        msgDiv.className = "message error";
+        msgDiv.innerText = "❌ حدث خطأ: " + error.message;
+        saveBtn.disabled = false;
+        saveBtn.innerText = "حفظ 💾";
       }
-
-      catch (error) {
-
-        console.error(
-          "Profile Error:",
-          error
-        );
-
-
-        document.getElementById("profileData")
-          .innerHTML = `
-
-          <div class="error">
-
-            ⚠️ تعذر تحميل بيانات البروفايل.
-
-            <br><br>
-
-            ${escapeHtml(error.message)}
-
-          </div>
-
-        `;
-
-      }
-
-    });
-
-
-    /* =========================
-       تسجيل الخروج
-    ========================= */
-
-    async function logout() {
-
-      try {
-
-        await auth.signOut();
-
-        window.location.href = "../admin.html";
-
-      }
-
-      catch (error) {
-
-        console.error(error);
-
-        alert(
-          "حدث خطأ أثناء تسجيل الخروج"
-        );
-
-      }
-
     }
 
+    function logout() {
+      localStorage.removeItem("currentAdminUser");
+      window.location.href = "../admin.html";
+    }
   </script>
 
 </body>
