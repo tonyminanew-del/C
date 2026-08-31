@@ -3,741 +3,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>بيانات الخادم - تطبيق الكنيسة</title>
-
+  <title>استكمال بيانات الخادم</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-
-  <!-- Firebase -->
+  
+  <!-- استدعاء فايربيس -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Cairo', sans-serif;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
     body {
-      background: #0b0f19;
-      color: white;
+      background-color: #0b0f19;
+      color: #ffffff;
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
     }
-
-    .servant-card {
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 30px;
       width: 100%;
       max-width: 450px;
-      padding: 30px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 24px;
       text-align: center;
       backdrop-filter: blur(16px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
     }
-
-    .card-title {
-      font-size: 1.3rem;
-      font-weight: 900;
-      color: #38bdf8;
-      margin-bottom: 5px;
-    }
-
-    .card-sub {
-      color: #94a3b8;
-      font-size: 0.85rem;
-      margin-bottom: 25px;
-    }
-
-    .avatar-wrapper {
-      position: relative;
-      width: 95px;
-      height: 95px;
-      margin: 0 auto 25px;
-      cursor: pointer;
-    }
-
-    .avatar-circle {
-      width: 95px;
-      height: 95px;
-      border-radius: 50%;
-      background: rgba(56,189,248,0.15);
-      border: 2px solid #38bdf8;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      font-size: 38px;
-    }
-
-    .avatar-circle img {
+    h2 { color: #38bdf8; margin-bottom: 10px; font-size: 1.5rem; }
+    p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 20px; }
+    .input-box, select {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .camera-icon {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      width: 29px;
-      height: 29px;
-      border-radius: 50%;
-      background: #38bdf8;
-      color: #0b0f19;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 20px;
-      text-align: right;
-    }
-
-    .form-label {
-      color: #cbd5e1;
-      font-size: 0.85rem;
-      font-weight: 700;
-      margin-top: 5px;
-    }
-
-    .input-box,
-    .select-box {
-      width: 100%;
-      padding: 13px 15px;
+      padding: 12px 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: rgba(255,255,255,0.05);
-      color: white;
-      outline: none;
+      color: #fff;
       font-size: 0.95rem;
+      outline: none;
+      text-align: right;
+      margin-bottom: 15px;
     }
-
-    .input-box:focus,
-    .select-box:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 10px rgba(56,189,248,0.25);
-    }
-
-    .select-box option {
-      background: #0b0f19;
-      color: white;
-    }
-
-    .save-btn {
+    select option { background: #0b0f19; color: #fff; }
+    .input-box:focus, select:focus { border-color: #38bdf8; }
+    .btn {
       width: 100%;
-      padding: 14px;
+      padding: 12px;
       border: none;
-      border-radius: 16px;
-      background: linear-gradient(135deg,#38bdf8,#0284c7);
-      color: white;
+      border-radius: 14px;
       font-size: 1rem;
-      font-weight: 900;
-      cursor: pointer;
-      box-shadow: 0 10px 20px rgba(56,189,248,0.2);
-    }
-
-    .save-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .status-msg {
-      margin-top: 15px;
-      font-size: 0.85rem;
       font-weight: 700;
-      min-height: 24px;
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
     }
-
-    .user-email {
-      color: #64748b;
-      font-size: 0.75rem;
-      margin-top: 8px;
-      direction: ltr;
-    }
+    .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+    .error { color: #f87171; font-size: 0.85rem; margin-top: 10px; }
   </style>
 </head>
-
 <body>
 
-  <div class="servant-card">
+  <div class="card">
+    <h2>أهلاً بك يا <span id="userNameSpan">...</span> 👋</h2>
+    <p>من فضلك أكمل بياناتك الشخصية للمتابعة</p>
 
-    <div class="card-title">
-      👨‍🏫 بيانات الخادم
-    </div>
+    <input type="text" id="phoneInput" class="input-box" placeholder="رقم الهاتف">
+    
+    <select id="titleSelect" class="input-box">
+      <option value="" disabled selected>اختر اللقب</option>
+      <option value="أخ">أخ</option>
+      <option value="لا تسوني">لا تسوني</option>
+      <option value="أب كاهن">أب كاهن</option>
+    </select>
 
-    <div class="card-sub">
-      استكمال بيانات حساب الخادم
-    </div>
-
-    <!-- الصورة -->
-    <div
-      class="avatar-wrapper"
-      onclick="document.getElementById('servantPhotoInput').click()"
-    >
-
-      <div class="avatar-circle" id="servantAvatar">
-        👤
-      </div>
-
-      <div class="camera-icon">
-        📷
-      </div>
-
-    </div>
-
-    <input
-      type="file"
-      id="servantPhotoInput"
-      accept="image/*"
-      style="display:none"
-      onchange="handlePhotoUpload(event)"
-    >
-
-    <!-- البيانات -->
-    <div class="form-group">
-
-      <label class="form-label">
-        اللقب / صفة الخدمة
-      </label>
-
-      <select id="servantTitle" class="select-box">
-
-        <option value="أخ">
-          أخ 👨‍🏫
-        </option>
-
-        <option value="تاسوني">
-          تاسوني 👩‍🏫
-        </option>
-
-        <option value="أبونا">
-          أبونا ⛪
-        </option>
-
-      </select>
-
-
-      <label class="form-label">
-        اسم الخادم بالكامل
-      </label>
-
-      <input
-        type="text"
-        id="servantName"
-        class="input-box"
-        placeholder="أدخل الاسم"
-      >
-
-
-      <label class="form-label">
-        رقم تليفون الخادم
-      </label>
-
-      <input
-        type="tel"
-        id="servantPhone"
-        class="input-box"
-        placeholder="أدخل رقم التليفون"
-      >
-
-    </div>
-
-
-    <button
-      class="save-btn"
-      id="saveBtn"
-      onclick="saveServantData()"
-    >
-      حفظ البيانات 💾
-    </button>
-
-
-    <div
-      class="status-msg"
-      id="statusMsg"
-    ></div>
-
-    <div
-      class="user-email"
-      id="userEmail"
-    ></div>
-
+    <button class="btn" onclick="saveUserData()">حفظ والانتقال للرئيسية 🚀</button>
+    <div class="error" id="errorMsg"></div>
   </div>
 
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
 
-<script>
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
 
-  /* =========================
-     Firebase Configuration
-  ========================= */
+    const currentUsername = localStorage.getItem("currentAdminUser");
 
-  const firebaseConfig = {
-
-    apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-
-    authDomain: "church-7afe1.firebaseapp.com",
-
-    projectId: "church-7afe1",
-
-    storageBucket: "church-7afe1.firebasestorage.app",
-
-    messagingSenderId: "1072334615357",
-
-    appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
-
-    measurementId: "G-E7Q76Z53SB"
-
-  };
-
-
-  /* =========================
-     تشغيل Firebase
-  ========================= */
-
-  if (!firebase.apps.length) {
-
-    firebase.initializeApp(firebaseConfig);
-
-  }
-
-
-  const auth = firebase.auth();
-
-  const db = firebase.firestore();
-
-
-  /* =========================
-     متغيرات
-  ========================= */
-
-  let currentUser = null;
-
-  let photoBase64Data = "";
-
-
-  /* =========================
-     رسالة الحالة
-  ========================= */
-
-  function showStatus(message, color) {
-
-    const statusMsg =
-      document.getElementById("statusMsg");
-
-    statusMsg.innerText = message;
-
-    statusMsg.style.color = color;
-
-  }
-
-
-  /* =========================
-     التحقق من تسجيل الدخول
-  ========================= */
-
-  auth.onAuthStateChanged(async (user) => {
-
-    if (!user) {
-
-      showStatus(
-        "لم يتم تسجيل الدخول. جاري الرجوع...",
-        "#f87171"
-      );
-
-      setTimeout(() => {
-
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!currentUsername) {
         window.location.href = "admin.html";
+        return;
+      }
+      document.getElementById('userNameSpan').innerText = currentUsername;
+    });
 
-      }, 1500);
+    async function saveUserData() {
+      const phone = document.getElementById('phoneInput').value.trim();
+      const userTitle = document.getElementById('titleSelect').value;
+      const errorMsg = document.getElementById('errorMsg');
 
-      return;
-
-    }
-
-
-    currentUser = user;
-
-
-    /* عرض الإيميل */
-
-    document.getElementById("userEmail").innerText =
-      user.email || "";
-
-
-    /* الاسم الموجود في Firebase Auth */
-
-    if (user.displayName) {
-
-      document.getElementById("servantName").value =
-        user.displayName;
-
-    }
-
-
-    /* =========================
-       جلب بيانات الخادم
-    ========================= */
-
-    try {
-
-      const adminRef =
-        db.collection("admins").doc(user.uid);
-
-      const doc =
-        await adminRef.get();
-
-
-      if (doc.exists) {
-
-        const data = doc.data();
-
-
-        if (data.title) {
-
-          document.getElementById("servantTitle").value =
-            data.title;
-
-        }
-
-
-        if (data.name) {
-
-          document.getElementById("servantName").value =
-            data.name;
-
-        }
-
-
-        if (data.phone) {
-
-          document.getElementById("servantPhone").value =
-            data.phone;
-
-        }
-
-
-        if (data.photo) {
-
-          photoBase64Data =
-            data.photo;
-
-          document.getElementById(
-            "servantAvatar"
-          ).innerHTML =
-            `<img src="${data.photo}" alt="Servant">`;
-
-        }
-
+      if (!phone || !userTitle) {
+        errorMsg.innerText = "يرجى إدخال رقم الهاتف واختيار اللقب ❌";
+        return;
       }
 
-    }
-
-    catch (error) {
-
-      console.error(
-        "Error loading admin:",
-        error
-      );
-
-      showStatus(
-        "تعذر تحميل بيانات الخادم",
-        "#f87171"
-      );
-
-    }
-
-  });
-
-
-  /* =========================
-     رفع الصورة
-  ========================= */
-
-  function handlePhotoUpload(event) {
-
-    const file =
-      event.target.files[0];
-
-
-    if (!file) {
-
-      return;
-
-    }
-
-
-    /* منع الصور الكبيرة جدًا */
-
-    if (file.size > 2 * 1024 * 1024) {
-
-      showStatus(
-        "حجم الصورة يجب أن يكون أقل من 2MB",
-        "#f87171"
-      );
-
-      event.target.value = "";
-
-      return;
-
-    }
-
-
-    const reader =
-      new FileReader();
-
-
-    reader.onload = function(e) {
-
-      photoBase64Data =
-        e.target.result;
-
-
-      document.getElementById(
-        "servantAvatar"
-      ).innerHTML =
-        `<img src="${photoBase64Data}" alt="Servant">`;
-
-    };
-
-
-    reader.onerror = function() {
-
-      showStatus(
-        "حدث خطأ أثناء قراءة الصورة",
-        "#f87171"
-      );
-
-    };
-
-
-    reader.readAsDataURL(file);
-
-  }
-
-
-  /* =========================
-     حفظ بيانات الخادم
-  ========================= */
-
-  async function saveServantData() {
-
-    if (!currentUser) {
-
-      showStatus(
-        "يجب تسجيل الدخول أولًا",
-        "#f87171"
-      );
-
-      return;
-
-    }
-
-
-    const title =
-      document.getElementById(
-        "servantTitle"
-      ).value;
-
-
-    const name =
-      document.getElementById(
-        "servantName"
-      ).value.trim();
-
-
-    const phone =
-      document.getElementById(
-        "servantPhone"
-      ).value.trim();
-
-
-    const saveBtn =
-      document.getElementById(
-        "saveBtn"
-      );
-
-
-    /* =========================
-       التحقق من البيانات
-    ========================= */
-
-    if (!name) {
-
-      showStatus(
-        "اكتب اسم الخادم",
-        "#f87171"
-      );
-
-      return;
-
-    }
-
-
-    if (!phone) {
-
-      showStatus(
-        "اكتب رقم التليفون",
-        "#f87171"
-      );
-
-      return;
-
-    }
-
-
-    /* تعطيل الزر أثناء الحفظ */
-
-    saveBtn.disabled = true;
-
-    saveBtn.innerText =
-      "جاري الحفظ...";
-
-
-    showStatus(
-      "جاري حفظ البيانات...",
-      "#38bdf8"
-    );
-
-
-    try {
-
-      /* =========================
-         المرجع الخاص بالخادم
-      ========================= */
-
-      const adminRef =
-        db.collection("admins")
-          .doc(currentUser.uid);
-
-
-      /* =========================
-         البيانات
-      ========================= */
-
-      const adminData = {
-
-        title: title,
-
-        name: name,
-
-        phone: phone,
-
-        photo: photoBase64Data,
-
-        email: currentUser.email || "",
-
-        updatedAt:
-          firebase.firestore.FieldValue.serverTimestamp()
-
-      };
-
-
-      /* =========================
-         الحفظ
-      ========================= */
-
-      await adminRef.set(
-        adminData,
-        {
-          merge: true
-        }
-      );
-
-
-      /* نجاح */
-
-      showStatus(
-        "✅ تم حفظ بيانات الخادم بنجاح",
-        "#4ade80"
-      );
-
-
-      saveBtn.innerText =
-        "تم الحفظ ✅";
-
-
-      /* التوجيه */
-
-      setTimeout(() => {
-
-        window.location.href =
-          "admin/home.html";
-
-      }, 1000);
-
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "Firebase Save Error:",
-        error
-      );
-
-
-      /* إعادة الزر */
-
-      saveBtn.disabled = false;
-
-      saveBtn.innerText =
-        "حفظ البيانات 💾";
-
-
-      /* رسائل الأخطاء */
-
-      if (
-        error.code ===
-        "permission-denied"
-      ) {
-
-        showStatus(
-          "❌ ليس لديك صلاحية لحفظ البيانات. تأكد من Firestore Rules.",
-          "#f87171"
-        );
-
+      try {
+        await db.collection('users').doc(currentUsername).set({
+          phone: phone,
+          title: userTitle
+        }, { merge: true });
+
+        window.location.href = "admin/home.html";
+
+      } catch (err) {
+        console.error(err);
+        errorMsg.innerText = "حدث خطأ أثناء الحفظ في قاعدة البيانات ❌";
       }
-
-      else if (
-        error.code ===
-        "unauthenticated"
-      ) {
-
-        showStatus(
-          "❌ انتهت جلسة تسجيل الدخول. سجل الدخول مرة أخرى.",
-          "#f87171"
-        );
-
-      }
-
-      else {
-
-        showStatus(
-          "❌ حدث خطأ أثناء الحفظ: " +
-          error.message,
-          "#f87171"
-        );
-
-      }
-
     }
-
-  }
-
-</script>
-
+  </script>
 </body>
 </html>
