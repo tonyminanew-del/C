@@ -133,10 +133,42 @@ select option {
   background: rgba(251,191,36,.12);
   border: 1px solid rgba(251,191,36,.25);
 }
+.approved-status {
+  color: #38bdf8;
+  background: rgba(56,189,248,.12);
+  border: 1px solid rgba(56,189,248,.25);
+}
 .delivered-status {
   color: #4ade80;
   background: rgba(74,222,128,.12);
   border: 1px solid rgba(74,222,128,.25);
+}
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.btn-approve {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#38bdf8,#0284c7);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: .8rem;
+}
+.btn-reject {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg,#ef4444,#dc2626);
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: .8rem;
 }
 .deliver-btn {
   width: 100%;
@@ -194,7 +226,7 @@ select option {
 <div class="container">
   <div class="header">
     <h1>🛒 طلبات الهدايا</h1>
-    <p>إدارة وتسليم طلبات المخدومين بالمرحلة</p>
+    <p>إدارة وقبول وتسليم طلبات المخدومين</p>
   </div>
 
   <div class="box">
@@ -330,7 +362,6 @@ function renderServants(servants) {
     `;
 
     card.addEventListener("click", (e) => {
-      // منع التداخل عند الضغط على أزرار داخل الكارد
       if (e.target.tagName === 'BUTTON') return;
       toggleServantBasket(servant.id);
     });
@@ -358,17 +389,32 @@ async function toggleServantBasket(servantId) {
     let html = "";
     snapshot.forEach(doc => {
       const order = doc.data();
-      const delivered = order.isDelivered === true;
+      const isDelivered = order.isDelivered === true;
+      const isApproved = order.isApproved === true;
+
+      let statusHtml = `<span class="status pending">قيد الانتظار ⏳</span>`;
+      if (isDelivered) {
+        statusHtml = `<span class="status delivered-status">تم التسليم ✔️</span>`;
+      } else if (isApproved) {
+        statusHtml = `<span class="status approved-status">تمت الموافقة - بانتظار التسليم 🎁</span>`;
+      }
+
       html += `
         <div class="sub-order-item">
           <div style="font-weight: bold; color: #38bdf8;">🎁 ${escapeHtml(order.name || "هدية")}</div>
           <div style="font-size: .75rem; color: #94a3b8; margin-top: 3px;">الكمية: ${order.count || 1} | النقاط: ${order.points || 0}</div>
-          <div>
-            <span class="status ${delivered ? "delivered-status" : "pending"}">
-              ${delivered ? "تم التسليم ✔️ (طلبات قديمة)" : "قيد الانتظار ⏳ (طلبات جديدة)"}
-            </span>
-          </div>
-          ${!delivered ? `<button class="deliver-btn" onclick="markDelivered('${servantId}', '${doc.id}')">تم التسليم ✅</button>` : ""}
+          <div>${statusHtml}</div>
+          
+          ${(!isApproved && !isDelivered) ? `
+            <div class="action-buttons">
+              <button class="btn-approve" onclick="approveOrder('${servantId}', '${doc.id}', '${escapeHtml(order.name || "هدية")}')">قبول ✅</button>
+              <button class="btn-reject" onclick="rejectOrder('${servantId}', '${doc.id}', '${escapeHtml(order.name || "هدية")}')">رفض ❌</button>
+            </div>
+          ` : ""}
+
+          ${(isApproved && !isDelivered) ? `
+            <button class="deliver-btn" onclick="markDelivered('${servantId}', '${doc.id}', '${escapeHtml(order.name || "هدية")}')">تسليم الهدية 📦</button>
+          ` : ""}
         </div>
       `;
     });
@@ -379,17 +425,82 @@ async function toggleServantBasket(servantId) {
   }
 }
 
-// تسليم الطلب
-async function markDelivered(servantId, orderId) {
-  if (!confirm("هل تم تسليم الهدية للمخدوم؟")) return;
+// قبول الطلب
+async function approveOrder(servantId, orderId, giftName) {
+  if (!confirm(`هل أنت متأكد من قبول طلب الهدية (${giftName})؟`)) return;
+  try {
+    await db.collection("servants").doc(servantId).collection("basket").doc(orderId).update({
+      isApproved: true,
+      approvedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // إرسال إشعار للمخدوم بقبول الهدية
+    await db.collection("myNewCollection").add({
+      title: "تمت الموافقة على طلب الهدية! 🎉",
+      body: `تم قبول طلبك لـ (${giftName}) بنجاح، توجه لتستلمها قريباً.`,
+      targetType: "specific",
+      targetUserId: servantId,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alert("تم قبول الطلب وإرسال إشعار للمخدوم ✅");
+    toggleServantBasket(servantId);
+    toggleServantBasket(servantId); // تحديث العرض
+  } catch (error) {
+    console.error("Approval error:", error);
+    alert("حدث خطأ أثناء قبول الطلب.");
+  }
+}
+
+// رفض الطلب
+async function rejectOrder(servantId, orderId, giftName) {
+  const reason = prompt("الرجاء كتابة سبب رفض الهدية:");
+  if (reason === null) return; // تم إلغاء العملية
+
+  try {
+    // إرسال إشعار للمخدوم بسبب الرفض
+    await db.collection("myNewCollection").add({
+      title: "عذراً، تم رفض طلب الهدية ❌",
+      body: `تم رفض طلبك لـ (${giftName}). السبب: ${reason || "لم يكتب سبب"}`,
+      targetType: "specific",
+      targetUserId: servantId,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // حذف الطلب من سلة المخدوم ليعود المعرض أو يُلغى الطلب
+    await db.collection("servants").doc(servantId).collection("basket").doc(orderId).delete();
+
+    alert("تم رفض الطلب وحذفه من السلة، وإرسال رسالة للمخدوم بالسبب ❌");
+    toggleServantBasket(servantId);
+    toggleServantBasket(servantId);
+  } catch (error) {
+    console.error("Rejection error:", error);
+    alert("حدث خطأ أثناء رفض الطلب.");
+  }
+}
+
+// تسليم الطلب النهائي
+async function markDelivered(servantId, orderId, giftName) {
+  if (!confirm(`هل تم تسليم الهدية (${giftName}) للمخدوم؟`)) return;
   try {
     await db.collection("servants").doc(servantId).collection("basket").doc(orderId).update({
       isDelivered: true,
       deliveredAt: firebase.firestore.FieldValue.serverTimestamp(),
       deliveredBy: currentAdmin.uid
     });
+
+    // إشعار نهائي بالتسليم
+    await db.collection("myNewCollection").add({
+      title: "تم تسليم الهدية بنجاح 🎁✨",
+      body: `استلمت هديرتك (${giftName}). نتمنى أن تنال إعجابك!`,
+      targetType: "specific",
+      targetUserId: servantId,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
     alert("تم تسجيل التسليم بنجاح ✅");
-    toggleServantBasket(servantId); // تحديث القائمة
+    toggleServantBasket(servantId);
+    toggleServantBasket(servantId);
   } catch (error) {
     console.error("Delivery error:", error);
     alert("حدث خطأ أثناء تسجيل التسليم.");
@@ -402,21 +513,6 @@ document.getElementById("searchInput").addEventListener("input", function() {
   const filtered = allServants.filter(s => (s.fullName || "").toLowerCase().includes(query));
   renderServants(filtered);
 });
-
-// دالة إرسال إشعار للمخدوم عند طلب هدية (تستدعى عند قيام المخدوم بطلب هدية)
-async function sendGiftNotification(userId, giftName) {
-  try {
-    await db.collection("myNewCollection").add({
-      title: "طلب هدية جديد 🎁",
-      body: `تم استلام طلبك لـ (${giftName}) بنجاح وجاري المراجعة.`,
-      targetType: "specific",
-      targetUserId: userId,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (error) {
-    console.error("Error sending notification:", error);
-  }
-}
 
 function escapeHtml(value) {
   return String(value)
