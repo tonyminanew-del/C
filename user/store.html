@@ -292,7 +292,7 @@
       });
     }
 
-    // جلب الهدايا المتاحة في المعرض
+    // جلب الهدايا ودمج المتشابهة بالاسم في المعرض
     function loadStoreGifts() {
       const giftsGrid = document.getElementById('giftsGrid');
 
@@ -304,14 +304,37 @@
           return;
         }
 
+        const groupedGifts = {};
+
         snapshot.forEach((doc) => {
           const gift = doc.data();
           const giftId = doc.id;
+          const giftName = gift.name || 'هدايا الكنيسة';
           const giftPrice = Number(gift.points) || 0;
           const giftQuantity = Number(gift.quantity) || 0;
           
-          const hasEnoughPoints = currentUserPoints >= giftPrice;
-          const isAvailable = giftQuantity > 0;
+          if (giftQuantity <= 0) return;
+
+          // تجميع الهدايا التي تحمل نفس الاسم معاً
+          if (!groupedGifts[giftName]) {
+            groupedGifts[giftName] = {
+              name: giftName,
+              points: giftPrice,
+              image: gift.image || '',
+              totalQuantity: 0,
+              ids: []
+            };
+          }
+
+          groupedGifts[giftName].totalQuantity += giftQuantity;
+          groupedGifts[giftName].ids.push(giftId);
+        });
+
+        let hasVisibleGifts = false;
+
+        Object.values(groupedGifts).forEach((gift) => {
+          hasVisibleGifts = true;
+          const hasEnoughPoints = currentUserPoints >= gift.points;
 
           const card = document.createElement('div');
           card.className = 'gift-card';
@@ -323,23 +346,20 @@
           let btnText = 'شراء 🛒';
           let isDisabled = false;
 
-          if (!isAvailable) {
-            btnText = 'نفدت الكمية ❌';
-            isDisabled = true;
-          } else if (!hasEnoughPoints) {
+          if (!hasEnoughPoints) {
             btnText = 'نقاط غير كافية 🔒';
             isDisabled = true;
           }
 
           card.innerHTML = `
             <div class="gift-img-box">${imgHTML}</div>
-            <div class="gift-name">${gift.name || 'هدايا الكنيسة'}</div>
+            <div class="gift-name">${gift.name}</div>
             <div class="gift-footer">
               <div class="gift-info-row">
-                <span>المتبقي: ${giftQuantity}</span>
-                <span class="gift-price">⭐ ${giftPrice} نقطة</span>
+                <span>المتبقي: ${gift.totalQuantity}</span>
+                <span class="gift-price">⭐ ${gift.points} نقطة</span>
               </div>
-              <button class="buy-btn" ${isDisabled ? 'disabled' : ''} onclick="buyGift('${giftId}', '${escapeHtml(gift.name || '')}', ${giftPrice}, '${gift.image || ''}')">
+              <button class="buy-btn" ${isDisabled ? 'disabled' : ''} onclick="buyGroupedGift('${escapeHtml(JSON.stringify(gift.ids))}', '${escapeHtml(gift.name)}', ${gift.points}, '${gift.image}')">
                 ${btnText}
               </button>
             </div>
@@ -347,14 +367,18 @@
 
           giftsGrid.appendChild(card);
         });
+
+        if (!hasVisibleGifts) {
+          giftsGrid.innerHTML = '<div class="empty-store">لا توجد هدايا متاحة في المعرض حالياً.</div>';
+        }
       }, (err) => {
         console.error("Error loading gifts:", err);
         giftsGrid.innerHTML = '<div class="empty-store">حدث خطأ أثناء تحميل المعرض.</div>';
       });
     }
 
-    // عملية شراء الهدية وخصم النقاط وخصم الكمية من المخزون وإضافتها لسلة المستخدم
-    async function buyGift(giftId, giftName, giftPrice, giftImage) {
+    // شراء الهدية المجمعة وخصم الكمية من أول مستند متاح وإزالته عند النفاد
+    async function buyGroupedGift(idsJson, giftName, giftPrice, giftImage) {
       if (!currentUsername) return;
 
       if (currentUserPoints < giftPrice) {
@@ -365,61 +389,89 @@
       const confirmBuy = confirm(`هل تريد بالتأكيد شراء هذه الهدية (${giftName}) مقابل ${giftPrice} نقطة؟`);
       if (!confirmBuy) return;
 
+      const idsList = JSON.parse(idsJson);
+      if (idsList.length === 0) return;
+
+      const giftId = idsList[0]; // أخذ أول ID متوفر للخصم منه
+
       try {
         const userRef = db.collection('users').doc(currentUsername);
-        const giftRef = giftId ? db.collection('gifts').doc(giftId) : null;
-        const basketRef = userRef.collection('basket').doc();
+        const giftRef = db.collection('gifts').doc(giftId);
+        const basketRef = userRef.collection('basket');
 
-        // استخدام Transaction لضمان ترابط العمليات بدقة تامة
+        const basketSnapshot = await basketRef
+          .where("giftId", "==", giftId)
+          .where("isApproved", "==", false)
+          .where("isDelivered", "==", false)
+          .get();
+
+        let existingBasketDocRef = null;
+        let existingBasketCount = 0;
+
+        basketSnapshot.forEach(doc => {
+          if (!existingBasketDocRef) {
+            existingBasketDocRef = doc.ref;
+            existingBasketCount = Number(doc.data().count) || 1;
+          }
+        });
+
         await db.runTransaction(async (transaction) => {
-          // 1. القراءة أولاً
           const userDoc = await transaction.get(userRef);
           if (!userDoc.exists) throw new Error("مستخدم غير موجود!");
 
-          let giftDoc = null;
-          if (giftRef) {
-            giftDoc = await transaction.get(giftRef);
-          }
+          const giftDoc = await transaction.get(giftRef);
 
           const currentPoints = Number(userDoc.data().points) || 0;
           if (currentPoints < giftPrice) {
             throw new Error("نقاطك غير كافية!");
           }
 
-          let currentQty = 1;
+          let currentQty = 0;
           if (giftDoc && giftDoc.exists) {
             currentQty = Number(giftDoc.data().quantity) || 0;
             if (currentQty <= 0) {
               throw new Error("عذراً، هذه الهدية نفدت من المتجر!");
             }
+          } else {
+            throw new Error("هذه الهدية لم تعد موجودة!");
           }
 
-          // 2. الكتابة والتحديث
-          // خصم النقاط من حساب المستخدم
+          // 1. خصم النقاط من المستخدم
           transaction.update(userRef, {
             points: currentPoints - giftPrice,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
 
-          // خصم 1 من كمية الهدية في المتجر
-          if (giftRef && giftDoc && giftDoc.exists) {
+          // 2. خصم الكمية أو حذف المستند إذا نفد
+          const newQty = currentQty - 1;
+          if (newQty <= 0) {
+            transaction.delete(giftRef);
+          } else {
             transaction.update(giftRef, {
-              quantity: currentQty - 1,
+              quantity: newQty,
               updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
           }
 
-          // إضافة الهدية إلى سلة المستخدم الفرعية
-          transaction.set(basketRef, {
-            giftId: giftId,
-            name: giftName,
-            points: giftPrice,
-            image: giftImage,
-            count: 1,
-            isDelivered: false,
-            isApproved: false,
-            addedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
+          // 3. دمج أو إضافة الهدية في السلة
+          if (existingBasketDocRef) {
+            transaction.update(existingBasketDocRef, {
+              count: existingBasketCount + 1,
+              addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          } else {
+            const newDocRef = basketRef.doc();
+            transaction.set(newDocRef, {
+              giftId: giftId,
+              name: giftName,
+              points: giftPrice,
+              image: giftImage,
+              count: 1,
+              isDelivered: false,
+              isApproved: false,
+              addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
         });
 
         alert("تم شراء الهدية بنجاح وإضافتها إلى سلتك! 🎉");
