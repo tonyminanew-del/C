@@ -17,7 +17,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <style>
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -33,23 +32,16 @@
 
       color: #111827;
       min-height: 100vh;
-
       padding-bottom: 100px;
       overflow-x: hidden;
     }
-
-    /* =========================
-       HEADER
-    ========================== */
 
     .header {
       width: 100%;
       background: rgba(255,255,255,.92);
       backdrop-filter: blur(20px);
       border-bottom: 1px solid #e5e7eb;
-
       padding: 18px 20px;
-
       position: sticky;
       top: 0;
       z-index: 50;
@@ -59,7 +51,6 @@
       width: 100%;
       max-width: 1000px;
       margin: auto;
-
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -75,23 +66,13 @@
     .brand-icon {
       width: 52px;
       height: 52px;
-
-      background: linear-gradient(
-        135deg,
-        #6366f1,
-        #8b5cf6
-      );
-
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       border-radius: 17px;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       font-size: 27px;
-
-      box-shadow:
-        0 10px 25px rgba(99,102,241,.25);
+      box-shadow: 0 10px 25px rgba(99,102,241,.25);
     }
 
     .brand-text h1 {
@@ -109,60 +90,34 @@
     .live-status {
       background: #ecfdf5;
       color: #059669;
-
       border: 1px solid #a7f3d0;
-
       border-radius: 30px;
-
       padding: 9px 14px;
-
       font-size: .75rem;
       font-weight: 800;
-
       white-space: nowrap;
     }
 
     .live-dot {
       display: inline-block;
-
       width: 8px;
       height: 8px;
-
       background: #10b981;
-
       border-radius: 50%;
-
       margin-left: 5px;
-
       animation: pulse 1.5s infinite;
     }
 
     @keyframes pulse {
-
-      0% {
-        box-shadow: 0 0 0 0 rgba(16,185,129,.5);
-      }
-
-      70% {
-        box-shadow: 0 0 0 8px rgba(16,185,129,0);
-      }
-
-      100% {
-        box-shadow: 0 0 0 0 rgba(16,185,129,0);
-      }
-
+      0% { box-shadow: 0 0 0 0 rgba(16,185,129,.5); }
+      70% { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
     }
-
-    /* =========================
-       MAIN
-    ========================== */
 
     .container {
       width: calc(100% - 30px);
       max-width: 1000px;
-
       margin: 30px auto;
-
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -175,38 +130,25 @@
     .page-title h2 {
       font-size: 1.8rem;
       font-weight: 900;
-
       color: #111827;
     }
 
     .page-title p {
       color: #64748b;
       font-size: .85rem;
-
       margin-top: 5px;
     }
 
-    /* =========================
-       USER CARD
-    ========================== */
-
     .user-card {
       background: #ffffff;
-
       border: 1px solid #e5e7eb;
-
       border-radius: 22px;
-
       padding: 18px 22px;
-
       display: flex;
       justify-content: space-between;
       align-items: center;
-
       gap: 15px;
-
-      box-shadow:
-        0 15px 35px rgba(15,23,42,.06);
+      box-shadow: 0 15px 35px rgba(15,23,42,.06);
     }
 
     .user-info {
@@ -218,49 +160,34 @@
     .user-avatar {
       width: 55px;
       height: 55px;
-
       border-radius: 50%;
-
-      background: linear-gradient(
-        135deg,
-        #6366f1,
-        #8b5cf6
-      );
-
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: white;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       font-size: 24px;
       font-weight: 900;
-
       overflow: hidden;
-
       flex-shrink: 0;
     }
 
     .user-avatar img {
       width: 100%;
       height: 100%;
-
       object-fit: cover;
     }
 
     .user-info h3 {
       font-size: 1rem;
       font-weight: 900;
-
       color: #111827;
     }
 
     .user-info p {
       font-size: .68rem;
       color: #94a3b8;
-
       margin-top: 2px;
-
       direction: ltr;
       text-align: right;
     }
@@ -268,45 +195,27 @@
     .login-badge {
       background: #ecfdf5;
       color: #059669;
-
       border: 1px solid #a7f3d0;
-
       padding: 8px 13px;
-
       border-radius: 30px;
-
       font-size: .7rem;
       font-weight: 800;
-
       white-space: nowrap;
     }
 
-    /* =========================
-       STATS
-    ========================== */
-
     .stats {
       display: grid;
-
-      grid-template-columns:
-        repeat(3, 1fr);
-
+      grid-template-columns: repeat(3, 1fr);
       gap: 15px;
     }
 
     .stat-card {
       background: white;
-
       border: 1px solid #e5e7eb;
-
       border-radius: 20px;
-
       padding: 20px;
-
       min-height: 105px;
-
-      box-shadow:
-        0 12px 30px rgba(15,23,42,.05);
+      box-shadow: 0 12px 30px rgba(15,23,42,.05);
     }
 
     .stat-card .label {
@@ -318,9 +227,7 @@
     .stat-card .number {
       font-size: 1.7rem;
       font-weight: 900;
-
       color: #111827;
-
       margin-top: 8px;
     }
 
@@ -332,82 +239,48 @@
       color: #10b981;
     }
 
-    /* =========================
-       TABS
-    ========================== */
-
     .tabs {
       background: white;
-
       border: 1px solid #e5e7eb;
-
       border-radius: 20px;
-
       padding: 5px;
-
       display: grid;
-
       grid-template-columns: 1fr 1fr;
-
       gap: 5px;
-
-      box-shadow:
-        0 10px 25px rgba(15,23,42,.04);
+      box-shadow: 0 10px 25px rgba(15,23,42,.04);
     }
 
     .tab-btn {
       border: none;
-
       background: transparent;
-
       padding: 13px 10px;
-
       border-radius: 15px;
-
       font-size: .85rem;
       font-weight: 800;
-
       color: #64748b;
-
       cursor: pointer;
-
       transition: .25s;
     }
 
     .tab-btn.active {
       background: #6366f1;
-
       color: white;
-
-      box-shadow:
-        0 8px 20px rgba(99,102,241,.25);
+      box-shadow: 0 8px 20px rgba(99,102,241,.25);
     }
-
-    /* =========================
-       REQUESTS
-    ========================== */
 
     .requests-area {
       background: white;
-
       border: 1px solid #e5e7eb;
-
       border-radius: 22px;
-
       padding: 20px;
-
       min-height: 250px;
-
-      box-shadow:
-        0 15px 35px rgba(15,23,42,.05);
+      box-shadow: 0 15px 35px rgba(15,23,42,.05);
     }
 
     .section-title {
       display: flex;
-
       justify-content: space-between;
       align-items: center;
-
       margin-bottom: 15px;
     }
 
@@ -423,220 +296,150 @@
 
     .requests-list {
       display: flex;
-
       flex-direction: column;
-
       gap: 13px;
     }
 
-    /* =========================
-       REQUEST CARD
-    ========================== */
-
     .request-card {
       border: 1px solid #e5e7eb;
-
       border-radius: 18px;
-
       padding: 15px;
-
       background: #ffffff;
-
       transition: .25s;
-
       animation: cardIn .3s ease;
     }
 
     @keyframes cardIn {
-
       from {
         opacity: 0;
         transform: translateY(8px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
-
     }
 
     .request-card:hover {
       transform: translateY(-2px);
-
-      box-shadow:
-        0 10px 25px rgba(15,23,42,.07);
+      box-shadow: 0 10px 25px rgba(15,23,42,.07);
     }
 
     .request-top {
       display: flex;
-
       justify-content: space-between;
       align-items: flex-start;
-
       gap: 12px;
     }
 
     .gift-info {
       display: flex;
-
       align-items: center;
-
       gap: 12px;
-
       min-width: 0;
     }
 
     .gift-image {
       width: 58px;
       height: 58px;
-
       border-radius: 14px;
-
       overflow: hidden;
-
       background: #f1f5f9;
-
       display: flex;
       align-items: center;
       justify-content: center;
-
       flex-shrink: 0;
-
       font-size: 25px;
     }
 
     .gift-image img {
       width: 100%;
       height: 100%;
-
       object-fit: cover;
     }
 
     .gift-name {
       font-size: .95rem;
-
       font-weight: 900;
-
       color: #111827;
-
       word-break: break-word;
     }
 
     .gift-date {
       font-size: .67rem;
-
       color: #94a3b8;
-
       margin-top: 3px;
     }
 
-    /* =========================
-       STATUS
-    ========================== */
-
     .status {
       padding: 6px 10px;
-
       border-radius: 30px;
-
       font-size: .67rem;
-
       font-weight: 900;
-
       white-space: nowrap;
     }
 
     .status.pending {
       background: #fff7ed;
       color: #ea580c;
-
       border: 1px solid #fed7aa;
     }
 
     .status.accepted {
       background: #ecfdf5;
       color: #059669;
-
       border: 1px solid #a7f3d0;
     }
 
     .status.rejected {
       background: #fef2f2;
       color: #dc2626;
-
       border: 1px solid #fecaca;
     }
 
     .status.delivered {
       background: #eff6ff;
       color: #2563eb;
-
       border: 1px solid #bfdbfe;
     }
 
-    /* =========================
-       DETAILS
-    ========================== */
-
     .request-details {
       margin-top: 14px;
-
       padding-top: 12px;
-
       border-top: 1px solid #f1f5f9;
-
       display: grid;
-
-      grid-template-columns:
-        repeat(2, 1fr);
-
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
 
     .detail {
       background: #f8fafc;
-
       border-radius: 11px;
-
       padding: 9px 10px;
     }
 
     .detail small {
       display: block;
-
       color: #94a3b8;
-
       font-size: .62rem;
-
       margin-bottom: 2px;
     }
 
     .detail strong {
       display: block;
-
       color: #334155;
-
       font-size: .75rem;
-
       font-weight: 800;
-
       word-break: break-word;
     }
 
     .note {
       margin-top: 10px;
-
       background: #f8fafc;
-
       border-radius: 12px;
-
       padding: 10px;
-
       font-size: .72rem;
-
       color: #475569;
-
       line-height: 1.7;
     }
 
@@ -644,134 +447,82 @@
       color: #111827;
     }
 
-    /* =========================
-       EMPTY
-    ========================== */
-
     .empty {
       text-align: center;
-
       padding: 45px 20px;
-
       color: #94a3b8;
     }
 
     .empty-icon {
       font-size: 45px;
-
       margin-bottom: 10px;
     }
 
     .empty h3 {
       color: #475569;
-
       font-size: 1rem;
-
       font-weight: 900;
-
       margin-bottom: 5px;
     }
 
     .empty p {
       font-size: .75rem;
-
       line-height: 1.8;
     }
 
     .loading {
       text-align: center;
-
       padding: 45px 20px;
-
       color: #6366f1;
-
       font-size: .85rem;
-
       font-weight: 800;
     }
 
     .error-box {
       background: #fef2f2;
-
       color: #dc2626;
-
       border: 1px solid #fecaca;
-
       border-radius: 15px;
-
       padding: 15px;
-
       text-align: center;
-
       font-size: .8rem;
-
       line-height: 1.8;
     }
 
-    /* =========================
-       BOTTOM NAV
-    ========================== */
-
     .bottom-nav {
       position: fixed;
-
       bottom: 15px;
-
       left: 50%;
-
       transform: translateX(-50%);
-
       width: calc(100% - 30px);
-
       max-width: 500px;
-
       background: rgba(15,23,42,.94);
-
       backdrop-filter: blur(20px);
-
       border: 1px solid rgba(255,255,255,.12);
-
       border-radius: 25px;
-
       padding: 9px 5px;
-
       display: flex;
-
       justify-content: space-around;
-
       align-items: center;
-
       z-index: 100;
-
-      box-shadow:
-        0 20px 45px rgba(0,0,0,.25);
+      box-shadow: 0 20px 45px rgba(0,0,0,.25);
     }
 
     .nav-item {
       width: 20%;
-
       display: flex;
-
       flex-direction: column;
-
       align-items: center;
-
       gap: 3px;
-
       color: #94a3b8;
-
       text-decoration: none;
-
       font-size: .63rem;
-
       font-weight: 700;
-
       transition: .25s;
     }
 
     .nav-icon {
       font-size: 19px;
-
       transition: .25s;
     }
 
@@ -783,1322 +534,432 @@
     .nav-item.active .nav-icon {
       transform: translateY(-2px);
     }
-
-    /* =========================
-       RESPONSIVE
-    ========================== */
-
-    @media (max-width: 650px) {
-
-      .container {
-        width: calc(100% - 20px);
-
-        margin-top: 20px;
-      }
-
-      .header {
-        padding: 13px 12px;
-      }
-
-      .brand-icon {
-        width: 45px;
-        height: 45px;
-
-        font-size: 23px;
-      }
-
-      .brand-text h1 {
-        font-size: 1rem;
-      }
-
-      .live-status {
-        padding: 7px 10px;
-
-        font-size: .65rem;
-      }
-
-      .page-title h2 {
-        font-size: 1.45rem;
-      }
-
-      .stats {
-        gap: 8px;
-      }
-
-      .stat-card {
-        padding: 14px 10px;
-
-        min-height: 90px;
-      }
-
-      .stat-card .label {
-        font-size: .65rem;
-      }
-
-      .stat-card .number {
-        font-size: 1.35rem;
-      }
-
-      .requests-area {
-        padding: 14px;
-      }
-
-      .request-top {
-        flex-direction: column;
-      }
-
-      .status {
-        align-self: flex-start;
-      }
-
-    }
-
   </style>
 </head>
 
 <body>
 
-  <!-- =========================
-       HEADER
-  ========================== -->
-
   <header class="header">
-
     <div class="header-inner">
-
       <div class="brand">
-
-        <div class="brand-icon">
-          🎁
-        </div>
-
+        <div class="brand-icon">🎁</div>
         <div class="brand-text">
           <h1>طلباتي</h1>
           <p>متابعة طلبات الهدايا</p>
         </div>
-
       </div>
-
       <div class="live-status">
         <span class="live-dot"></span>
         تحديث مباشر
       </div>
-
     </div>
-
   </header>
 
-
-  <!-- =========================
-       MAIN
-  ========================== -->
-
   <main class="container">
-
     <div class="page-title">
-
       <h2>طلبات الهدايا 🎁</h2>
-
-      <p>
-        تابع حالة طلبات الهدايا الخاصة بك
-      </p>
-
+      <p>تابع حالة طلبات الهدايا الخاصة بك</p>
     </div>
-
-
-    <!-- USER -->
 
     <div class="user-card">
-
       <div class="user-info">
-
-        <div class="user-avatar" id="userAvatar">
-          👤
-        </div>
-
+        <div class="user-avatar" id="userAvatar">👤</div>
         <div>
-
-          <div class="user-info">
-
-            <div style="display:none"></div>
-
-          </div>
-
-          <h3 id="userName">
-            جاري تحميل الاسم...
-          </h3>
-
-          <p id="userId">
-            ...
-          </p>
-
+          <h3 id="userName">جاري تحميل الاسم...</h3>
+          <p id="userId">...</p>
         </div>
-
       </div>
-
-      <div class="login-badge">
-        ● مسجل الدخول
-      </div>
-
+      <div class="login-badge">● مسجل الدخول</div>
     </div>
-
-
-    <!-- STATS -->
 
     <div class="stats">
-
       <div class="stat-card">
-
-        <div class="label">
-          كل الطلبات
-        </div>
-
-        <div
-          class="number"
-          id="totalCount"
-        >
-          0
-        </div>
-
+        <div class="label">كل الطلبات</div>
+        <div class="number" id="totalCount">0</div>
       </div>
-
-
       <div class="stat-card pending">
-
-        <div class="label">
-          قيد المراجعة
-        </div>
-
-        <div
-          class="number"
-          id="pendingCount"
-        >
-          0
-        </div>
-
+        <div class="label">قيد المراجعة</div>
+        <div class="number" id="pendingCount">0</div>
       </div>
-
-
       <div class="stat-card accepted">
-
-        <div class="label">
-          تم القبول
-        </div>
-
-        <div
-          class="number"
-          id="acceptedCount"
-        >
-          0
-        </div>
-
+        <div class="label">تم القبول</div>
+        <div class="number" id="acceptedCount">0</div>
       </div>
-
     </div>
-
-
-    <!-- TABS -->
 
     <div class="tabs">
-
-      <button
-        class="tab-btn active"
-        id="currentTab"
-        onclick="switchTab('current')"
-      >
-        الطلبات الحالية
-      </button>
-
-      <button
-        class="tab-btn"
-        id="oldTab"
-        onclick="switchTab('old')"
-      >
-        الطلبات القديمة
-      </button>
-
+      <button class="tab-btn active" id="currentTab" onclick="switchTab('current')">الطلبات الحالية</button>
+      <button class="tab-btn" id="oldTab" onclick="switchTab('old')">الطلبات القديمة</button>
     </div>
 
-
-    <!-- REQUESTS -->
-
     <section class="requests-area">
-
       <div class="section-title">
-
-        <h3 id="sectionTitle">
-          الطلبات الحالية
-        </h3>
-
-        <span id="sectionCount">
-          0 طلب
-        </span>
-
+        <h3 id="sectionTitle">الطلبات الحالية</h3>
+        <span id="sectionCount">0 طلب</span>
       </div>
-
-      <div
-        class="requests-list"
-        id="requests"
-      >
-
-        <div class="loading">
-          جاري تحميل الطلبات... 🔄
-        </div>
-
+      <div class="requests-list" id="requests">
+        <div class="loading">جاري تحميل الطلبات... 🔄</div>
       </div>
-
     </section>
-
   </main>
 
-
-  <!-- =========================
-       BOTTOM NAV
-  ========================== -->
-
   <nav class="bottom-nav">
-
-    <a
-      href="home.html"
-      class="nav-item"
-    >
+    <a href="home.html" class="nav-item">
       <span class="nav-icon">🏠</span>
       <span>الرئيسية</span>
     </a>
-
-    <a
-      href="profile.html"
-      class="nav-item"
-    >
+    <a href="profile.html" class="nav-item">
       <span class="nav-icon">👤</span>
       <span>البروفايل</span>
     </a>
-
-    <a
-      href="control.html"
-      class="nav-item"
-    >
+    <a href="control.html" class="nav-item">
       <span class="nav-icon">⚙️</span>
       <span>الإدارة</span>
     </a>
-
-    <a
-      href="store.html"
-      class="nav-item"
-    >
+    <a href="store.html" class="nav-item">
       <span class="nav-icon">🎁</span>
       <span>المعرض</span>
     </a>
-
-    <a
-      href="basket.html"
-      class="nav-item active"
-    >
+    <a href="basket.html" class="nav-item active">
       <span class="nav-icon">🛒</span>
       <span>السلة</span>
-    </a>
-
+    </a> مفاجأة
   </nav>
 
-
   <script>
-
-    /* =====================================================
-       FIREBASE
-    ====================================================== */
-
     const firebaseConfig = {
-
-      apiKey:
-        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-
-      authDomain:
-        "church-7afe1.firebaseapp.com",
-
-      projectId:
-        "church-7afe1",
-
-      storageBucket:
-        "church-7afe1.firebasestorage.app",
-
-      messagingSenderId:
-        "1072334615357",
-
-      appId:
-        "1:1072334615357:web:c03b199f00ea9d19d40b54",
-
-      measurementId:
-        "G-E7Q76Z53SB"
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
     };
 
-
     if (!firebase.apps.length) {
-
       firebase.initializeApp(firebaseConfig);
-
     }
 
-
-    const db =
-      firebase.firestore();
-
-
-    /* =====================================================
-       VARIABLES
-    ====================================================== */
+    const db = firebase.firestore();
 
     let currentUsername = null;
-
     let allRequests = [];
-
     let currentTab = "current";
-
     let unsubscribeRequests = null;
-
     let unsubscribeUser = null;
 
+    window.addEventListener("DOMContentLoaded", () => {
+      currentUsername = localStorage.getItem("currentUsername") || 
+                        localStorage.getItem("username") || 
+                        localStorage.getItem("currentUser") || 
+                        localStorage.getItem("name") || 
+                        localStorage.getItem("currentAdminUser");
 
-    /* =====================================================
-       START
-    ====================================================== */
-
-    window.addEventListener(
-      "DOMContentLoaded",
-      () => {
-
-        /*
-         * نفس طريقة home.html بالضبط
-         */
-        currentUsername =
-          localStorage.getItem("currentAdminUser");
-
-
-        if (!currentUsername) {
-
-          document.getElementById("requests").innerHTML = `
-
-            <div class="error-box">
-
-              ❌ لم يتم تسجيل الدخول.
-
-              <br>
-
-              سجل الدخول بحساب المخدوم ثم افتح الصفحة مرة أخرى.
-
-            </div>
-
-          `;
-
-          document.getElementById("userName").innerText =
-            "غير مسجل الدخول";
-
-          return;
-
-        }
-
-
-        /*
-         * إظهار الـ ID المستخدم
-         */
-        document.getElementById("userId").innerText =
-          "الحساب: " + currentUsername;
-
-
-        /*
-         * تحميل بيانات المستخدم
-         */
-        listenToUser();
-
-
-        /*
-         * تحميل الطلبات
-         */
-        listenToRequests();
-
+      if (!currentUsername) {
+        document.getElementById("requests").innerHTML = `
+          <div class="error-box">
+            ❌ لم يتم تسجيل الدخول.
+            <br>
+            سجل الدخول بحساب المخدوم ثم افتح الصفحة مرة أخرى.
+          </div>
+        `;
+        document.getElementById("userName").innerText = "غير مسجل الدخول";
+        return;
       }
-    );
 
+      document.getElementById("userId").innerText = "الحساب: " + currentUsername;
 
-    /* =====================================================
-       USER DATA
-    ====================================================== */
+      listenToUser();
+      listenToRequests();
+    });
 
     function listenToUser() {
-
       if (unsubscribeUser) {
         unsubscribeUser();
       }
 
+      const userRef = db.collection("users").doc(currentUsername);
 
-      const userRef =
-        db.collection("users")
-          .doc(currentUsername);
-
-
-      unsubscribeUser =
-        userRef.onSnapshot(
-
-          (doc) => {
-
-            if (!doc.exists) {
-
-              document.getElementById("userName")
-                .innerText =
-                currentUsername;
-
-              return;
-            }
-
-
-            const data = doc.data();
-
-
-            /*
-             * نفس منطق home.html
-             */
-
-            const title =
-              data.title || "";
-
-
-            const name =
-              data.username ||
-              data.fullName ||
-              currentUsername;
-
-
-            let displayName =
-              name;
-
-
-            if (title) {
-
-              displayName =
-                `${title} / ${name}`;
-
-            }
-
-
-            document.getElementById("userName")
-              .innerText =
-              displayName;
-
-
-            /*
-             * الصورة
-             */
-
-            const photo =
-              data.photo ||
-              data.image ||
-              data.photoBase64 ||
-              "";
-
-
-            if (photo) {
-
-              document.getElementById("userAvatar")
-                .innerHTML = `
-
-                  <img
-                    src="${escapeHtml(photo)}"
-                    alt="الصورة"
-                  >
-
-              `;
-
-            }
-
-          },
-
-          (error) => {
-
-            console.error(
-              "User listener error:",
-              error
-            );
-
-            document.getElementById("userName")
-              .innerText =
-              currentUsername;
-
+      unsubscribeUser = userRef.onSnapshot(
+        (doc) => {
+          if (!doc.exists) {
+            document.getElementById("userName").innerText = currentUsername;
+            return;
           }
 
-        );
+          const data = doc.data();
+          const title = data.title || "";
+          const name = data.username || data.fullName || currentUsername;
 
+          let displayName = name;
+          if (title) {
+            displayName = `${title} / ${name}`;
+          }
+
+          document.getElementById("userName").innerText = displayName;
+
+          const photo = data.photo || data.image || data.photoBase64 || "";
+
+          if (photo) {
+            document.getElementById("userAvatar").innerHTML = `
+              <img src="${escapeHtml(photo)}" alt="الصورة">
+            `;
+          }
+        },
+        (error) => {
+          console.error("User listener error:", error);
+          document.getElementById("userName").innerText = currentUsername;
+        }
+      );
     }
-
-
-    /* =====================================================
-       REQUESTS LISTENER
-    ====================================================== */
 
     function listenToRequests() {
-
       if (unsubscribeRequests) {
-
         unsubscribeRequests();
-
       }
 
+      const requestsRef = db.collection("giftRequests").where("servantId", "==", currentUsername);
 
-      const requestsRef =
-        db.collection("giftRequests")
-          .where(
-            "servantId",
-            "==",
-            currentUsername
-          );
+      unsubscribeRequests = requestsRef.onSnapshot(
+        (snapshot) => {
+          allRequests = [];
 
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            allRequests.push({
+              id: doc.id,
+              ...data
+            });
+          });
 
-      unsubscribeRequests =
-        requestsRef.onSnapshot(
-
-          (snapshot) => {
-
-            allRequests = [];
-
-
-            snapshot.forEach(
-              (doc) => {
-
-                const data =
-                  doc.data();
-
-
+          db.collection("users").doc(currentUsername).collection("basket").get().then((basketSnap) => {
+            basketSnap.forEach((doc) => {
+              const data = doc.data();
+              if (!allRequests.some(r => r.id === doc.id)) {
                 allRequests.push({
-
                   id: doc.id,
-
                   ...data
-
                 });
-
               }
-            );
+            });
 
-
-            /*
-             * ترتيب الأحدث أولاً
-             */
-
-            allRequests.sort(
-              (a, b) => {
-
-                return getTime(b.createdAt)
-                     -
-                       getTime(a.createdAt);
-
-              }
-            );
-
+            allRequests.sort((a, b) => {
+              return getTime(b.createdAt || b.addedAt) - getTime(a.createdAt || a.addedAt);
+            });
 
             updateStats();
-
             renderRequests();
-
-          },
-
-          (error) => {
-
-            console.error(
-              "Requests listener error:",
-              error
-            );
-
-
-            document.getElementById(
-              "requests"
-            ).innerHTML = `
-
-              <div class="error-box">
-
-                ⚠️ حدث خطأ أثناء تحميل طلباتك.
-
-                <br><br>
-
-                ${escapeHtml(error.message)}
-
-              </div>
-
-            `;
-
-          }
-
-        );
-
+          }).catch(err => {
+            console.error("Error fetching basket subcollection:", err);
+            allRequests.sort((a, b) => {
+              return getTime(b.createdAt) - getTime(a.createdAt);
+            });
+            updateStats();
+            renderRequests();
+          });
+        },
+        (error) => {
+          console.error("Requests listener error:", error);
+          document.getElementById("requests").innerHTML = `
+            <div class="error-box">
+              ⚠️ حدث خطأ أثناء تحميل طلباتك.
+              <br><br>
+              ${escapeHtml(error.message)}
+            </div>
+          `;
+        }
+      );
     }
-
-
-    /* =====================================================
-       STATUS
-    ====================================================== */
 
     function getStatus(status) {
-
-      status =
-        String(status || "pending")
-          .toLowerCase();
-
+      status = String(status || "pending").toLowerCase();
 
       switch (status) {
-
         case "accepted":
-
         case "approved":
-
-          return {
-
-            key: "accepted",
-
-            text:
-              "✅ تم قبول الطلب"
-
-          };
-
-
+          return { key: "accepted", text: "✅ تم قبول الطلب" };
         case "rejected":
-
         case "declined":
-
-          return {
-
-            key: "rejected",
-
-            text:
-              "❌ تم رفض الطلب"
-
-          };
-
-
+          return { key: "rejected", text: "❌ تم رفض الطلب" };
         case "delivered":
-
         case "completed":
-
-          return {
-
-            key: "delivered",
-
-            text:
-              "📦 تم التسليم"
-
-          };
-
-
+          return { key: "delivered", text: "📦 تم التسليم" };
         case "pending":
-
         default:
-
-          return {
-
-            key: "pending",
-
-            text:
-              "⏳ قيد المراجعة"
-
-          };
-
+          return { key: "pending", text: "⏳ قيد المراجعة" };
       }
-
     }
 
-
-    /* =====================================================
-       CURRENT / OLD
-    ====================================================== */
-
     function isOldRequest(request) {
-
-      const status =
-        String(request.status || "pending")
-          .toLowerCase();
-
-
-      /*
-       * الطلبات القديمة:
-       *
-       * تم التسليم
-       * تم الرفض
-       */
-
+      const status = String(request.status || "").toLowerCase();
       return (
         status === "delivered" ||
         status === "completed" ||
         status === "rejected" ||
-        status === "declined"
+        status === "declined" ||
+        request.isDelivered === true ||
+        request.isRejected === true
       );
-
     }
-
-
-    /* =====================================================
-       STATS
-    ====================================================== */
 
     function updateStats() {
+      const total = allRequests.length;
+      const pending = allRequests.filter(request => {
+        const status = String(request.status || "pending").toLowerCase();
+        return status === "pending" && !request.isDelivered && !request.isRejected;
+      }).length;
 
-      const total =
-        allRequests.length;
+      const accepted = allRequests.filter(request => {
+        const status = String(request.status || "").toLowerCase();
+        return status === "accepted" || status === "approved" || request.isApproved === true;
+      }).length;
 
-
-      const pending =
-        allRequests.filter(
-          request => {
-
-            const status =
-              String(
-                request.status ||
-                "pending"
-              ).toLowerCase();
-
-            return status === "pending";
-
-          }
-        ).length;
-
-
-      const accepted =
-        allRequests.filter(
-          request => {
-
-            const status =
-              String(
-                request.status || ""
-              ).toLowerCase();
-
-            return (
-              status === "accepted" ||
-              status === "approved"
-            );
-
-          }
-        ).length;
-
-
-      document.getElementById(
-        "totalCount"
-      ).innerText = total;
-
-
-      document.getElementById(
-        "pendingCount"
-      ).innerText = pending;
-
-
-      document.getElementById(
-        "acceptedCount"
-      ).innerText = accepted;
-
+      document.getElementById("totalCount").innerText = total;
+      document.getElementById("pendingCount").innerText = pending;
+      document.getElementById("acceptedCount").innerText = accepted;
     }
-
-
-    /* =====================================================
-       RENDER
-    ====================================================== */
 
     function renderRequests() {
+      const container = document.getElementById("requests");
 
-      const container =
-        document.getElementById(
-          "requests"
-        );
+      const currentRequests = allRequests.filter(request => {
+        if (currentTab === "current") {
+          return !isOldRequest(request);
+        }
+        return isOldRequest(request);
+      });
 
+      document.getElementById("sectionTitle").innerText =
+        currentTab === "current" ? "الطلبات الحالية" : "الطلبات القديمة";
 
-      const currentRequests =
-        allRequests.filter(
-          request => {
-
-            if (currentTab === "current") {
-
-              return !isOldRequest(request);
-
-            }
-
-            return isOldRequest(request);
-
-          }
-        );
-
-
-      document.getElementById(
-        "sectionTitle"
-      ).innerText =
-        currentTab === "current"
-          ? "الطلبات الحالية"
-          : "الطلبات القديمة";
-
-
-      document.getElementById(
-        "sectionCount"
-      ).innerText =
-        currentRequests.length +
-        " طلب";
-
+      document.getElementById("sectionCount").innerText = currentRequests.length + " طلب";
 
       if (currentRequests.length === 0) {
-
         container.innerHTML = `
-
           <div class="empty">
-
-            <div class="empty-icon">
-
-              ${
-                currentTab === "current"
-                  ? "🛒"
-                  : "📦"
-              }
-
-            </div>
-
-            <h3>
-
-              ${
-                currentTab === "current"
-                  ? "لا توجد طلبات حالياً"
-                  : "لا توجد طلبات قديمة"
-              }
-
-            </h3>
-
-            <p>
-
-              ${
-                currentTab === "current"
-                  ? "عندما تطلب هدية ستظهر هنا مباشرة."
-                  : "الطلبات التي تم تسليمها أو رفضها ستظهر هنا."
-              }
-
-            </p>
-
+            <div class="empty-icon">${currentTab === "current" ? "🛒" : "📦"}</div>
+            <h3>${currentTab === "current" ? "لا توجد طلبات حالياً" : "لا توجد طلبات قديمة"}</h3>
+            <p>${currentTab === "current" ? "عندما تطلب هدية ستظهر هنا مباشرة." : "الطلبات التي تم تسليمها أو رفضها ستظهر هنا."}</p>
           </div>
-
         `;
-
         return;
-
       }
-
 
       container.innerHTML = "";
-
-
-      currentRequests.forEach(
-        request => {
-
-          container.appendChild(
-            createRequestCard(request)
-          );
-
-        }
-      );
-
+      currentRequests.forEach(request => {
+        container.appendChild(createRequestCard(request));
+      });
     }
-
-
-    /* =====================================================
-       CREATE REQUEST CARD
-    ====================================================== */
 
     function createRequestCard(request) {
+      const card = document.createElement("div");
+      card.className = "request-card";
 
-      const card =
-        document.createElement("div");
+      const status = getStatus(request.status || (request.isDelivered ? "delivered" : (request.isRejected ? "rejected" : (request.isApproved ? "accepted" : "pending"))));
+      const giftName = request.giftName || request.name || request.gift || "هدية";
+      const image = request.giftImage || request.image || "";
+      const quantity = Number(request.quantity || request.count || 1);
+      const points = Number(request.points || request.giftPoints || 0);
+      const totalPoints = Number(request.totalPoints || (points * quantity));
+      const date = formatDate(request.createdAt || request.addedAt);
 
-
-      card.className =
-        "request-card";
-
-
-      const status =
-        getStatus(request.status);
-
-
-      const giftName =
-        request.giftName ||
-        request.name ||
-        request.gift ||
-        "هدية";
-
-
-      const image =
-        request.giftImage ||
-        request.image ||
-        "";
-
-
-      const quantity =
-        Number(
-          request.quantity ||
-          request.count ||
-          1
-        );
-
-
-      const points =
-        Number(
-          request.points ||
-          request.giftPoints ||
-          0
-        );
-
-
-      const totalPoints =
-        Number(
-          request.totalPoints ||
-          (points * quantity)
-        );
-
-
-      const date =
-        formatDate(
-          request.createdAt ||
-          request.addedAt
-        );
-
-
-      let imageHTML =
-        `<span>🎁</span>`;
-
-
+      let imageHTML = `<span>🎁</span>`;
       if (image) {
-
-        imageHTML = `
-
-          <img
-            src="${escapeHtml(image)}"
-            alt="${escapeHtml(giftName)}"
-            loading="lazy"
-          >
-
-        `;
-
+        imageHTML = `<img src="${escapeHtml(image)}" alt="${escapeHtml(giftName)}" loading="lazy">`;
       }
-
 
       card.innerHTML = `
-
         <div class="request-top">
-
           <div class="gift-info">
-
-            <div class="gift-image">
-
-              ${imageHTML}
-
-            </div>
-
-
+            <div class="gift-image">${imageHTML}</div>
             <div>
-
-              <div class="gift-name">
-
-                ${escapeHtml(giftName)}
-
-              </div>
-
-              <div class="gift-date">
-
-                ${escapeHtml(date)}
-
-              </div>
-
+              <div class="gift-name">${escapeHtml(giftName)}</div>
+              <div class="gift-date">${escapeHtml(date)}</div>
             </div>
-
           </div>
-
-
-          <div class="status ${status.key}">
-
-            ${status.text}
-
-          </div>
-
+          <div class="status ${status.key}">${status.text}</div>
         </div>
-
-
         <div class="request-details">
-
           <div class="detail">
-
-            <small>
-              الكمية
-            </small>
-
-            <strong>
-              ${quantity}
-            </strong>
-
+            <small>الكمية</small>
+            <strong>${quantity}</strong>
           </div>
-
-
           <div class="detail">
-
-            <small>
-              سعر الهدية
-            </small>
-
-            <strong>
-              ⭐ ${points} نقطة
-            </strong>
-
+            <small>سعر الهدية</small>
+            <strong>⭐ ${points} نقطة</strong>
           </div>
-
-
           <div class="detail">
-
-            <small>
-              إجمالي النقاط
-            </small>
-
-            <strong>
-              ⭐ ${totalPoints} نقطة
-            </strong>
-
+            <small>إجمالي النقاط</small>
+            <strong>⭐ ${totalPoints} نقطة</strong>
           </div>
-
-
           <div class="detail">
-
-            <small>
-              رقم الطلب
-            </small>
-
-            <strong>
-              ${escapeHtml(request.id)}
-            </strong>
-
+            <small>رقم الطلب</small>
+            <strong>${escapeHtml(request.id)}</strong>
           </div>
-
         </div>
-
-
         ${createNote(request)}
-
       `;
-
 
       return card;
-
     }
-
-
-    /* =====================================================
-       NOTE
-    ====================================================== */
 
     function createNote(request) {
-
-      const note =
-        request.adminNote ||
-        request.note ||
-        request.rejectionReason ||
-        "";
-
-
+      const note = request.adminNote || request.note || request.rejectionReason || "";
       if (!note) {
-
         return "";
-
       }
-
-
       return `
-
         <div class="note">
-
-          <strong>
-            📝 ملاحظة المسؤول:
-          </strong>
-
+          <strong>📝 ملاحظة المسؤول:</strong>
           ${escapeHtml(note)}
-
         </div>
-
       `;
-
     }
-
-
-    /* =====================================================
-       SWITCH TAB
-    ====================================================== */
 
     function switchTab(tab) {
+      currentTab = tab;
+      const currentButton = document.getElementById("currentTab");
+      const oldButton = document.getElementById("oldTab");
 
-      currentTab =
-        tab;
-
-
-      const currentButton =
-        document.getElementById(
-          "currentTab"
-        );
-
-
-      const oldButton =
-        document.getElementById(
-          "oldTab"
-        );
-
-
-      currentButton.classList.toggle(
-        "active",
-        tab === "current"
-      );
-
-
-      oldButton.classList.toggle(
-        "active",
-        tab === "old"
-      );
-
+      currentButton.classList.toggle("active", tab === "current");
+      oldButton.classList.toggle("active", tab === "old");
 
       renderRequests();
-
     }
-
-
-    /* =====================================================
-       DATE
-    ====================================================== */
 
     function getTime(timestamp) {
+      if (!timestamp) return 0;
+      if (timestamp.seconds !== undefined) return timestamp.seconds * 1000;
+      if (timestamp.toDate) return timestamp.toDate().getTime();
+      if (timestamp instanceof Date) return timestamp.getTime();
 
-      if (!timestamp) {
-        return 0;
-      }
-
-
-      if (
-        timestamp.seconds !== undefined
-      ) {
-
-        return timestamp.seconds * 1000;
-
-      }
-
-
-      if (
-        timestamp.toDate
-      ) {
-
-        return timestamp
-          .toDate()
-          .getTime();
-
-      }
-
-
-      if (
-        timestamp instanceof Date
-      ) {
-
-        return timestamp.getTime();
-
-      }
-
-
-      const parsed =
-        new Date(timestamp)
-          .getTime();
-
-
-      return isNaN(parsed)
-        ? 0
-        : parsed;
-
+      const parsed = new Date(timestamp).getTime();
+      return isNaN(parsed) ? 0 : parsed;
     }
-
 
     function formatDate(timestamp) {
+      const time = getTime(timestamp);
+      if (!time) return "التاريخ غير متوفر";
 
-      const time =
-        getTime(timestamp);
-
-
-      if (!time) {
-
-        return "التاريخ غير متوفر";
-
-      }
-
-
-      const date =
-        new Date(time);
-
-
-      return date.toLocaleString(
-        "ar-EG",
-        {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-          hour: "numeric",
-          minute: "2-digit"
-        }
-      );
-
+      const date = new Date(time);
+      return date.toLocaleString("ar-EG", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
+      });
     }
-
-
-    /* =====================================================
-       ESCAPE HTML
-    ====================================================== */
 
     function escapeHtml(value) {
-
       return String(value ?? "")
-
-        .replaceAll(
-          "&",
-          "&amp;"
-        )
-
-        .replaceAll(
-          "<",
-          "&lt;"
-        )
-
-        .replaceAll(
-          ">",
-          "&gt;"
-        )
-
-        .replaceAll(
-          '"',
-          "&quot;"
-        )
-
-        .replaceAll(
-          "'",
-          "&#039;"
-        );
-
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
     }
-
-
-    /* =====================================================
-       CLEANUP
-    ====================================================== */
-
-    window.addEventListener(
-      "beforeunload",
-      () => {
-
-        if (unsubscribeRequests) {
-          unsubscribeRequests();
-        }
-
-        if (unsubscribeUser) {
-          unsubscribeUser();
-        }
-
-      }
-    );
-
   </script>
-
 </body>
-
 </html>
