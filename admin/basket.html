@@ -477,7 +477,8 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
   try {
     const userRef = db.collection("users").doc(userId);
     const orderRef = userRef.collection("basket").doc(orderId);
-    const giftRef = giftId ? db.collection("gifts").doc(giftId) : null;
+    // التحقق من أن giftId نص صالح وليس نصاً فارغاً
+    const giftRef = (giftId && giftId !== "undefined" && giftId !== "null") ? db.collection("gifts").doc(giftId) : null;
 
     await db.runTransaction(async (transaction) => {
       const userDoc = await transaction.get(userRef);
@@ -486,11 +487,13 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
       const currentPoints = Number(userDoc.data().points) || 0;
       const pointsToRefund = Number(giftPoints) * Number(orderCount);
 
+      // إرجاع النقاط لحساب المستخدم
       transaction.update(userRef, {
         points: currentPoints + pointsToRefund,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
+      // إذا كانت الهدية مرتبطة بـ giftId وموجودة، قم بإرجاع الكمية
       if (giftRef) {
         const giftDoc = await transaction.get(giftRef);
         if (giftDoc.exists) {
@@ -502,6 +505,7 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
         }
       }
 
+      // حذف الطلب من سلة المستخدم
       transaction.delete(orderRef);
     });
 
@@ -518,7 +522,7 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
     toggleUserBasket(userId);
   } catch (error) {
     console.error("Rejection error:", error);
-    alert("حدث خطأ أثناء رفض الطلب وإرجاع النقاط.");
+    alert("حدث خطأ أثناء رفض الطلب وإرجاع النقاط: " + error.message);
   }
 }
 
