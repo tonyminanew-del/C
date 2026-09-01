@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>طلبي - متابعة الهدية</title>
+  <title>طلبي - متابعة الهدايا</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -17,7 +17,9 @@
     .header { background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(2, 132, 199, 0.05)); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: 22px; padding: 20px; text-align: center; }
     .header h1 { color: #38bdf8; font-size: 1.3rem; font-weight: 800; margin-bottom: 5px; }
     .header p { color: #94a3b8; font-size: 0.85rem; }
-    .order-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+    .user-info-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 16px; padding: 14px 18px; font-size: 0.85rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 6px; }
+    .user-info-box span { color: #38bdf8; font-weight: 700; }
+    .order-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
     .order-header { display: flex; justify-content: space-between; align-items: center; }
     .gift-name { font-size: 1.05rem; font-weight: 700; color: #fff; }
     .gift-info { font-size: 0.8rem; color: #94a3b8; }
@@ -39,12 +41,15 @@
 
   <div class="container">
     <div class="header">
-      <h1>🎁 تفاصيل طلبي</h1>
-      <p>تتبع حالة هديتك الحالية والوقت وبواسطة من تم تسليمها</p>
+      <h1>🎁 طلبات الهدايا</h1>
+      <p id="userSubtitle">جاري التحقق من قاعدة البيانات...</p>
     </div>
 
+    <!-- خانة بيانات المستخدم المسجل -->
+    <div id="userInfoContainer"></div>
+
     <div id="ordersContainer">
-      <div class="loading-state">جاري تحميل تفاصيل طلبك...</div>
+      <div class="loading-state">جاري فحص البيانات وجلب الهدايا...</div>
     </div>
   </div>
 
@@ -80,124 +85,157 @@
     const db = firebase.firestore();
 
     window.addEventListener('DOMContentLoaded', async () => {
-      let currentUsername = localStorage.getItem("currentAdminUser") || 
-                            localStorage.getItem("currentUsername") || 
-                            localStorage.getItem("username") ||
-                            localStorage.getItem("userName");
+      // 1. جلب اسم المستخدم من التخزين المحلي بكل الاحتمالات
+      let loggedUser = localStorage.getItem("currentUsername") || 
+                       localStorage.getItem("username") || 
+                       localStorage.getItem("currentAdminUser") || 
+                       localStorage.getItem("currentUser") || 
+                       localStorage.getItem("userName") || 
+                       localStorage.getItem("user") ||
+                       localStorage.getItem("name");
 
-      if (!currentUsername) {
-        currentUsername = "6tony mim";
+      // إذا لم يكن هناك مسجل، نضعه افتراضياً للتجربة (يمكنك تعديله أو جعله يعتمد على تسجيل الدخول)
+      if (!loggedUser) {
+        loggedUser = "6tony mim"; 
       }
 
-      loadLatestOrder(currentUsername);
+      console.log("الاسم المراد فحصه في قاعدة البيانات:", loggedUser);
+      document.getElementById('userSubtitle').innerText = `حساب المستخدم: ${loggedUser}`;
+
+      // 2. التحقق من وجود المستخدم في قاعدة البيانات وجلب بياناته وسلته
+      verifyAndFetchUserData(loggedUser);
     });
 
-    async function loadLatestOrder(userId) {
-      const container = document.getElementById('ordersContainer');
-      
-      try {
-        let ordersList = [];
+    async function verifyAndFetchUserData(userId) {
+      const userContainer = document.getElementById('userInfoContainer');
+      const ordersContainer = document.getElementById('ordersContainer');
 
-        let basketSnapshot = await db.collection("users").doc(userId).collection("basket").get().catch(() => null);
-        
-        if ((!basketSnapshot || basketSnapshot.empty) && userId !== "6tony mim") {
-          basketSnapshot = await db.collection("users").doc("6tony mim").collection("basket").get().catch(() => null);
+      try {
+        // التحقق من وثيقة المستخدم في مجموعة users
+        const userDocRef = db.collection("users").doc(userId);
+        const userDoc = await userDocRef.get();
+
+        if (!userDoc.exists) {
+          // المستخدم غير مسجل في قاعدة البيانات بهذا الاسم
+          userContainer.innerHTML = `
+            <div class="user-info-box" style="border-color: rgba(239, 68, 68, 0.4);">
+              <span>⚠️ تنبيه:</span> هذا المستخدم غير مسجل في قاعدة البيانات (Firestore).
+            </div>
+          `;
+          ordersContainer.innerHTML = `
+            <div class="empty-state">
+              لا يمكن جلب الطلبات لعدم وجود حساب مطابق في قاعدة البيانات.
+            </div>
+          `;
+          return;
         }
 
-        if (basketSnapshot && !basketSnapshot.empty) {
+        // المستخدم موجود، جلب بياناته الأساسية
+        const userData = userDoc.data();
+        const fullName = userData.fullName || userId;
+        const grade = userData.grade || "غير محدد";
+        const stage = userData.stage || "غير محدد";
+        const points = userData.points !== undefined ? userData.points : 0;
+
+        // عرض تفاصيل بيانات المستخدم في الصفحة
+        userContainer.innerHTML = `
+          <div class="user-info-box">
+            <div>👤 الاسم بالكامل: <span>${escapeHtml(fullName)}</span></div>
+            <div>📚 الصف الدراسي: <span>${escapeHtml(grade)} (${escapeHtml(stage)})</span></div>
+            <div>⭐ النقاط المتاحة: <span>${points} نقطة</span></div>
+          </div>
+        `;
+
+        // 3. جلب تفاصيل الشراء (الهدايا الموجودة في سلة هذا المستخدم)
+        const basketSnapshot = await userDocRef.collection("basket").get();
+        
+        let ordersList = [];
+        if (!basketSnapshot.empty) {
           basketSnapshot.forEach(doc => {
             ordersList.push({ id: doc.id, ...doc.data() });
           });
         }
 
         if (ordersList.length === 0) {
-          container.innerHTML = `
+          ordersContainer.innerHTML = `
             <div class="empty-state">
-              ليس لديك أي طلب حالياً، قم بإضافة هدية من المعرض! 🛒<br>
-              <span style="font-size: 0.7rem; color: #38bdf8; margin-top: 5px; display:inline-block;">(المستخدم: ${escapeHtml(userId)})</span>
+              المستخدم مسجل، لكن ليس لديه أي طلبات هدايا في السلة حالياً. 🛒<br>
+              <a href="store.html" style="color: #38bdf8; text-decoration: underline; margin-top: 10px; display:inline-block;">اذهب إلى المعرض لاختيار هدية</a>
             </div>
           `;
           return;
         }
 
-        // إعطاء أولوية عرض للطلبات التي تم الموافقة عليها أو تسليمها أولاً، ثم الأحدث
+        // ترتيب الطلبات من الأحدث للأقدم
         ordersList.sort((a, b) => {
-          const scoreA = (a.isApproved || a.isDelivered || a.status === 'approved' || a.status === 'delivered') ? 2 : 1;
-          const scoreB = (b.isApproved || b.isDelivered || b.status === 'approved' || b.status === 'delivered') ? 2 : 1;
-          
-          if (scoreA !== scoreB) {
-            return scoreB - scoreA; // الطلب الموافق عليه أو المسلم يأتي أولاً
-          }
-
-          // وإلا فالأحدث تاريخاً
           const timeA = a.addedAt?.toMillis ? a.addedAt.toMillis() : 0;
           const timeB = b.addedAt?.toMillis ? b.addedAt.toMillis() : 0;
           return timeB - timeA;
         });
 
-        const order = ordersList[0];
-        console.log("الطلب النشط الذي تم اختياره:", order);
+        ordersContainer.innerHTML = "";
 
-        const giftName = order.name || "هدية";
-        const count = order.count || 1;
-        const points = order.points || 0;
+        // بناء تفاصيل كل طلب شراء
+        ordersList.forEach(order => {
+          const giftName = order.name || "هدية بدون اسم";
+          const count = order.count || 1;
+          const itemPoints = order.points || 0;
 
-        let statusBadge = `<span class="status-badge status-pending">جاري المراجعة 🔄</span>`;
-        let detailsHtml = `<div>حالة الطلب: في انتظار مراجعة الخادم.</div>`;
+          let statusBadge = `<span class="status-badge status-pending">جاري المراجعة 🔄</span>`;
+          let detailsHtml = `<div>حالة الطلب: في انتظار مراجعة الخادم.</div>`;
 
-        if (order.isRejected || order.status === 'rejected' || order.state === 'rejected') {
-          statusBadge = `<span class="status-badge status-rejected">تم الرفض ❌</span>`;
-          detailsHtml = `<div>⚠️ تم رفض الطلب وإعادة النقاط لحسابك.</div>`;
-        } else if (order.isDelivered === true || order.status === 'delivered' || order.state === 'delivered') {
-          statusBadge = `<span class="status-badge status-delivered">تم التسليم ✔️</span>`;
-          
-          let deliverTime = "وقت غير محدد";
-          if (order.deliveredAt && order.deliveredAt.toDate) {
-            deliverTime = order.deliveredAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+          if (order.isRejected || order.status === 'rejected') {
+            statusBadge = `<span class="status-badge status-rejected">تم الرفض ❌</span>`;
+            detailsHtml = `<div>⚠️ تم رفض الطلب وإعادة النقاط لحسابك.</div>`;
+          } else if (order.isDelivered === true || order.status === 'delivered') {
+            statusBadge = `<span class="status-badge status-delivered">تم التسليم ✔️</span>`;
+            
+            let deliverTime = "وقت غير محدد";
+            if (order.deliveredAt && order.deliveredAt.toDate) {
+              deliverTime = order.deliveredAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+            }
+            let deliveredByText = order.deliveredByName || order.deliveredBy || "أحد خدام الكنيسة";
+
+            detailsHtml = `
+              <div>📅 وقت التسليم: <span>${deliverTime}</span></div>
+              <div>👤 بواسطة: <span>${escapeHtml(deliveredByText)}</span></div>
+            `;
+          } else if (order.isApproved === true || order.approved === true || order.status === 'approved') {
+            statusBadge = `<span class="status-badge status-approved">تمت الموافقة 🎁</span>`;
+            
+            let approveTime = "قريباً";
+            if (order.approvedAt && order.approvedAt.toDate) {
+              approveTime = order.approvedAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+            }
+
+            detailsHtml = `
+              <div>✅ تمت الموافقة في: <span>${approveTime}</span></div>
+              <div>💡 توجه لتستلم هديتك من الخادم المسؤول.</div>
+            `;
           }
 
-          let deliveredByText = order.deliveredByName || order.deliveredBy || "أحد خدام الكنيسة";
-
-          detailsHtml = `
-            <div>📅 وقت التسليم: <span>${deliverTime}</span></div>
-            <div>👤 بواسطة: <span>${escapeHtml(deliveredByText)}</span></div>
-          `;
-        } else if (order.isApproved === true || order.approved === true || order.status === 'approved' || order.state === 'approved') {
-          statusBadge = `<span class="status-badge status-approved">تمت الموافقة 🎁</span>`;
-          
-          let approveTime = "قريباً";
-          if (order.approvedAt && order.approvedAt.toDate) {
-            approveTime = order.approvedAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
-          }
-
-          detailsHtml = `
-            <div>✅ تمت الموافقة في: <span>${approveTime}</span></div>
-            <div>💡 توجه لتستلم هديتك من الخادم المسؤول.</div>
-          `;
-        }
-
-        container.innerHTML = "";
-        const card = document.createElement("div");
-        card.className = "order-card";
-        card.innerHTML = `
-          <div class="order-header">
-            <div>
-              <div class="gift-name">🎁 ${escapeHtml(giftName)}</div>
-              <div class="gift-info">الكمية: ${count} | الإجمالي: ${points * count} نقطة ⭐</div>
+          const card = document.createElement("div");
+          card.className = "order-card";
+          card.innerHTML = `
+            <div class="order-header">
+              <div>
+                <div class="gift-name">🎁 ${escapeHtml(giftName)}</div>
+                <div class="gift-info">الكمية: ${count} | إجمالي التكلفة: ${itemPoints * count} نقطة ⭐</div>
+              </div>
+              <div>${statusBadge}</div>
             </div>
-            <div>${statusBadge}</div>
-          </div>
-          <div class="details-box">
-            ${detailsHtml}
-          </div>
-        `;
+            <div class="details-box">
+              ${detailsHtml}
+            </div>
+          `;
 
-        container.appendChild(card);
+          ordersContainer.appendChild(card);
+        });
 
       } catch (error) {
-        console.error("Error loading order:", error);
-        container.innerHTML = `
-          <div class="empty-state" style="color: #ef4444;">⚠️ حدث خطأ أثناء جلب تفاصيل الطلب من قاعدة البيانات.</div>
+        console.error("خطأ أثناء جلب بيانات المستخدم أو الطلبات:", error);
+        ordersContainer.innerHTML = `
+          <div class="empty-state" style="color: #ef4444;">⚠️ حدث خطأ أثناء الاتصال بقاعدة البيانات.</div>
         `;
       }
     }
