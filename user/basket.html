@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>طلباتي - متابعة الهدايا</title>
+  <title>طلبي - متابعة الهدية</title>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
   
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -39,12 +39,12 @@
 
   <div class="container">
     <div class="header">
-      <h1>📦 سجل طلباتي</h1>
-      <p>تتبع حالة هداياك والوقت وبواسطة من تم تسليمها</p>
+      <h1>🎁 تفاصيل طلبي</h1>
+      <p>تتبع حالة هديتك الحالية والوقت وبواسطة من تم تسليمها</p>
     </div>
 
     <div id="ordersContainer">
-      <div class="loading-state">جاري تحميل طلباتك من السلة...</div>
+      <div class="loading-state">جاري تحميل تفاصيل طلبك...</div>
     </div>
   </div>
 
@@ -56,7 +56,7 @@
       <span class="nav-icon">🎁</span><span>المعرض</span>
     </a>
     <a href="my-orders.html" class="nav-item active">
-      <span class="nav-icon">📦</span><span>طلباتي</span>
+      <span class="nav-icon">📦</span><span>طلبي</span>
     </a>
     <a href="profile.html" class="nav-item">
       <span class="nav-icon">👤</span><span>بروفايل</span>
@@ -80,30 +80,26 @@
     const db = firebase.firestore();
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // جلب اسم المستخدم من الـ localStorage
       let currentUsername = localStorage.getItem("currentAdminUser") || 
-                              localStorage.getItem("currentUsername") || 
-                              localStorage.getItem("username") ||
-                              localStorage.getItem("userName");
+                            localStorage.getItem("currentUsername") || 
+                            localStorage.getItem("username") ||
+                            localStorage.getItem("userName");
 
-      // لو الاسم المخزن هو "tony" فقط بدون "6"، نقوم بتجربة البحث المباشر أو توحيد القيمة
       if (!currentUsername) {
-        currentUsername = "6tony mim"; // قيمة افتراضية للاختبار بناءً على الصورة لديك
+        currentUsername = "6tony mim";
       }
 
-      loadUserOrders(currentUsername);
+      loadLatestOrder(currentUsername);
     });
 
-    async function loadUserOrders(userId) {
+    async function loadLatestOrder(userId) {
       const container = document.getElementById('ordersContainer');
       
       try {
         let ordersList = [];
 
-        // البحث المباشر في الـ basket للمستخدم بالـ ID الموجود في الصورة (مثل "6tony mim")
         let basketSnapshot = await db.collection("users").doc(userId).collection("basket").get().catch(() => null);
         
-        // لو لم يتم العثور عليه وكان مفقوداً حرف الـ '6' أو المسافة، نجرب البحث المباشر بالاسم الظاهر في الصورة
         if ((!basketSnapshot || basketSnapshot.empty) && userId !== "6tony mim") {
           basketSnapshot = await db.collection("users").doc("6tony mim").collection("basket").get().catch(() => null);
         }
@@ -117,83 +113,91 @@
         if (ordersList.length === 0) {
           container.innerHTML = `
             <div class="empty-state">
-              سلتك فارغة، قم بإضافة هدايا من المعرض! 🛒<br>
-              <span style="font-size: 0.7rem; color: #38bdf8; margin-top: 5px; display:inline-block;">(المستخدم المُبحث عنه: ${escapeHtml(userId)})</span>
+              ليس لديك أي طلب حالياً، قم بإضافة هدية من المعرض! 🛒<br>
+              <span style="font-size: 0.7rem; color: #38bdf8; margin-top: 5px; display:inline-block;">(المستخدم: ${escapeHtml(userId)})</span>
             </div>
           `;
           return;
         }
 
-        container.innerHTML = "";
-
-        // ترتيب الطلبات من الأحدث للأقدم
+        // إعطاء أولوية عرض للطلبات التي تم الموافقة عليها أو تسليمها أولاً، ثم الأحدث
         ordersList.sort((a, b) => {
-          const timeA = a.addedAt?.toMillis ? a.addedAt.toMillis() : (a.createdAt?.toMillis ? a.createdAt.toMillis() : 0);
-          const timeB = b.addedAt?.toMillis ? b.addedAt.toMillis() : (b.createdAt?.toMillis ? b.createdAt.toMillis() : 0);
+          const scoreA = (a.isApproved || a.isDelivered || a.status === 'approved' || a.status === 'delivered') ? 2 : 1;
+          const scoreB = (b.isApproved || b.isDelivered || b.status === 'approved' || b.status === 'delivered') ? 2 : 1;
+          
+          if (scoreA !== scoreB) {
+            return scoreB - scoreA; // الطلب الموافق عليه أو المسلم يأتي أولاً
+          }
+
+          // وإلا فالأحدث تاريخاً
+          const timeA = a.addedAt?.toMillis ? a.addedAt.toMillis() : 0;
+          const timeB = b.addedAt?.toMillis ? b.addedAt.toMillis() : 0;
           return timeB - timeA;
         });
 
-        ordersList.forEach(order => {
-          const giftName = order.name || "هدية";
-          const count = order.count || 1;
-          const points = order.points || 0;
+        const order = ordersList[0];
+        console.log("الطلب النشط الذي تم اختياره:", order);
 
-          let statusBadge = `<span class="status-badge status-pending">قيد الانتظار ⏳</span>`;
-          let detailsHtml = `<div>حالة الطلب: في انتظار مراجعة الخادم.</div>`;
+        const giftName = order.name || "هدية";
+        const count = order.count || 1;
+        const points = order.points || 0;
 
-          if (order.isRejected || order.status === 'rejected') {
-            statusBadge = `<span class="status-badge status-rejected">تم الرفض ❌</span>`;
-            detailsHtml = `<div>⚠️ تم رفض الطلب وإعادة النقاط لحسابك.</div>`;
-          } else if (order.isDelivered) {
-            statusBadge = `<span class="status-badge status-delivered">تم التسليم ✔️</span>`;
-            
-            let deliverTime = "وقت غير محدد";
-            if (order.deliveredAt && order.deliveredAt.toDate) {
-              deliverTime = order.deliveredAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
-            }
+        let statusBadge = `<span class="status-badge status-pending">جاري المراجعة 🔄</span>`;
+        let detailsHtml = `<div>حالة الطلب: في انتظار مراجعة الخادم.</div>`;
 
-            let deliveredByText = order.deliveredByName || order.deliveredBy || "أحد خدام الكنيسة";
-
-            detailsHtml = `
-              <div>📅 وقت التسليم: <span>${deliverTime}</span></div>
-              <div>👤 بواسطة: <span>${escapeHtml(deliveredByText)}</span></div>
-            `;
-          } else if (order.isApproved) {
-            statusBadge = `<span class="status-badge status-approved">تمت الموافقة 🎁</span>`;
-            
-            let approveTime = "قريباً";
-            if (order.approvedAt && order.approvedAt.toDate) {
-              approveTime = order.approvedAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
-            }
-
-            detailsHtml = `
-              <div>✅ تمت الموافقة في: <span>${approveTime}</span></div>
-              <div>💡 توجه لتستلم هديتك من الخادم المسؤول.</div>
-            `;
+        if (order.isRejected || order.status === 'rejected' || order.state === 'rejected') {
+          statusBadge = `<span class="status-badge status-rejected">تم الرفض ❌</span>`;
+          detailsHtml = `<div>⚠️ تم رفض الطلب وإعادة النقاط لحسابك.</div>`;
+        } else if (order.isDelivered === true || order.status === 'delivered' || order.state === 'delivered') {
+          statusBadge = `<span class="status-badge status-delivered">تم التسليم ✔️</span>`;
+          
+          let deliverTime = "وقت غير محدد";
+          if (order.deliveredAt && order.deliveredAt.toDate) {
+            deliverTime = order.deliveredAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
           }
 
-          const card = document.createElement("div");
-          card.className = "order-card";
-          card.innerHTML = `
-            <div class="order-header">
-              <div>
-                <div class="gift-name">🎁 ${escapeHtml(giftName)}</div>
-                <div class="gift-info">الكمية: ${count} | الإجمالي: ${points * count} نقطة ⭐</div>
-              </div>
-              <div>${statusBadge}</div>
-            </div>
-            <div class="details-box">
-              ${detailsHtml}
-            </div>
-          `;
+          let deliveredByText = order.deliveredByName || order.deliveredBy || "أحد خدام الكنيسة";
 
-          container.appendChild(card);
-        });
+          detailsHtml = `
+            <div>📅 وقت التسليم: <span>${deliverTime}</span></div>
+            <div>👤 بواسطة: <span>${escapeHtml(deliveredByText)}</span></div>
+          `;
+        } else if (order.isApproved === true || order.approved === true || order.status === 'approved' || order.state === 'approved') {
+          statusBadge = `<span class="status-badge status-approved">تمت الموافقة 🎁</span>`;
+          
+          let approveTime = "قريباً";
+          if (order.approvedAt && order.approvedAt.toDate) {
+            approveTime = order.approvedAt.toDate().toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' });
+          }
+
+          detailsHtml = `
+            <div>✅ تمت الموافقة في: <span>${approveTime}</span></div>
+            <div>💡 توجه لتستلم هديتك من الخادم المسؤول.</div>
+          `;
+        }
+
+        container.innerHTML = "";
+        const card = document.createElement("div");
+        card.className = "order-card";
+        card.innerHTML = `
+          <div class="order-header">
+            <div>
+              <div class="gift-name">🎁 ${escapeHtml(giftName)}</div>
+              <div class="gift-info">الكمية: ${count} | الإجمالي: ${points * count} نقطة ⭐</div>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+          <div class="details-box">
+            ${detailsHtml}
+          </div>
+        `;
+
+        container.appendChild(card);
 
       } catch (error) {
-        console.error("Error loading orders:", error);
+        console.error("Error loading order:", error);
         container.innerHTML = `
-          <div class="empty-state" style="color: #ef4444;">⚠️ حدث خطأ أثناء جلب الطلبات من قاعدة البيانات.</div>
+          <div class="empty-state" style="color: #ef4444;">⚠️ حدث خطأ أثناء جلب تفاصيل الطلب من قاعدة البيانات.</div>
         `;
       }
     }
