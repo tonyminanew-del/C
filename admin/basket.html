@@ -480,36 +480,34 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
     const orderRef = userRef.collection("basket").doc(orderId);
     const giftRef = (giftId && giftId !== "undefined" && giftId !== "null") ? db.collection("gifts").doc(giftId) : null;
 
-    // جلب مستند الهدية خارج الـ transaction لتحديد ما إذا كانت موجودة أم لا
-    let giftDoc = null;
-    if (giftRef) {
-      giftDoc = await giftRef.get();
-    }
-
     await db.runTransaction(async (transaction) => {
+      // 1. تنفيذ جميع عمليات القراءة (Reads) أولاً بالكامل
       const userDoc = await transaction.get(userRef);
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
 
+      let freshGiftDoc = null;
+      if (giftRef) {
+        freshGiftDoc = await transaction.get(giftRef);
+      }
+
+      // 2. حساب القيم الجديدة
       const currentPoints = Number(userDoc.data().points) || 0;
       const pointsToRefund = Number(giftPoints) * Number(orderCount);
 
-      // 1. إرجاع النقاط لحساب المستخدم
+      // 3. تنفيذ عمليات الكتابة (Writes) والتحديثات بعدها
       transaction.update(userRef, {
         points: currentPoints + pointsToRefund,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // 2. إرجاع الكمية للمتجر (أو إعادة إنشاء الهدية إذا تم حذفها نهائياً لأن كميتها وصلت لصفر)
       if (giftRef) {
-        const freshGiftDoc = await transaction.get(giftRef);
-        if (freshGiftDoc.exists) {
+        if (freshGiftDoc && freshGiftDoc.exists) {
           const currentQty = Number(freshGiftDoc.data().quantity) || 0;
           transaction.update(giftRef, {
             quantity: currentQty + Number(orderCount),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         } else {
-          // إذا كانت الهدية قد حذفت تماماً من المتجر لأن كميتها نفدت، يتم إرجاعها وإنشائها مرة أخرى
           transaction.set(giftRef, {
             name: giftName,
             points: Number(giftPoints),
@@ -520,7 +518,6 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
         }
       }
 
-      // 3. حذف الطلب من سلة المستخدم
       transaction.delete(orderRef);
     });
 
