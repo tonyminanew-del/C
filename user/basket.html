@@ -282,12 +282,12 @@
       }
     });
 
-    // جلب الهدايا والطلبات من مجموعة Basket الخاصة بالمستخدم
+    // جلب الهدايا والطلبات من مجموعة Basket داخل كولكشن users الخاص بالمستخدم
     function loadBasketItems(uid) {
       const basketList = document.getElementById('basketList');
       const totalItemsCount = document.getElementById('totalItemsCount');
 
-      db.collection('servants').doc(uid).collection('basket')
+      db.collection('users').doc(uid).collection('basket')
         .orderBy('addedAt', 'desc')
         .onSnapshot((snapshot) => {
           basketList.innerHTML = '';
