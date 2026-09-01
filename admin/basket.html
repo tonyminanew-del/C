@@ -247,7 +247,7 @@ select option {
       <h2>📦 المخدومين</h2>
       <span class="count" id="ordersCount">0</span>
     </div>
-    <div id="servantsList">
+    <div id="usersList">
       <div class="empty">اختر المرحلة لعرض المخدومين والطلبات.</div>
     </div>
   </div>
@@ -284,7 +284,7 @@ if (!firebase.apps.length) {
 const auth = firebase.auth();
 const db = firebase.firestore();
 let currentAdmin = null;
-let allServants = [];
+let allUsers = [];
 
 auth.onAuthStateChanged(async (user) => {
   if (!user) {
@@ -304,7 +304,6 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-// تغيير المرحلة
 document.getElementById("stageSelect").addEventListener("change", function() {
   const stage = this.value;
   const searchInput = document.getElementById("searchInput");
@@ -312,67 +311,64 @@ document.getElementById("stageSelect").addEventListener("change", function() {
   
   if (!stage) {
     searchInput.disabled = true;
-    document.getElementById("servantsList").innerHTML = `<div class="empty">اختر المرحلة لعرض المخدومين.</div>`;
+    document.getElementById("usersList").innerHTML = `<div class="empty">اختر المرحلة لعرض المخدومين.</div>`;
     document.getElementById("ordersCount").innerText = "0";
-    allServants = [];
+    allUsers = [];
     return;
   }
   
   searchInput.disabled = false;
-  loadServants(stage);
+  loadUsers(stage);
 });
 
-// جلب المخدومين بالمرحلة
-async function loadServants(stage) {
-  const list = document.getElementById("servantsList");
+async function loadUsers(stage) {
+  const list = document.getElementById("usersList");
   list.innerHTML = `<div class="loading">جاري تحميل المخدومين...</div>`;
   try {
-    const snapshot = await db.collection("servants").where("stage", "==", stage).get();
-    allServants = [];
+    const snapshot = await db.collection("users").where("stage", "==", stage).get();
+    allUsers = [];
     snapshot.forEach(doc => {
-      allServants.push({ id: doc.id, ...doc.data() });
+      allUsers.push({ id: doc.id, ...doc.data() });
     });
-    renderServants(allServants);
+    renderUsers(allUsers);
   } catch (error) {
-    console.error("Servants error:", error);
+    console.error("Users error:", error);
     list.innerHTML = `<div class="error">⚠️ تعذر جلب المخدومين.</div>`;
   }
 }
 
-// عرض قائمة المخدومين
-function renderServants(servants) {
-  const list = document.getElementById("servantsList");
+function renderUsers(users) {
+  const list = document.getElementById("usersList");
   list.innerHTML = "";
-  document.getElementById("ordersCount").innerText = servants.length;
+  document.getElementById("ordersCount").innerText = users.length;
 
-  if (servants.length === 0) {
+  if (users.length === 0) {
     list.innerHTML = `<div class="empty">لا يوجد مخدومين في هذه المرحلة.</div>`;
     return;
   }
 
-  servants.forEach(servant => {
+  users.forEach(userItem => {
     const card = document.createElement("div");
     card.className = "order-card";
     card.innerHTML = `
-      <div class="servant-name">👤 ${escapeHtml(servant.fullName || "بدون اسم")}</div>
-      <div style="font-size: .78rem; color: #94a3b8;">الصف: ${escapeHtml(servant.grade || "غير محدد")} | اضغط لعرض الطلبات</div>
-      <div class="sub-orders-container" id="basket-${servant.id}">
+      <div class="servant-name">👤 ${escapeHtml(userItem.fullName || userItem.id || "بدون اسم")}</div>
+      <div style="font-size: .78rem; color: #94a3b8;">الصف: ${escapeHtml(userItem.grade || "غير محدد")} | النقاط: ${userItem.points || 0} ⭐ | اضغط لعرض الطلبات</div>
+      <div class="sub-orders-container" id="basket-${escapeHtml(userItem.id)}">
         <div class="loading">جاري التحميل...</div>
       </div>
     `;
 
     card.addEventListener("click", (e) => {
       if (e.target.tagName === 'BUTTON') return;
-      toggleServantBasket(servant.id);
+      toggleUserBasket(userItem.id);
     });
 
     list.appendChild(card);
   });
 }
 
-// فتح/إغلاق تفاصيل طلبات المخدوم
-async function toggleServantBasket(servantId) {
-  const container = document.getElementById(`basket-${servantId}`);
+async function toggleUserBasket(userId) {
+  const container = document.getElementById(`basket-${userId}`);
   if (container.style.display === "block") {
     container.style.display = "none";
     return;
@@ -380,17 +376,22 @@ async function toggleServantBasket(servantId) {
 
   container.style.display = "block";
   try {
-    const snapshot = await db.collection("servants").doc(servantId).collection("basket").get();
+    const snapshot = await db.collection("users").doc(userId).collection("basket").get();
     if (snapshot.empty) {
       container.innerHTML = `<div class="empty">لا توجد طلبات مسجلة لهذا المخدوم.</div>`;
       return;
     }
 
-    let html = "";
+    container.innerHTML = "";
     snapshot.forEach(doc => {
       const order = doc.data();
+      const orderId = doc.id;
       const isDelivered = order.isDelivered === true;
       const isApproved = order.isApproved === true;
+      const giftName = order.name || "هدية";
+      const giftPoints = Number(order.points) || 0;
+      const orderCount = Number(order.count) || 1;
+      const giftId = order.giftId || "";
 
       let statusHtml = `<span class="status pending">قيد الانتظار ⏳</span>`;
       if (isDelivered) {
@@ -399,119 +400,158 @@ async function toggleServantBasket(servantId) {
         statusHtml = `<span class="status approved-status">تمت الموافقة - بانتظار التسليم 🎁</span>`;
       }
 
-      html += `
-        <div class="sub-order-item">
-          <div style="font-weight: bold; color: #38bdf8;">🎁 ${escapeHtml(order.name || "هدية")}</div>
-          <div style="font-size: .75rem; color: #94a3b8; margin-top: 3px;">الكمية: ${order.count || 1} | النقاط: ${order.points || 0}</div>
-          <div>${statusHtml}</div>
-          
-          ${(!isApproved && !isDelivered) ? `
-            <div class="action-buttons">
-              <button class="btn-approve" onclick="approveOrder('${servantId}', '${doc.id}', '${escapeHtml(order.name || "هدية")}')">قبول ✅</button>
-              <button class="btn-reject" onclick="rejectOrder('${servantId}', '${doc.id}', '${escapeHtml(order.name || "هدية")}')">رفض ❌</button>
-            </div>
-          ` : ""}
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "sub-order-item";
+      
+      let buttonsHtml = "";
+      if (!isApproved && !isDelivered) {
+        buttonsHtml = `
+          <div class="action-buttons">
+            <button class="btn-approve" id="app-${orderId}">قبول ✅</button>
+            <button class="btn-reject" id="rej-${orderId}">رفض ❌</button>
+          </div>
+        `;
+      } else if (isApproved && !isDelivered) {
+        buttonsHtml = `
+          <button class="deliver-btn" id="del-${orderId}">تسليم الهدية 📦</button>
+        `;
+      }
 
-          ${(isApproved && !isDelivered) ? `
-            <button class="deliver-btn" onclick="markDelivered('${servantId}', '${doc.id}', '${escapeHtml(order.name || "هدية")}')">تسليم الهدية 📦</button>
-          ` : ""}
-        </div>
+      itemDiv.innerHTML = `
+        <div style="font-weight: bold; color: #38bdf8;">🎁 ${escapeHtml(giftName)}</div>
+        <div style="font-size: .75rem; color: #94a3b8; margin-top: 3px;">الكمية: ${orderCount} | النقاط: ${giftPoints}</div>
+        <div>${statusHtml}</div>
+        ${buttonsHtml}
       `;
+
+      if (!isApproved && !isDelivered) {
+        itemDiv.querySelector(`#app-${orderId}`).addEventListener("click", () => {
+          approveOrder(userId, orderId, giftName);
+        });
+        itemDiv.querySelector(`#rej-${orderId}`).addEventListener("click", () => {
+          rejectOrder(userId, orderId, giftName, giftPoints, orderCount, giftId);
+        });
+      } else if (isApproved && !isDelivered) {
+        itemDiv.querySelector(`#del-${orderId}`).addEventListener("click", () => {
+          markDelivered(userId, orderId, giftName);
+        });
+      }
+
+      container.appendChild(itemDiv);
     });
-    container.innerHTML = html;
   } catch (error) {
     console.error(error);
     container.innerHTML = `<div class="error">تعذر جلب الطلبات</div>`;
   }
 }
 
-// قبول الطلب
-async function approveOrder(servantId, orderId, giftName) {
+async function approveOrder(userId, orderId, giftName) {
   if (!confirm(`هل أنت متأكد من قبول طلب الهدية (${giftName})؟`)) return;
   try {
-    await db.collection("servants").doc(servantId).collection("basket").doc(orderId).update({
+    await db.collection("users").doc(userId).collection("basket").doc(orderId).update({
       isApproved: true,
       approvedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // إرسال إشعار للمخدوم بقبول الهدية
     await db.collection("myNewCollection").add({
       title: "تمت الموافقة على طلب الهدية! 🎉",
       body: `تم قبول طلبك لـ (${giftName}) بنجاح، توجه لتستلمها قريباً.`,
       targetType: "specific",
-      targetUserId: servantId,
+      targetUserId: userId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     alert("تم قبول الطلب وإرسال إشعار للمخدوم ✅");
-    toggleServantBasket(servantId);
-    toggleServantBasket(servantId); // تحديث العرض
+    document.getElementById(`basket-${userId}`).style.display = "none";
+    toggleUserBasket(userId);
   } catch (error) {
     console.error("Approval error:", error);
     alert("حدث خطأ أثناء قبول الطلب.");
   }
 }
 
-// رفض الطلب
-async function rejectOrder(servantId, orderId, giftName) {
+async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, giftId) {
   const reason = prompt("الرجاء كتابة سبب رفض الهدية:");
-  if (reason === null) return; // تم إلغاء العملية
+  if (reason === null) return;
 
   try {
-    // إرسال إشعار للمخدوم بسبب الرفض
+    const userRef = db.collection("users").doc(userId);
+    const orderRef = userRef.collection("basket").doc(orderId);
+    const giftRef = giftId ? db.collection("gifts").doc(giftId) : null;
+
+    await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
+      
+      const currentPoints = Number(userDoc.data().points) || 0;
+      const pointsToRefund = Number(giftPoints) * Number(orderCount);
+
+      transaction.update(userRef, {
+        points: currentPoints + pointsToRefund,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      if (giftRef) {
+        const giftDoc = await transaction.get(giftRef);
+        if (giftDoc.exists) {
+          const currentQty = Number(giftDoc.data().quantity) || 0;
+          transaction.update(giftRef, {
+            quantity: currentQty + Number(orderCount),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }
+
+      transaction.delete(orderRef);
+    });
+
     await db.collection("myNewCollection").add({
       title: "عذراً، تم رفض طلب الهدية ❌",
-      body: `تم رفض طلبك لـ (${giftName}). السبب: ${reason || "لم يكتب سبب"}`,
+      body: `تم رفض طلبك لـ (${giftName}). السبب: ${reason || "لم يكتب سبب"}. تمت إعادة النقاط لحسابك.`,
       targetType: "specific",
-      targetUserId: servantId,
+      targetUserId: userId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // حذف الطلب من سلة المخدوم ليعود المعرض أو يُلغى الطلب
-    await db.collection("servants").doc(servantId).collection("basket").doc(orderId).delete();
-
-    alert("تم رفض الطلب وحذفه من السلة، وإرسال رسالة للمخدوم بالسبب ❌");
-    toggleServantBasket(servantId);
-    toggleServantBasket(servantId);
+    alert("تم رفض الطلب، إرجاع النقاط للمخدوم، وحذفه من السلة ✅");
+    document.getElementById(`basket-${userId}`).style.display = "none";
+    toggleUserBasket(userId);
   } catch (error) {
     console.error("Rejection error:", error);
-    alert("حدث خطأ أثناء رفض الطلب.");
+    alert("حدث خطأ أثناء رفض الطلب وإرجاع النقاط.");
   }
 }
 
-// تسليم الطلب النهائي
-async function markDelivered(servantId, orderId, giftName) {
+async function markDelivered(userId, orderId, giftName) {
   if (!confirm(`هل تم تسليم الهدية (${giftName}) للمخدوم؟`)) return;
   try {
-    await db.collection("servants").doc(servantId).collection("basket").doc(orderId).update({
+    await db.collection("users").doc(userId).collection("basket").doc(orderId).update({
       isDelivered: true,
       deliveredAt: firebase.firestore.FieldValue.serverTimestamp(),
       deliveredBy: currentAdmin.uid
     });
 
-    // إشعار نهائي بالتسليم
     await db.collection("myNewCollection").add({
       title: "تم تسليم الهدية بنجاح 🎁✨",
-      body: `استلمت هديرتك (${giftName}). نتمنى أن تنال إعجابك!`,
+      body: `استلمت هديتك (${giftName}). نتمنى أن تنال إعجابك!`,
       targetType: "specific",
-      targetUserId: servantId,
+      targetUserId: userId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     alert("تم تسجيل التسليم بنجاح ✅");
-    toggleServantBasket(servantId);
-    toggleServantBasket(servantId);
+    document.getElementById(`basket-${userId}`).style.display = "none";
+    toggleUserBasket(userId);
   } catch (error) {
     console.error("Delivery error:", error);
     alert("حدث خطأ أثناء تسجيل التسليم.");
   }
 }
 
-// البحث الحي
 document.getElementById("searchInput").addEventListener("input", function() {
   const query = this.value.trim().toLowerCase();
-  const filtered = allServants.filter(s => (s.fullName || "").toLowerCase().includes(query));
-  renderServants(filtered);
+  const filtered = allUsers.filter(u => (u.fullName || u.id || "").toLowerCase().includes(query));
+  renderUsers(filtered);
 });
 
 function escapeHtml(value) {
