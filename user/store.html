@@ -1,623 +1,389 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>معرض الهدايا - تطبيق الكنيسة</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Cairo', sans-serif;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معرض الهدايا - تطبيق الكنيسة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  
+  <!-- استدعاء فايربيس فايراستور فقط -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-body {
-  background-color: #0b0f19;
-  color: #ffffff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 20px 100px 20px;
-  overflow-x: hidden;
-}
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+    }
 
-.container {
-  width: 100%;
-  max-width: 500px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+    body {
+      background-color: #0b0f19;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 20px 95px 20px;
+      overflow-x: hidden;
+    }
 
-.top-points-card {
-  background: linear-gradient(135deg, rgba(56,189,248,.15), rgba(2,132,199,.05));
-  border: 1px solid rgba(56,189,248,.3);
-  border-radius: 20px;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 10px 25px rgba(0,0,0,.4);
-}
+    .container {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-.points-info {
-  text-align: left;
-}
+    /* الهيدر العلوي ونقاط المستخدم */
+    .store-header {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.6));
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 20px;
+      padding: 18px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
 
-.points-info h4 {
-  font-size: .9rem;
-  color: #94a3b8;
-  margin-bottom: 2px;
-}
+    .store-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #fff;
+    }
 
-.points-info div {
-  font-size: 1.6rem;
-  font-weight: 900;
-  color: #38bdf8;
-  text-shadow: 0 0 10px rgba(56,189,248,.4);
-}
+    .user-points-badge {
+      background: #38bdf8;
+      color: #0b0f19;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+    }
 
-.store-title {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
+    /* شبكة الهدايا */
+    .gifts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
 
-.blocked-box {
-  display: none;
-  background: rgba(239,68,68,.1);
-  border: 1px solid rgba(239,68,68,.4);
-  border-radius: 18px;
-  padding: 18px;
-  text-align: center;
-  color: #fca5a5;
-  line-height: 1.8;
-}
+    .gift-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+    }
 
-.blocked-box strong {
-  display: block;
-  color: #ef4444;
-  font-size: 1.1rem;
-  margin-bottom: 5px;
-}
+    .gift-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+      background: rgba(255, 255, 255, 0.06);
+      transform: translateY(-3px);
+    }
 
-.gifts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 15px;
-}
+    .gift-img-box {
+      width: 100%;
+      height: 120px;
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-.gift-card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 20px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  backdrop-filter: blur(12px);
-  transition: all .3s ease;
-  position: relative;
-  overflow: hidden;
-}
+    .gift-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-.gift-card:hover {
-  transform: translateY(-5px);
-  border-color: #38bdf8;
-  box-shadow: 0 10px 20px rgba(56,189,248,.15);
-}
+    .gift-img-placeholder {
+      font-size: 40px;
+    }
 
-.gift-img-box {
-  width: 100%;
-  height: 120px;
-  border-radius: 14px;
-  overflow: hidden;
-  background: rgba(255,255,255,.05);
-  margin-bottom: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    .gift-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+    }
 
-.gift-img-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    .gift-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: auto;
+    }
 
-.gift-img-placeholder {
-  font-size: 40px;
-}
+    .gift-price {
+      font-size: 0.85rem;
+      color: #38bdf8;
+      font-weight: 700;
+      text-align: center;
+    }
 
-.gift-name {
-  font-size: .95rem;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 4px;
-  min-height: 25px;
-}
+    .buy-btn {
+      background: #38bdf8;
+      color: #0b0f19;
+      border: none;
+      padding: 8px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.3s ease;
+    }
 
-.gift-details {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: .8rem;
-  gap: 5px;
-}
+    .buy-btn:hover {
+      opacity: 0.9;
+    }
 
-.gift-price {
-  color: #38bdf8;
-  font-weight: 800;
-}
+    .buy-btn:disabled {
+      background: #475569;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
 
-.gift-qty {
-  color: #94a3b8;
-}
+    .empty-store {
+      grid-column: span 2;
+      text-align: center;
+      color: #94a3b8;
+      padding: 50px 0;
+      font-size: 0.95rem;
+    }
 
-.add-to-cart-btn {
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 9px;
-  font-size: .85rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: .2s;
-  width: 100%;
-}
+    /* الشريط السفلي للتنقل */
+    .bottom-nav {
+      position: fixed;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 30px);
+      max-width: 450px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 25px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 10px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      z-index: 100;
+    }
 
-.add-to-cart-btn:hover {
-  opacity: .9;
-  transform: translateY(-1px);
-}
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #94a3b8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      gap: 4px;
+      transition: all 0.3s ease;
+      width: 23%;
+    }
 
-.add-to-cart-btn:disabled {
-  background: #334155;
-  color: #94a3b8;
-  cursor: not-allowed;
-  transform: none;
-}
+    .nav-item .nav-icon {
+      font-size: 20px;
+      transition: transform 0.3s ease;
+    }
 
-.empty-msg {
-  text-align: center;
-  color: #94a3b8;
-  grid-column: 1 / -1;
-  padding: 40px 0;
-  font-size: .95rem;
-}
+    .nav-item:hover, .nav-item.active {
+      color: #38bdf8;
+    }
 
-.loading {
-  text-align: center;
-  color: #38bdf8;
-  padding: 30px;
-  grid-column: 1 / -1;
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 30px);
-  max-width: 450px;
-  background: rgba(15,23,42,.9);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 25px;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 10px;
-  box-shadow: 0 20px 40px rgba(0,0,0,.7);
-  z-index: 100;
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-decoration: none;
-  color: #94a3b8;
-  font-size: .75rem;
-  font-weight: 600;
-  gap: 4px;
-  transition: .3s;
-  width: 23%;
-}
-
-.nav-icon {
-  font-size: 20px;
-  transition: transform .3s;
-}
-
-.nav-item:hover,
-.nav-item.active {
-  color: #38bdf8;
-}
-
-.nav-item:hover .nav-icon,
-.nav-item.active .nav-icon {
-  transform: translateY(-3px);
-}
-
-.toast {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-120px);
-  width: calc(100% - 40px);
-  max-width: 450px;
-  padding: 14px 18px;
-  border-radius: 14px;
-  background: #0f172a;
-  border: 1px solid rgba(255,255,255,.15);
-  box-shadow: 0 15px 35px rgba(0,0,0,.5);
-  text-align: center;
-  font-weight: 700;
-  z-index: 9999;
-  transition: transform .3s ease;
-}
-
-.toast.show {
-  transform: translateX(-50%) translateY(0);
-}
-
-.toast.success {
-  border-color: rgba(34,197,94,.5);
-  color: #4ade80;
-}
-
-.toast.error {
-  border-color: rgba(239,68,68,.5);
-  color: #f87171;
-}
-</style>
+    .nav-item:hover .nav-icon, .nav-item.active .nav-icon {
+      transform: translateY(-3px);
+    }
+  </style>
 </head>
 <body>
 
-<div id="toast" class="toast"></div>
+  <div class="container">
 
-<div class="container">
-  <div class="top-points-card">
-    <div class="store-title">
-      🎁 <span>معرض الهدايا</span>
+    <!-- الهيدر وعرض النقاط -->
+    <div class="store-header">
+      <div class="store-title">🎁 معرض الهدايا</div>
+      <div class="user-points-badge" id="userPointsBadge">⭐ 0 نقطة</div>
     </div>
-    <div class="points-info">
-      <h4>نقاطك الحالية</h4>
-      <div id="userPoints">0</div>
+
+    <!-- شبكة الهدايا -->
+    <div class="gifts-grid" id="giftsGrid">
+      <div class="empty-store">جاري تحميل الهدايا...</div>
     </div>
+
   </div>
 
-  <div id="blockedBox" class="blocked-box">
-    <strong>🚫 الحساب محظور</strong>
-    لا يمكنك شراء الهدايا حالياً.<br>يرجى التواصل مع المسؤول.
-  </div>
+  <!-- الشريط السفلي للتنقل -->
+  <nav class="bottom-nav">
+    <a href="home.html" class="nav-item">
+      <span class="nav-icon">🏠</span>
+      <span>الرئيسية</span>
+    </a>
+    <a href="profile.html" class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>البروفايل</span>
+    </a>
+    <a href="store.html" class="nav-item active">
+      <span class="nav-icon">🎁</span>
+      <span>المعرض</span>
+    </a>
+    <a href="basket.html" class="nav-item">
+      <span class="nav-icon">🛒</span>
+      <span>السلة</span>
+    </a>
+  </nav>
 
-  <div class="gifts-grid" id="giftsContainer">
-    <div class="loading">جاري تحميل الهدايا...</div>
-  </div>
-</div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
 
-<nav class="bottom-nav">
-  <a href="home.html" class="nav-item">
-    <span class="nav-icon">🏠</span>
-    <span>الرئيسية</span>
-  </a>
-  <a href="profile.html" class="nav-item">
-    <span class="nav-icon">👤</span>
-    <span>البروفايل</span>
-  </a>
-  <a href="store.html" class="nav-item active">
-    <span class="nav-icon">🎁</span>
-    <span>المعرض</span>
-  </a>
-  <a href="basket.html" class="nav-item">
-    <span class="nav-icon">🛒</span>
-    <span>السلة</span>
-  </a>
-</nav>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-  authDomain: "church-7afe1.firebaseapp.com",
-  projectId: "church-7afe1",
-  storageBucket: "church-7afe1.firebasestorage.app",
-  messagingSenderId: "1072334615357",
-  appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
-  measurementId: "G-E7Q76Z53SB"
-};
-
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const db = firebase.firestore();
-
-let currentUserId = null;
-let activeCollection = "users"; // نبدأ بالكولكشن الأرجح حسب صورك (users)
-let currentUserPoints = 0;
-let currentUserBlocked = false;
-let userListener = null;
-let giftsListener = null;
-
-window.addEventListener("DOMContentLoaded", async () => {
-  // البحث في جميع المفاتيح المحتملة المخزنة في المتصفح
-  currentUserId = localStorage.getItem("userId") || 
-                  localStorage.getItem("currentAdminUser") || 
-                  localStorage.getItem("currentServantId") || 
-                  localStorage.getItem("servantId") ||
-                  localStorage.getItem("userUid");
-
-  // إذا لم يتم العثور على المعرف، نبحث تلقائياً داخل كولكشن users ثم servants لجلب أول مستخدم مسجل
-  if (!currentUserId) {
-    try {
-      let snapshot = await db.collection("users").limit(1).get();
-      if (!snapshot.empty) {
-        currentUserId = snapshot.docs[0].id;
-        activeCollection = "users";
-        localStorage.setItem("userId", currentUserId);
-      } else {
-        snapshot = await db.collection("servants").limit(1).get();
-        if (!snapshot.empty) {
-          currentUserId = snapshot.docs[0].id;
-          activeCollection = "servants";
-          localStorage.setItem("currentServantId", currentUserId);
-        }
-      }
-    } catch (e) {
-      console.error(e);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
     }
-  }
+    const db = firebase.firestore();
 
-  // إذا وجدنا مفتاحاً مخزناً، نحدد الكولكشن بدقة بناءً على أين وُجد
-  if (localStorage.getItem("currentServantId") || localStorage.getItem("servantId")) {
-    activeCollection = "servants";
-  } else if (localStorage.getItem("userId")) {
-    activeCollection = "users";
-  }
+    let currentUserPoints = 0;
+    const currentUsername = localStorage.getItem("currentUsername");
 
-  if (!currentUserId) {
-    showToast("برجاء تسجيل الدخول أولاً", "error");
-    setTimeout(() => {
-      window.location.href = "user.html";
-    }, 1500);
-    return;
-  }
+    // التحقق من تسجيل الدخول عبر الـ localStorage
+    if (!currentUsername) {
+      window.location.href = "../index.html";
+    } else {
+      listenToUserData(currentUsername);
+      loadStoreGifts();
+    }
 
-  listenToUserData(currentUserId);
-  listenToGifts();
-});
-
-function listenToUserData(userId) {
-  if (userListener) {
-    userListener();
-    userListener = null;
-  }
-
-  userListener = db.collection(activeCollection).doc(userId).onSnapshot((doc) => {
-    if (!doc.exists) {
-      // تجربة الكولكشن الآخر في حال لم يُوجد في الأول
-      const altCollection = activeCollection === "users" ? "servants" : "users";
-      db.collection(altCollection).doc(userId).get().then((altDoc) => {
-        if (altDoc.exists) {
-          activeCollection = altCollection;
-          listenToUserData(userId);
-        } else {
-          currentUserPoints = 0;
-          currentUserBlocked = false;
-          updateUserUI();
+    // الاستماع لنقاط المستخدم من كولكشن users عبر الـ username
+    function listenToUserData(username) {
+      db.collection('users').doc(username).onSnapshot((doc) => {
+        if (doc.exists) {
+          currentUserPoints = Number(doc.data().points) || 0;
+          document.getElementById('userPointsBadge').innerText = `⭐ ${currentUserPoints} نقطة`;
+          loadStoreGifts();
         }
       });
-      return;
     }
 
-    const data = doc.data();
-    currentUserPoints = Number(data.points) || 0;
-    currentUserBlocked = data.isBlocked === true || data.blocked === true;
-    updateUserUI();
-  }, (error) => {
-    console.error("User listener error:", error);
-    showToast("تعذر تحميل بيانات حسابك", "error");
-  });
-}
+    // جلب الهدايا المتاحة في المعرض
+    function loadStoreGifts() {
+      const giftsGrid = document.getElementById('giftsGrid');
 
-function updateUserUI() {
-  document.getElementById("userPoints").innerText = currentUserPoints;
-  const blockedBox = document.getElementById("blockedBox");
-  if (currentUserBlocked) {
-    blockedBox.style.display = "block";
-  } else {
-    blockedBox.style.display = "none";
-  }
-}
+      db.collection('gifts').onSnapshot((snapshot) => {
+        giftsGrid.innerHTML = '';
 
-function listenToGifts() {
-  const container = document.getElementById("giftsContainer");
-  if (giftsListener) {
-    giftsListener();
-    giftsListener = null;
-  }
+        if (snapshot.empty) {
+          giftsGrid.innerHTML = '<div class="empty-store">لا توجد هدايا متاحة في المعرض حالياً.</div>';
+          return;
+        }
 
-  giftsListener = db.collection("gifts").onSnapshot((snapshot) => {
-    container.innerHTML = "";
-    let availableCount = 0;
+        snapshot.forEach((doc) => {
+          const gift = doc.data();
+          const giftId = doc.id;
+          const giftPrice = Number(gift.points) || 0;
+          const hasEnoughPoints = currentUserPoints >= giftPrice;
 
-    snapshot.forEach((doc) => {
-      const gift = doc.data();
-      const giftId = doc.id;
-      const quantity = Number(gift.quantity) || 0;
-      const points = Number(gift.points) || 0;
-      const name = gift.name || "هدية";
+          const card = document.createElement('div');
+          card.className = 'gift-card';
 
-      if (quantity <= 0) return;
+          const imgHTML = gift.image 
+            ? `<img src="${gift.image}" alt="${gift.name}">` 
+            : `<div class="gift-img-placeholder">🎁</div>`;
 
-      availableCount++;
+          card.innerHTML = `
+            <div class="gift-img-box">${imgHTML}</div>
+            <div class="gift-name">${gift.name || 'هدايا الكنيسة'}</div>
+            <div class="gift-footer">
+              <div class="gift-price">⭐ ${giftPrice} نقطة</div>
+              <button class="buy-btn" ${!hasEnoughPoints ? 'disabled' : ''} onclick="buyGift('${giftId}', '${escapeHtml(gift.name || '')}', ${giftPrice}, '${gift.image || ''}')">
+                ${hasEnoughPoints ? 'شراء 🛒' : 'نقاط غير كافية 🔒'}
+              </button>
+            </div>
+          `;
 
-      const card = document.createElement("div");
-      card.className = "gift-card";
-
-      let imageHTML = `<div class="gift-img-placeholder">🎁</div>`;
-      if (gift.image) {
-        imageHTML = `<img src="${escapeHtml(gift.image)}" alt="${escapeHtml(name)}" loading="lazy">`;
-      }
-
-      const disabled = currentUserBlocked ? "disabled" : "";
-      const buttonText = currentUserBlocked ? "الحساب محظور 🚫" : "إضافة للسلة 🛒";
-
-      card.innerHTML = `
-        <div class="gift-img-box">${imageHTML}</div>
-        <div class="gift-name">${escapeHtml(name)}</div>
-        <div class="gift-details">
-          <span class="gift-price">⭐ ${points} نقطة</span>
-          <span class="gift-qty">المتاح: ${quantity}</span>
-        </div>
-        <button class="add-to-cart-btn" ${disabled} data-gift-id="${escapeHtml(giftId)}">
-          ${buttonText}
-        </button>
-      `;
-
-      card.querySelector(".add-to-cart-btn").addEventListener("click", () => {
-        addToBasket(giftId);
-      });
-
-      container.appendChild(card);
-    });
-
-    if (availableCount === 0) {
-      container.innerHTML = `<div class="empty-msg">لا توجد هدايا متاحة حالياً 🎁</div>`;
-    }
-  }, (error) => {
-    console.error("Gifts error:", error);
-    container.innerHTML = `<div class="empty-msg">⚠️ حدث خطأ أثناء تحميل الهدايا</div>`;
-  });
-}
-
-async function addToBasket(giftId) {
-  if (!currentUserId) {
-    showToast("برجاء تسجيل الدخول أولاً", "error");
-    return;
-  }
-
-  if (currentUserBlocked) {
-    showToast("حسابك محظور ولا يمكنك شراء الهدايا 🚫", "error");
-    return;
-  }
-
-  const userRef = db.collection(activeCollection).doc(currentUserId);
-  const giftRef = db.collection("gifts").doc(giftId);
-  const basketRef = userRef.collection("basket").doc(giftId);
-
-  try {
-    await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userRef);
-      const giftDoc = await transaction.get(giftRef);
-      const basketDoc = await transaction.get(basketRef);
-
-      if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
-      const userData = userDoc.data();
-      if (userData.isBlocked === true || userData.blocked === true) throw new Error("USER_BLOCKED");
-
-      if (!giftDoc.exists) throw new Error("GIFT_NOT_FOUND");
-      const gift = giftDoc.data();
-      const giftPoints = Number(gift.points) || 0;
-      const giftQuantity = Number(gift.quantity) || 0;
-      const userPoints = Number(userData.points) || 0;
-
-      if (giftQuantity <= 0) throw new Error("OUT_OF_STOCK");
-      if (userPoints < giftPoints) throw new Error("NOT_ENOUGH_POINTS");
-
-      const oldCount = basketDoc.exists ? Number(basketDoc.data().count) || 0 : 0;
-
-      transaction.update(userRef, {
-        points: userPoints - giftPoints,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      transaction.update(giftRef, {
-        quantity: giftQuantity - 1,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      const basketData = {
-        giftId: giftId,
-        name: gift.name || "هدية",
-        points: giftPoints,
-        image: gift.image || "",
-        count: oldCount + 1,
-        isApproved: false,
-        isDelivered: false,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      };
-
-      if (basketDoc.exists) {
-        transaction.update(basketRef, basketData);
-      } else {
-        transaction.set(basketRef, {
-          ...basketData,
-          addedAt: firebase.firestore.FieldValue.serverTimestamp()
+          giftsGrid.appendChild(card);
         });
-      }
-    });
-
-    showToast("تم شراء الهدية وإضافتها للسلة بنجاح! 🛒✨", "success");
-
-  } catch (error) {
-    console.error("Purchase error:", error);
-    switch (error.message) {
-      case "USER_BLOCKED":
-        showToast("حسابك محظور ولا يمكنك شراء الهدايا 🚫", "error");
-        break;
-      case "USER_NOT_FOUND":
-        showToast("لم يتم العثور على بيانات حسابك", "error");
-        break;
-      case "GIFT_NOT_FOUND":
-        showToast("هذه الهدية لم تعد موجودة", "error");
-        break;
-      case "OUT_OF_STOCK":
-        showToast("عذراً، نفدت كمية هذه الهدية ❌", "error");
-        break;
-      case "NOT_ENOUGH_POINTS":
-        showToast("النقاط غير كافية لشراء هذه الهدية ⭐", "error");
-        break;
-      default:
-        showToast("حدث خطأ أثناء تنفيذ العملية ❌", "error");
+      }, (err) => {
+        console.error("Error loading gifts:", err);
+        giftsGrid.innerHTML = '<div class="empty-store">حدث خطأ أثناء تحميل المعرض.</div>';
+      });
     }
-  }
-}
 
-let toastTimer = null;
-function showToast(message, type) {
-  const toast = document.getElementById("toast");
-  toast.innerText = message;
-  toast.className = "toast " + type + " show";
-  if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    toast.classList.remove("show");
-  }, 3000);
-}
+    // عملية شراء الهدية وخصم النقاط وإضافتها لسلة المستخدم
+    async function buyGift(giftId, giftName, giftPrice, giftImage) {
+      if (!currentUsername) return;
 
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-</script>
+      if (currentUserPoints < giftPrice) {
+        alert("عذراً، لا تمتلك نقاط كافية لشراء هذه الهدية.");
+        return;
+      }
+
+      const confirmBuy = confirm(`هل تريد بالتأكيد شراء هذه الهدية (${giftName}) مقابل ${giftPrice} نقطة؟`);
+      if (!confirmBuy) return;
+
+      try {
+        const userRef = db.collection('users').doc(currentUsername);
+        const basketRef = userRef.collection('basket').doc();
+
+        // استخدام Transaction لضمان خصم النقاط وإضافة الطلب بدقة
+        await db.runTransaction(async (transaction) => {
+          const userDoc = await transaction.get(userRef);
+          if (!userDoc.exists) throw new Error("مستخدم غير موجود!");
+
+          const currentPoints = Number(userDoc.data().points) || 0;
+          if (currentPoints < giftPrice) {
+            throw new Error("نقاطك غير كافية!");
+          }
+
+          // خصم النقاط من حساب المستخدم في كولكشن users
+          transaction.update(userRef, {
+            points: currentPoints - giftPrice,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          // إضافة الهدية إلى سلة المستخدم الفرعية
+          transaction.set(basketRef, {
+            giftId: giftId,
+            name: giftName,
+            points: giftPrice,
+            image: giftImage,
+            count: 1,
+            isDelivered: false,
+            addedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        });
+
+        alert("تم شراء الهدية بنجاح وإضافتها إلى سلتك! 🎉");
+      } catch (error) {
+        console.error("Transaction failed: ", error);
+        alert("❌ حدث خطأ أثناء إتمام عملية الشراء: " + error.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+  </script>
+
 </body>
 </html>
