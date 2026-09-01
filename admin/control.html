@@ -22,10 +22,10 @@
     }
 
     body {
-      background: #0b0f19;
+      background: #0f111a;
       color: #fff;
       min-height: 100vh;
-      padding: 20px;
+      padding: 20px 20px 40px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -37,24 +37,25 @@
     }
 
     .card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #1a1c29;
+      border: 1px solid #2a2e43;
       border-radius: 20px;
       padding: 20px;
       margin-bottom: 18px;
-      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
     h1,
     h2 {
       text-align: center;
-      color: #38bdf8;
+      color: #00e676;
       margin-bottom: 10px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
     }
 
     .admin-info {
       text-align: center;
-      color: #94a3b8;
+      color: #a0aec0;
       font-size: 0.85rem;
     }
 
@@ -64,7 +65,7 @@
 
     label {
       display: block;
-      color: #cbd5e1;
+      color: #d1d5db;
       font-size: 0.9rem;
       margin-bottom: 7px;
       font-weight: 600;
@@ -75,8 +76,8 @@
       width: 100%;
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      background: #0f172a;
+      border: 1px solid #2a2e43;
+      background: #0f111a;
       color: #fff;
       outline: none;
       font-size: 1rem;
@@ -84,7 +85,7 @@
 
     select:focus,
     input:focus {
-      border-color: #38bdf8;
+      border-color: #00e676;
     }
 
     .password-box {
@@ -110,19 +111,22 @@
       width: 100%;
       padding: 12px;
       border-radius: 12px;
-      background: linear-gradient(135deg, #38bdf8, #0284c7);
-      color: #fff;
+      background: #00e676;
+      color: #0f111a;
       font-weight: 800;
       font-size: 1rem;
       margin-top: 5px;
+      box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+      transition: all 0.3s ease;
     }
 
     .main-btn:hover {
       opacity: 0.9;
+      transform: translateY(-2px);
     }
 
     .back-btn {
-      background: #334155;
+      background: #2a2e43;
       color: #fff;
       padding: 8px 15px;
       border-radius: 10px;
@@ -156,8 +160,8 @@
     }
 
     .servant-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #1a1c29;
+      border: 1px solid #2a2e43;
       border-radius: 16px;
       padding: 15px;
       display: flex;
@@ -165,10 +169,11 @@
       align-items: center;
       cursor: pointer;
       transition: 0.25s;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
 
     .servant-card:hover {
-      border-color: #38bdf8;
+      border-color: #00e676;
       transform: translateY(-2px);
     }
 
@@ -180,15 +185,16 @@
     .servant-name {
       font-weight: 800;
       margin-bottom: 4px;
+      color: #fff;
     }
 
     .servant-phone {
-      color: #94a3b8;
+      color: #a0aec0;
       font-size: 0.8rem;
     }
 
     .points {
-      color: #38bdf8;
+      color: #00e676;
       font-weight: 900;
       font-size: 1.1rem;
       white-space: nowrap;
@@ -230,7 +236,6 @@
     }
 
     /* Profile */
-
     .profile-header {
       text-align: center;
       margin-bottom: 20px;
@@ -241,9 +246,9 @@
       height: 90px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid #38bdf8;
+      border: 3px solid #00e676;
       margin-bottom: 10px;
-      background: #1e293b;
+      background: #0f111a;
     }
 
     .points-control {
@@ -261,8 +266,8 @@
       width: 40px;
       height: 42px;
       border-radius: 10px;
-      background: #38bdf8;
-      color: #0b0f19;
+      background: #00e676;
+      color: #0f111a;
       font-weight: 900;
       font-size: 0.85rem;
       flex-shrink: 0;
@@ -292,19 +297,8 @@
     .loading,
     .empty {
       text-align: center;
-      color: #94a3b8;
+      color: #a0aec0;
       padding: 30px;
-    }
-
-    .image-preview-box {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .image-preview-box small {
-      color: #94a3b8;
-      display: block;
-      margin-top: 5px;
     }
   </style>
 </head>
@@ -315,1387 +309,421 @@
 
   <!-- Header -->
   <div class="card">
-
     <h1>⚙️ لوحة إدارة الكنيسة</h1>
-
     <div id="adminInfo" class="admin-info">
-      جاري التحقق من الحساب...
+      تم تسجيل الدخول بحساب الخادم
     </div>
-
     <button class="logout-btn" onclick="logout()">
       تسجيل الخروج
     </button>
-
   </div>
-
 
   <!-- الرسائل -->
   <div id="message" class="message"></div>
 
-
   <!-- اختيار المرحلة -->
   <div id="stageSection" class="card">
-
     <div class="form-group">
-
       <label>
         اختر المرحلة الدراسية:
       </label>
-
       <select id="stageSelect" onchange="stageChanged()">
-
-        <option value="">
-          -- اختر المرحلة --
-        </option>
-
-        <option value="primary">
-          ابتدائي
-        </option>
-
-        <option value="prep">
-          إعدادي
-        </option>
-
-        <option value="sec">
-          ثانوي
-        </option>
-
+        <option value="">-- اختر المرحلة --</option>
+        <option value="primary">ابتدائي</option>
+        <option value="prep">إعدادي</option>
+        <option value="sec">ثانوي</option>
       </select>
-
     </div>
 
-
     <div id="passwordBox" class="password-box">
-
       <div class="form-group">
-
-        <label>
-          🔒 كلمة سر المرحلة
-        </label>
-
-        <input
-          type="password"
-          id="stagePassword"
-          placeholder="أدخل كلمة السر"
-          onkeydown="passwordEnter(event)"
-        >
-
+        <label>🔒 كلمة سر المرحلة</label>
+        <input type="password" id="stagePassword" placeholder="أدخل كلمة السر" onkeydown="passwordEnter(event)">
       </div>
-
       <button class="main-btn" onclick="verifyStage()">
         فتح المرحلة 🔓
       </button>
-
     </div>
-
   </div>
-
 
   <!-- Dashboard -->
   <div id="dashboardSection" style="display:none;">
-
     <div class="card">
-
       <div class="form-group">
-
-        <label>
-          اختر الصف:
-        </label>
-
-        <select id="gradeSelect" onchange="loadServants()">
-
-          <option value="">
-            -- اختر الصف --
-          </option>
-
-        </select>
-
-      </div>
-
-
-      <div class="form-group">
-
-        <label>
-          🔍 البحث عن مخدوم
-        </label>
-
+        <label>🔍 البحث الشامل في المرحلة (لكل الصفوف)</label>
         <div class="search-box">
-
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="اكتب الاسم..."
-            oninput="searchServants()"
-          >
-
-          <button
-            class="main-btn"
-            style="width:auto;"
-            onclick="searchServants()"
-          >
-            بحث
-          </button>
-
+          <input type="text" id="searchInput" placeholder="اكتب اسم المخدوم للبحث..." oninput="searchServants()">
+          <button class="main-btn" style="width:auto; margin-top:0;" onclick="searchServants()">بحث</button>
         </div>
-
       </div>
-
     </div>
 
-
     <div id="servantsList" class="servants-list"></div>
-
   </div>
-
 
   <!-- Profile -->
   <div id="profileSection" style="display:none;">
-
     <button class="back-btn" onclick="backToDashboard()">
       ⬅ العودة للقائمة
     </button>
 
-
     <div class="card">
-
       <div class="profile-header">
-
-        <img
-          id="viewAvatar"
-          src=""
-          class="profile-avatar"
-          alt="صورة المخدوم"
-        >
-
-        <h2
-          id="viewNameTitle"
-          style="margin:0;"
-        >
-          اسم المخدوم
-        </h2>
-
+        <img id="viewAvatar" src="" class="profile-avatar" alt="صورة المخدوم">
+        <h2 id="viewNameTitle" style="margin:0;">اسم المخدوم</h2>
       </div>
-
 
       <!-- تغيير الصورة -->
       <div class="form-group">
-
-        <label>
-          🖼️ تغيير صورة المخدوم من جهازك:
-        </label>
-
-        <input
-          type="file"
-          id="imageInput"
-          accept="image/*"
-          onchange="compressAndPreviewImage(event)"
-        >
-
-        <small style="color:#94a3b8;display:block;margin-top:5px;">
-          سيتم ضغط الصورة تلقائيًا قبل الحفظ.
-        </small>
-
+        <label>🖼️ تغيير صورة المخدوم من جهازك:</label>
+        <input type="file" id="imageInput" accept="image/*" onchange="compressAndPreviewImage(event)">
+        <small style="color:#a0aec0;display:block;margin-top:5px;">سيتم ضغط الصورة تلقائيًا قبل الحفظ.</small>
       </div>
-
 
       <!-- الاسم -->
       <div class="form-group">
-
-        <label>
-          الاسم بالكامل
-        </label>
-
-        <input
-          type="text"
-          id="editName"
-        >
-
+        <label>الاسم بالكامل</label>
+        <input type="text" id="editName">
       </div>
-
 
       <!-- الهاتف -->
       <div class="form-group">
-
-        <label>
-          رقم التليفون الشخصي
-        </label>
-
-        <input
-          type="tel"
-          id="editPhone"
-        >
-
+        <label>رقم التليفون الشخصي</label>
+        <input type="tel" id="editPhone">
       </div>
-
 
       <!-- النقاط -->
       <div class="form-group">
-
-        <label>
-          النقاط
-        </label>
-
+        <label>النقاط</label>
         <div class="points-control">
-
-          <button
-            class="point-btn"
-            onclick="changePoints(-5)"
-          >
-            -5
-          </button>
-
-          <button
-            class="point-btn"
-            onclick="changePoints(-1)"
-          >
-            -1
-          </button>
-
-          <input
-            type="number"
-            id="editPoints"
-            min="0"
-          >
-
-          <button
-            class="point-btn"
-            onclick="changePoints(1)"
-          >
-            +1
-          </button>
-
-          <button
-            class="point-btn"
-            onclick="changePoints(5)"
-          >
-            +5
-          </button>
-
+          <button class="point-btn" onclick="changePoints(-5)">-5</button>
+          <button class="point-btn" onclick="changePoints(-1)">-1</button>
+          <input type="number" id="editPoints" min="0">
+          <button class="point-btn" onclick="changePoints(1)">+1</button>
+          <button class="point-btn" onclick="changePoints(5)">+5</button>
         </div>
-
       </div>
 
-
       <!-- حفظ -->
-      <button
-        class="main-btn"
-        onclick="saveServantProfile()"
-      >
+      <button class="main-btn" onclick="saveServantProfile()">
         حفظ التعديلات 💾
       </button>
 
-
       <!-- حظر -->
       <div id="blockButtonContainer"></div>
-
     </div>
-
   </div>
 
 </div>
 
-
 <script>
-
-  /* =====================================================
-     Firebase
-     ===================================================== */
-
   const firebaseConfig = {
-
     apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-
-    authDomain:
-      "church-7afe1.firebaseapp.com",
-
-    projectId:
-      "church-7afe1",
-
-    storageBucket:
-      "church-7afe1.firebasestorage.app",
-
-    messagingSenderId:
-      "1072334615357",
-
-    appId:
-      "1:1072334615357:web:c03b199f00ea9d19d40b54",
-
-    measurementId:
-      "G-E7Q76Z53SB"
-
+    authDomain: "church-7afe1.firebaseapp.com",
+    projectId: "church-7afe1",
+    storageBucket: "church-7afe1.firebasestorage.app",
+    messagingSenderId: "1072334615357",
+    appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+    measurementId: "G-E7Q76Z53SB"
   };
-
 
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
   }
 
-
   const auth = firebase.auth();
   const db = firebase.firestore();
 
-
-  /* =====================================================
-     كلمات سر المراحل
-     ===================================================== */
-
   const stagePasswords = {
-
     primary: "344",
-
     prep: "455",
-
     sec: "899"
-
   };
-
-
-  /* =====================================================
-     الصفوف
-     ===================================================== */
-
-  const stageGrades = {
-
-    primary: [
-
-      "الصف الأول الابتدائي",
-      "الصف الثاني الابتدائي",
-      "الصف الثالث الابتدائي",
-      "الصف الرابع الابتدائي",
-      "الصف الخامس الابتدائي",
-      "الصف السادس الابتدائي"
-
-    ],
-
-    prep: [
-
-      "الصف الأول الإعدادي",
-      "الصف الثاني الإعدادي",
-      "الصف الثالث الإعدادي"
-
-    ],
-
-    sec: [
-
-      "الصف الأول الثانوي",
-      "الصف الثاني الثانوي",
-      "الصف الثالث الثانوي"
-
-    ]
-
-  };
-
-
-  /* =====================================================
-     متغيرات
-     ===================================================== */
-
-  let currentAdmin = null;
 
   let selectedStage = "";
-
   let servants = [];
-
   let unsubscribe = null;
-
   let currentSelectedServantId = null;
-
   let newImageBase64 = "";
 
-
-  /* =====================================================
-     صورة افتراضية محلية
-     لا تعتمد على placeholder.com
-     ===================================================== */
-
-  const DEFAULT_AVATAR =
-    "data:image/svg+xml;charset=UTF-8," +
-    encodeURIComponent(`
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="200"
-        height="200"
-        viewBox="0 0 200 200"
-      >
-        <rect
-          width="200"
-          height="200"
-          fill="#1e293b"
-        />
-
-        <circle
-          cx="100"
-          cy="75"
-          r="38"
-          fill="#64748b"
-        />
-
-        <path
-          d="M35 190c8-48 38-70 65-70s57 22 65 70"
-          fill="#64748b"
-        />
-
-      </svg>
-    `);
-
-
-  /* =====================================================
-     التحقق من تسجيل الدخول
-     ===================================================== */
-
-  auth.onAuthStateChanged((user) => {
-
-    if (!user) {
-
-      document.getElementById("adminInfo").innerText =
-        "غير مسجل الدخول.";
-
-      setTimeout(() => {
-
-        window.location.href = "user.html";
-
-      }, 1500);
-
-      return;
-
-    }
-
-
-    currentAdmin = user;
-
-
-    document.getElementById("adminInfo").innerText =
-      "تم تسجيل الدخول بحساب الخادم";
-
-  });
-
-
-  /* =====================================================
-     تغيير المرحلة
-     ===================================================== */
+  const DEFAULT_AVATAR = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+      <rect width="200" height="200" fill="#1e293b"/>
+      <circle cx="100" cy="75" r="38" fill="#64748b"/>
+      <path d="M35 190c8-48 38-70 65-70s57 22 65 70" fill="#64748b"/>
+    </svg>
+  `);
 
   function stageChanged() {
-
-    selectedStage =
-      document.getElementById("stageSelect").value;
-
-
-    const passwordBox =
-      document.getElementById("passwordBox");
-
-
+    selectedStage = document.getElementById("stageSelect").value;
+    const passwordBox = document.getElementById("passwordBox");
     if (!selectedStage) {
-
       passwordBox.classList.remove("show");
-
       return;
-
     }
-
-
     passwordBox.classList.add("show");
-
-
     document.getElementById("stagePassword").value = "";
-
   }
-
-
-  /* =====================================================
-     Enter للباسورد
-     ===================================================== */
 
   function passwordEnter(event) {
-
     if (event.key === "Enter") {
-
       verifyStage();
-
     }
-
   }
-
-
-  /* =====================================================
-     التحقق من كلمة السر
-     ===================================================== */
 
   function verifyStage() {
-
-    const password =
-      document.getElementById("stagePassword").value;
-
-
+    const password = document.getElementById("stagePassword").value;
     if (stagePasswords[selectedStage] === password) {
-
-      document.getElementById("stageSection").style.display =
-        "none";
-
-
-      document.getElementById("dashboardSection").style.display =
-        "block";
-
-
-      populateGrades(selectedStage);
-
-
-      showMessage(
-        "تم فتح المرحلة بنجاح 🔓",
-        "success"
-      );
-
+      document.getElementById("stageSection").style.display = "none";
+      document.getElementById("dashboardSection").style.display = "block";
+      loadStageServants();
+      showMessage("تم فتح المرحلة بنجاح 🔓", "success");
     } else {
-
-      showMessage(
-        "كلمة السر غير صحيحة ❌",
-        "error"
-      );
-
+      showMessage("كلمة السر غير صحيحة ❌", "error");
     }
-
   }
 
-
-  /* =====================================================
-     إضافة الصفوف
-     ===================================================== */
-
-  function populateGrades(stage) {
-
-    const select =
-      document.getElementById("gradeSelect");
-
-
-    select.innerHTML =
-      `<option value="">-- اختر الصف --</option>`;
-
-
-    stageGrades[stage].forEach((grade) => {
-
-      const option =
-        document.createElement("option");
-
-
-      option.value = grade;
-
-      option.textContent = grade;
-
-
-      select.appendChild(option);
-
-    });
-
-  }
-
-
-  /* =====================================================
-     تحميل المخدومين
-     ===================================================== */
-
-  function loadServants() {
-
-    const grade =
-      document.getElementById("gradeSelect").value;
-
-
-    const list =
-      document.getElementById("servantsList");
-
+  function loadStageServants() {
+    const list = document.getElementById("servantsList");
 
     if (unsubscribe) {
-
       unsubscribe();
-
       unsubscribe = null;
-
     }
 
+    list.innerHTML = `<div class="loading">جاري تحميل مخدومي المرحلة...</div>`;
 
-    if (!grade) {
-
-      list.innerHTML = "";
-
-      return;
-
-    }
-
-
-    list.innerHTML =
-      `<div class="loading">
-        جاري تحميل المخدومين...
-      </div>`;
-
-
-    unsubscribe =
-      db
-        .collection("servants")
-        .where("stage", "==", selectedStage)
-        .where("grade", "==", grade)
-        .onSnapshot(
-
-          (snapshot) => {
-
-            servants = [];
-
-
-            snapshot.forEach((doc) => {
-
-              servants.push({
-
-                id: doc.id,
-
-                ...doc.data()
-
-              });
-
+    // تم تعديل الكولكشن من servants إلى users ليتطابق مع قاعدة البيانات لديك
+    unsubscribe = db.collection("users")
+      .where("stage", "==", selectedStage)
+      .onSnapshot(
+        (snapshot) => {
+          servants = [];
+          snapshot.forEach((doc) => {
+            servants.push({
+              id: doc.id,
+              ...doc.data()
             });
-
-
-            searchServants();
-
-          },
-
-
-          (error) => {
-
-            console.error(
-              "Firestore Error:",
-              error
-            );
-
-
-            list.innerHTML =
-              `<div class="empty">
-                ⚠️ تعذر جلب البيانات.
-                <br><br>
-                ${escapeHTML(error.message)}
-              </div>`;
-
-          }
-
-        );
-
+          });
+          searchServants();
+        },
+        (error) => {
+          console.error("Firestore Error:", error);
+          list.innerHTML = `<div class="empty">⚠️ تعذر جلب البيانات.<br><br>${escapeHTML(error.message)}</div>`;
+        }
+      );
   }
-
-
-  /* =====================================================
-     البحث
-     ===================================================== */
 
   function searchServants() {
-
-    const query =
-      document
-        .getElementById("searchInput")
-        .value
-        .trim()
-        .toLowerCase();
-
-
-    const filtered =
-      query
-
-        ? servants.filter((s) =>
-
-            (s.fullName || "")
-              .toLowerCase()
-              .includes(query)
-
-          )
-
-        : servants;
-
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
+    const filtered = query
+      ? servants.filter((s) => (s.fullName || "").toLowerCase().includes(query))
+      : servants;
 
     renderServants(filtered);
-
   }
-
-
-  /* =====================================================
-     عرض المخدومين
-     ===================================================== */
 
   function renderServants(list) {
-
-    const container =
-      document.getElementById("servantsList");
-
-
+    const container = document.getElementById("servantsList");
     container.innerHTML = "";
 
-
     if (list.length === 0) {
-
-      container.innerHTML =
-        `<div class="empty">
-          لا يوجد مخدومين في هذا الصف.
-        </div>`;
-
+      container.innerHTML = `<div class="empty">لا يوجد مخدومين مطابقة للبحث في هذه المرحلة.</div>`;
       return;
-
     }
-
 
     list.forEach((servant) => {
+      const card = document.createElement("div");
+      card.className = "servant-card" + (servant.isBlocked ? " blocked" : "");
+      card.onclick = () => openServantProfile(servant);
 
-      const card =
-        document.createElement("div");
-
-
-      card.className =
-        "servant-card" +
-        (servant.isBlocked ? " blocked" : "");
-
-
-      card.onclick =
-        () => openServantProfile(servant);
-
-
-      const servantImg =
-        servant.image ||
-        servant.photoBase64 ||
-        DEFAULT_AVATAR;
-
+      const servantImg = servant.image || servant.photoBase64 || DEFAULT_AVATAR;
 
       card.innerHTML = `
-
-        <div
-          style="
-            display:flex;
-            align-items:center;
-            gap:12px;
-          "
-        >
-
-          <img
-            src="${escapeHTML(servantImg)}"
-            style="
-              width:45px;
-              height:45px;
-              border-radius:50%;
-              object-fit:cover;
-              background:#1e293b;
-            "
-            onerror="this.src=DEFAULT_AVATAR"
-          >
-
+        <div style="display:flex; align-items:center; gap:12px;">
+          <img src="${escapeHTML(servantImg)}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; background:#0f111a;" onerror="this.src=DEFAULT_AVATAR">
           <div>
-
             <div class="servant-name">
-
-              ${escapeHTML(
-                servant.fullName || "بدون اسم"
-              )}
-
-              ${
-                servant.isBlocked
-
-                  ? `<span class="blocked-badge">
-                      محظور
-                    </span>`
-
-                  : ""
-              }
-
+              ${escapeHTML(servant.fullName || "بدون اسم")}
+              ${servant.isBlocked ? `<span class="blocked-badge">محظور</span>` : ""}
             </div>
-
-
             <div class="servant-phone">
-
-              📞
-              ${
-                escapeHTML(
-                  servant.userPhone ||
-                  "لا يوجد رقم"
-                )
-              }
-
+              📞 ${escapeHTML(servant.userPhone || "لا يوجد رقم")} | <span style="color:#38bdf8;">${escapeHTML(servant.grade || '')}</span>
             </div>
-
           </div>
-
         </div>
-
-
-        <div class="points">
-
-          ⭐
-          ${Number(servant.points) || 0}
-
-        </div>
-
+        <div class="points">⭐ ${Number(servant.points) || 0}</div>
       `;
-
-
       container.appendChild(card);
-
     });
-
   }
-
-
-  /* =====================================================
-     فتح بروفايل المخدوم
-     ===================================================== */
 
   function openServantProfile(servant) {
+    currentSelectedServantId = servant.id;
+    newImageBase64 = servant.image || servant.photoBase64 || "";
 
-    currentSelectedServantId =
-      servant.id;
+    document.getElementById("dashboardSection").style.display = "none";
+    document.getElementById("profileSection").style.display = "block";
 
+    document.getElementById("viewNameTitle").innerText = servant.fullName || "مخدوم";
+    document.getElementById("viewAvatar").src = newImageBase64 || DEFAULT_AVATAR;
+    document.getElementById("editName").value = servant.fullName || "";
+    document.getElementById("editPhone").value = servant.userPhone || "";
+    document.getElementById("editPoints").value = Number(servant.points) || 0;
+    document.getElementById("imageInput").value = "";
 
-    newImageBase64 =
-      servant.image ||
-      servant.photoBase64 ||
-      "";
-
-
-    document.getElementById(
-      "dashboardSection"
-    ).style.display = "none";
-
-
-    document.getElementById(
-      "profileSection"
-    ).style.display = "block";
-
-
-    document.getElementById(
-      "viewNameTitle"
-    ).innerText =
-      servant.fullName || "مخدوم";
-
-
-    /* إصلاح الخطأ الموجود في الكود القديم */
-    document.getElementById(
-      "viewAvatar"
-    ).src =
-      newImageBase64 || DEFAULT_AVATAR;
-
-
-    document.getElementById(
-      "editName"
-    ).value =
-      servant.fullName || "";
-
-
-    document.getElementById(
-      "editPhone"
-    ).value =
-      servant.userPhone || "";
-
-
-    document.getElementById(
-      "editPoints"
-    ).value =
-      Number(servant.points) || 0;
-
-
-    document.getElementById(
-      "imageInput"
-    ).value = "";
-
-
-    const blockContainer =
-      document.getElementById(
-        "blockButtonContainer"
-      );
-
-
+    const blockContainer = document.getElementById("blockButtonContainer");
     if (servant.isBlocked) {
-
-      blockContainer.innerHTML = `
-
-        <button
-          class="block-action-btn btn-unblock"
-          onclick="toggleBlock(false)"
-        >
-          إزالة الحظر 🔓
-        </button>
-
-      `;
-
+      blockContainer.innerHTML = `<button class="block-action-btn btn-unblock" onclick="toggleBlock(false)">إزالة الحظر 🔓</button>`;
     } else {
-
-      blockContainer.innerHTML = `
-
-        <button
-          class="block-action-btn btn-block"
-          onclick="toggleBlock(true)"
-        >
-          حظر المخدوم 🚫
-        </button>
-
-      `;
-
+      blockContainer.innerHTML = `<button class="block-action-btn btn-block" onclick="toggleBlock(true)">حظر المخدوم 🚫</button>`;
     }
-
   }
-
-
-  /* =====================================================
-     تعديل النقاط
-     ===================================================== */
 
   function changePoints(value) {
-
-    const input =
-      document.getElementById(
-        "editPoints"
-      );
-
-
-    let points =
-      parseInt(input.value) || 0;
-
-
+    const input = document.getElementById("editPoints");
+    let points = parseInt(input.value) || 0;
     points += value;
-
-
-    if (points < 0) {
-
-      points = 0;
-
-    }
-
-
+    if (points < 0) points = 0;
     input.value = points;
-
   }
-
-
-  /* =====================================================
-     ضغط الصورة
-     ===================================================== */
 
   function compressAndPreviewImage(event) {
-
-    const file =
-      event.target.files[0];
-
-
+    const file = event.target.files[0];
     if (!file) return;
 
-
     if (!file.type.startsWith("image/")) {
-
       alert("من فضلك اختر صورة فقط.");
-
       event.target.value = "";
-
       return;
-
     }
 
-
-    const reader =
-      new FileReader();
-
-
+    const reader = new FileReader();
     reader.onload = function(e) {
-
-      const img =
-        new Image();
-
-
+      const img = new Image();
       img.onload = function() {
-
-        const canvas =
-          document.createElement("canvas");
-
-
+        const canvas = document.createElement("canvas");
         const MAX_WIDTH = 300;
-
         const MAX_HEIGHT = 300;
-
-
-        let width =
-          img.width;
-
-
-        let height =
-          img.height;
-
+        let width = img.width;
+        let height = img.height;
 
         if (width > height) {
-
           if (width > MAX_WIDTH) {
-
-            height *=
-              MAX_WIDTH / width;
-
-            width =
-              MAX_WIDTH;
-
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
           }
-
         } else {
-
           if (height > MAX_HEIGHT) {
-
-            width *=
-              MAX_HEIGHT / height;
-
-            height =
-              MAX_HEIGHT;
-
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
           }
-
         }
 
+        canvas.width = Math.round(width);
+        canvas.height = Math.round(height);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-        canvas.width =
-          Math.round(width);
-
-
-        canvas.height =
-          Math.round(height);
-
-
-        const ctx =
-          canvas.getContext("2d");
-
-
-        ctx.drawImage(
-          img,
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
-
-
-        newImageBase64 =
-          canvas.toDataURL(
-            "image/jpeg",
-            0.7
-          );
-
-
-        document.getElementById(
-          "viewAvatar"
-        ).src =
-          newImageBase64;
-
+        newImageBase64 = canvas.toDataURL("image/jpeg", 0.7);
+        document.getElementById("viewAvatar").src = newImageBase64;
       };
-
-
-      img.src =
-        e.target.result;
-
+      img.src = e.target.result;
     };
-
-
     reader.readAsDataURL(file);
-
   }
-
-
-  /* =====================================================
-     العودة للقائمة
-     ===================================================== */
 
   function backToDashboard() {
-
-    document.getElementById(
-      "profileSection"
-    ).style.display = "none";
-
-
-    document.getElementById(
-      "dashboardSection"
-    ).style.display = "block";
-
-
-    currentSelectedServantId =
-      null;
-
-
-    newImageBase64 =
-      "";
-
+    document.getElementById("profileSection").style.display = "none";
+    document.getElementById("dashboardSection").style.display = "block";
+    currentSelectedServantId = null;
+    newImageBase64 = "";
   }
-
-
-  /* =====================================================
-     حفظ بيانات المخدوم
-     ===================================================== */
 
   async function saveServantProfile() {
+    if (!currentSelectedServantId) return;
 
-    if (!currentSelectedServantId) {
-
-      return;
-
-    }
-
-
-    const name =
-      document.getElementById(
-        "editName"
-      ).value.trim();
-
-
-    const phone =
-      document.getElementById(
-        "editPhone"
-      ).value.trim();
-
-
-    const points =
-      Math.max(
-        0,
-        parseInt(
-          document.getElementById(
-            "editPoints"
-          ).value
-        ) || 0
-      );
-
+    const name = document.getElementById("editName").value.trim();
+    const phone = document.getElementById("editPhone").value.trim();
+    const points = Math.max(0, parseInt(document.getElementById("editPoints").value) || 0);
 
     if (!name) {
-
-      alert(
-        "برجاء كتابة اسم المخدوم."
-      );
-
+      alert("برجاء كتابة اسم المخدوم.");
       return;
-
     }
 
-
     try {
-
       const updateData = {
-
         fullName: name,
-
         userPhone: phone,
-
         points: points,
-
-        updatedAt:
-          firebase.firestore.FieldValue
-            .serverTimestamp()
-
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
-
-      /* =================================================
-         حفظ الصورة في الحقلين
-         ================================================= */
-
       if (newImageBase64) {
-
-        updateData.image =
-          newImageBase64;
-
-        updateData.photoBase64 =
-          newImageBase64;
-
+        updateData.image = newImageBase64;
+        updateData.photoBase64 = newImageBase64;
       }
 
+      // التحديث في كولكشن users الصحيح
+      await db.collection("users").doc(currentSelectedServantId).update(updateData);
 
-      await db
-        .collection("servants")
-        .doc(currentSelectedServantId)
-        .update(updateData);
+      document.getElementById("viewNameTitle").innerText = name;
+      document.getElementById("viewAvatar").src = newImageBase64 || DEFAULT_AVATAR;
 
-
-      document.getElementById(
-        "viewNameTitle"
-      ).innerText = name;
-
-
-      document.getElementById(
-        "viewAvatar"
-      ).src =
-        newImageBase64 ||
-        DEFAULT_AVATAR;
-
-
-      alert(
-        "تم حفظ بيانات المخدوم وتحديث الصورة والنقاط بنجاح ✅"
-      );
-
+      alert("تم حفظ بيانات المخدوم وتحديث الصورة والنقاط بنجاح ✅");
     } catch (error) {
-
-      console.error(
-        "Save Error:",
-        error
-      );
-
-
-      alert(
-        "❌ لم يتم الحفظ:\n" +
-        error.message
-      );
-
+      console.error("Save Error:", error);
+      alert("❌ لم يتم الحفظ:\n" + error.message);
     }
-
   }
-
-
-  /* =====================================================
-     الحظر / إزالة الحظر
-     ===================================================== */
 
   async function toggleBlock(status) {
+    if (!currentSelectedServantId) return;
 
-    if (!currentSelectedServantId) {
-
-      return;
-
-    }
-
-
-    const confirmed =
-      confirm(
-        status
-          ? "هل تريد حظر هذا المخدوم؟"
-          : "هل تريد إزالة الحظر عنه؟"
-      );
-
-
-    if (!confirmed) {
-
-      return;
-
-    }
-
+    const confirmed = confirm(status ? "هل تريد حظر هذا المخدوم؟" : "هل تريد إزالة الحظر عنه؟");
+    if (!confirmed) return;
 
     try {
+      // التحديث في كولكشن users الصحيح
+      await db.collection("users").doc(currentSelectedServantId).update({
+        isBlocked: status,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
-      await db
-        .collection("servants")
-        .doc(currentSelectedServantId)
-        .update({
-
-          isBlocked: status,
-
-          updatedAt:
-            firebase.firestore.FieldValue
-              .serverTimestamp()
-
-        });
-
-
-      alert(
-        status
-          ? "تم حظر المخدوم 🚫"
-          : "تم إزالة الحظر 🔓"
-      );
-
-
+      alert(status ? "تم حظر المخدوم 🚫" : "تم إزالة الحظر 🔓");
       backToDashboard();
-
     } catch (error) {
-
-      console.error(
-        "Block Error:",
-        error
-      );
-
-
-      alert(
-        "❌ حدث خطأ:\n" +
-        error.message
-      );
-
+      console.error("Block Error:", error);
+      alert("❌ حدث خطأ:\n" + error.message);
     }
-
   }
-
-
-  /* =====================================================
-     تسجيل الخروج
-     ===================================================== */
 
   async function logout() {
-
-    if (unsubscribe) {
-
-      unsubscribe();
-
-    }
-
-
-    await auth.signOut();
-
-
-    window.location.href =
-      "user.html";
-
+    if (unsubscribe) unsubscribe();
+    try {
+      await auth.signOut();
+    } catch (e) {}
+    window.location.href = "user.html";
   }
-
-
-  /* =====================================================
-     الرسائل
-     ===================================================== */
 
   function showMessage(text, type) {
-
-    const msg =
-      document.getElementById(
-        "message"
-      );
-
-
-    msg.innerText =
-      text;
-
-
-    msg.className =
-      "message show " +
-      type;
-
-
+    const msg = document.getElementById("message");
+    msg.innerText = text;
+    msg.className = "message show " + type;
     setTimeout(() => {
-
-      msg.classList.remove(
-        "show"
-      );
-
+      msg.classList.remove("show");
     }, 3000);
-
   }
-
-
-  /* =====================================================
-     حماية النصوص
-     ===================================================== */
 
   function escapeHTML(value) {
-
     return String(value)
-
-      .replaceAll(
-        "&",
-        "&amp;"
-      )
-
-      .replaceAll(
-        "<",
-        "&lt;"
-      )
-
-      .replaceAll(
-        ">",
-        "&gt;"
-      )
-
-      .replaceAll(
-        '"',
-        "&quot;"
-      )
-
-      .replaceAll(
-        "'",
-        "&#039;"
-      );
-
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
-
 </script>
 
 </body>
