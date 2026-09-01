@@ -276,73 +276,112 @@
 
     auth.onAuthStateChanged((user) => {
       if (user) {
-        loadBasketItems(user.uid);
+        // جلب البيانات الأساسية للمستخدم أولاً لمعرفة username الخاص به
+        db.collection('users').doc(user.uid).get().then((userDoc) => {
+          let username = null;
+          let fullName = null;
+          if (userDoc.exists) {
+            username = userDoc.data().username;
+            fullName = userDoc.data().fullName;
+          }
+          loadBasketItems(user.uid, username, fullName);
+        }).catch((err) => {
+          console.error("Error getting user profile:", err);
+          loadBasketItems(user.uid, null, null);
+        });
       } else {
         window.location.href = "user.html";
       }
     });
 
-    // جلب الهدايا والطلبات من مجموعة Basket داخل كولكشن users الخاص بالمستخدم
-    function loadBasketItems(uid) {
+    // دالة جلب الطلبات ببحث مزدوج (سواء كانت في كولكشن فرعي داخل المستخدم أو في كولكشن orders العام)
+    function loadBasketItems(uid, username, fullName) {
       const basketList = document.getElementById('basketList');
       const totalItemsCount = document.getElementById('totalItemsCount');
 
-      db.collection('users').doc(uid).collection('basket')
-        .orderBy('addedAt', 'desc')
-        .onSnapshot((snapshot) => {
-          basketList.innerHTML = '';
-
-          if (snapshot.empty) {
-            basketList.innerHTML = '<div class="empty-basket">سلتك فارغة، قم بإضافة هدايا من المعرض! 🎁</div>';
-            totalItemsCount.innerText = '0 عنصر';
-            return;
+      // سنقوم بالاستماع لكولكشن orders العام وتصفيتها بناءً على معرف المستخدم أو اسمه لضمان ظهور كل طلباته بدقة
+      db.collection('orders').onSnapshot((snapshot) => {
+        let userOrders = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          // مطابقة الطلبات بناءً على الـ uid أو الـ username أو الـ clientName
+          if (data.userId === uid || (username && data.username === username) || (fullName && data.clientName === fullName)) {
+            userOrders.push({ id: doc.id, ...data });
           }
-
-          totalItemsCount.innerText = `${snapshot.size} عنصر`;
-
-          snapshot.forEach((doc) => {
-            const item = doc.data();
-
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'basket-item';
-
-            const imgHTML = item.image 
-              ? `<img src="${item.image}" alt="${item.name}">` 
-              : `<div class="item-img-placeholder">🎁</div>`;
-
-            // تنسيق التاريخ والوقت
-            let formattedDate = 'غير محدد';
-            if (item.addedAt && item.addedAt.toDate) {
-              const d = item.addedAt.toDate();
-              formattedDate = `${d.toLocaleDateString('ar-EG')} - ${d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
-            }
-
-            // حالة التسليم
-            const isDelivered = item.isDelivered === true;
-            const statusClass = isDelivered ? 'delivered' : 'pending';
-            const statusText = isDelivered ? 'تم التسليم ✔️' : 'قيد الانتظار ⏳';
-
-            itemDiv.innerHTML = `
-              <div class="item-img-box">${imgHTML}</div>
-              <div class="item-info">
-                <div class="item-name">${item.name}</div>
-                <div class="item-meta">
-                  <span>⭐ ${item.points || 0} نقطة</span>
-                  <span>الكمية: ${item.count || 1}</span>
-                </div>
-                <div class="item-date">🕒 ${formattedDate}</div>
-                <div>
-                  <span class="status-badge ${statusClass}">${statusText}</span>
-                </div>
-              </div>
-            `;
-
-            basketList.appendChild(itemDiv);
-          });
-        }, (err) => {
-          console.error("Error loading basket:", err);
-          basketList.innerHTML = '<div class="empty-basket">حدث خطأ أثناء تحميل السلة.</div>';
         });
+
+        if (userOrders.length === 0) {
+          // محاولة جلبها من الكولكشن الفرعي التقليدي إن لم توجد في العام
+          db.collection('users').doc(uid).collection('basket').onSnapshot((subSnapshot) => {
+            if (subSnapshot.empty) {
+              basketList.innerHTML = '<div class="empty-basket">سلتك فارغة، قم بإضافة هدايا من المعرض! 🎁</div>';
+              totalItemsCount.innerText = '0 عنصر';
+              return;
+            }
+            renderOrdersList(subSnapshot);
+          });
+          return;
+        }
+
+        renderOrdersFromArray(userOrders);
+      }, (err) => {
+        console.error("Error loading orders:", err);
+        basketList.innerHTML = '<div class="empty-basket">حدث خطأ أثناء تحميل السلة.</div>';
+      });
+    }
+
+    function renderOrdersFromArray(orders) {
+      const basketList = document.getElementById('basketList');
+      const totalItemsCount = document.getElementById('totalItemsCount');
+
+      basketList.innerHTML = '';
+      totalItemsCount.innerText = `${orders.length} عنصر`;
+
+      orders.forEach((item) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'basket-item';
+
+        const imgHTML = item.image 
+          ? `<img src="${item.image}" alt="${item.name || item.itemName}">` 
+          : `<div class="item-img-placeholder">🎁</div>`;
+
+        let formattedDate = 'غير محدد';
+        if (item.addedAt && item.addedAt.toDate) {
+          const d = item.addedAt.toDate();
+          formattedDate = `${d.toLocaleDateString('ar-EG')} - ${d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}`;
+        } else if (item.date) {
+          formattedDate = item.date;
+        }
+
+        const isDelivered = item.status === 'delivered' || item.isDelivered === true;
+        const statusClass = isDelivered ? 'delivered' : 'pending';
+        const statusText = isDelivered ? 'تم التسليم ✔️' : 'قيد الانتظار ⏳';
+
+        itemDiv.innerHTML = `
+          <div class="item-img-box">${imgHTML}</div>
+          <div class="item-info">
+            <div class="item-name">${item.name || item.itemName || item.title || 'هدية'}</div>
+            <div class="item-meta">
+              <span>⭐ ${item.points || 0} نقطة</span>
+              <span>الكمية: ${item.quantity || item.count || 1}</span>
+            </div>
+            <div class="item-date">🕒 ${formattedDate}</div>
+            <div>
+              <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+          </div>
+        `;
+
+        basketList.appendChild(itemDiv);
+      });
+    }
+
+    function renderOrdersList(snapshot) {
+      let orders = [];
+      snapshot.forEach(doc => {
+        orders.push({ id: doc.id, ...doc.data() });
+      });
+      renderOrdersFromArray(orders);
     }
   </script>
 
