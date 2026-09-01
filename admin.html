@@ -120,21 +120,35 @@
       font-weight: 700;
       text-decoration: underline;
     }
+
+    /* إخفاء الفورم الأساسي في البداية لحين كتابة كلمة السر */
+    #mainAuthSection {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-  <div class="auth-card">
+  <!-- 1. شاشة التحقق من كلمة السر السرية أولاً -->
+  <div class="auth-card" id="serverLockCard">
+    <div class="admin-icon">🔒</div>
+    <div class="auth-title">بوابة الخوادم المحمية</div>
+    <div class="auth-sub">أدخل كلمة سر الخادم لعرض صفحة التسجيل</div>
+    
+    <input type="password" id="serverPassInput" class="input-box" placeholder="كلمة السر السرية">
+    <button class="btn btn-main" onclick="checkServerPass()">دخول 🚀</button>
+    <div class="error-msg" id="serverErrorMsg"></div>
+  </div>
+
+  <!-- 2. فورم تسجيل الدخول/إنشاء الحساب (الذي أرسلته) والذي يظهر بعد صحة كلمة السر -->
+  <div class="auth-card" id="mainAuthSection">
     <div class="admin-icon" id="formIcon">📝</div>
     <div class="auth-title" id="formTitle">إنشاء حساب جديد</div>
     <div class="auth-sub" id="formSub">أدخل بياناتك لإنشاء حساب خادم</div>
 
     <div id="formFieldsContainer">
       <input type="text" id="usernameInput" class="input-box" placeholder="اسم المستخدم (Username)">
-      <input type="password" id="passwordInput" class="input-box" placeholder="كلمة المرور الخاصة بحسابك">
-      
-      <!-- حقل كلمة سر الخادم المطلوبة stmina -->
-      <input type="password" id="serverSecretInput" class="input-box" placeholder="كلمة سر الخوادم السرية (stmina)">
+      <input type="password" id="passwordInput" class="input-box" placeholder="كلمة المرور (Password)">
       
       <div id="confirmPassBox">
         <input type="password" id="confirmPasswordInput" class="input-box" placeholder="إعادة كتابة كلمة المرور">
@@ -151,6 +165,20 @@
   </div>
 
   <script>
+    // وظيفة التحقق من كلمة سر الخادم قبل إظهار الفورم
+    function checkServerPass() {
+      const pass = document.getElementById('serverPassInput').value.trim();
+      const errorMsg = document.getElementById('serverErrorMsg');
+
+      if (pass === "stmina") {
+        // إخفاء كارد قفل الخادم وإظهار الفورم الأساسي (الاسم والباسورد)
+        document.getElementById('serverLockCard').style.display = 'none';
+        document.getElementById('mainAuthSection').style.display = 'block';
+      } else {
+        errorMsg.innerText = "كلمة السر غير صحيحة ❌";
+      }
+    }
+
     const firebaseConfig = {
       apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
       authDomain: "church-7afe1.firebaseapp.com",
@@ -198,17 +226,10 @@
     async function handleAuthAction() {
       const username = document.getElementById('usernameInput').value.trim();
       const password = document.getElementById('passwordInput').value.trim();
-      const serverSecret = document.getElementById('serverSecretInput').value.trim();
       const errorMsg = document.getElementById('errorMsg');
 
-      if (!username || !password || !serverSecret) {
+      if (!username || !password) {
         errorMsg.innerText = "يرجى ملء جميع الحقول المطلوبة ❌";
-        return;
-      }
-
-      // التحقق من كلمة السر السرية للخادم
-      if (serverSecret !== "stmina") {
-        errorMsg.innerText = "كلمة سر الخوادم (stmina) غير صحيحة ❌";
         return;
       }
 
