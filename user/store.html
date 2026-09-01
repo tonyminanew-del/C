@@ -355,28 +355,35 @@ const auth = firebase.auth();
 const db = firebase.firestore();
 
 let currentUser = null;
+let currentUsername = null; // الاعتماد على اسم المستخدم كمستند بناءً على هيكلة الكولكشن users
 let currentUserPoints = 0;
 let currentUserBlocked = false;
 let userListener = null;
 let giftsListener = null;
 
+// بما أن الحسابات تسجل بـ Username كمعرف (Document ID) في كولكشن users
+// سنعتمد على التخزين المحلي أو حالة المصادقة لجلب اسم المستخدم الحالي
 auth.onAuthStateChanged((user) => {
-  if (!user) {
+  // يمكنك حفظ اسم المستخدم في localStorage عند تسجيل الدخول (مثلاً: localStorage.setItem("currentAdminUser", username))
+  currentUsername = localStorage.getItem("currentAdminUser");
+  
+  if (!currentUsername) {
     window.location.href = "user.html";
     return;
   }
-  currentUser = user;
-  listenToUser(user.uid);
+  
+  listenToUser(currentUsername);
   listenToGifts();
 });
 
-function listenToUser(uid) {
+function listenToUser(username) {
   if (userListener) {
     userListener();
     userListener = null;
   }
 
-  userListener = db.collection("servants").doc(uid).onSnapshot((doc) => {
+  // استخدام كولكشن users والمستند هو اسم المستخدم
+  userListener = db.collection("users").doc(username).onSnapshot((doc) => {
     if (!doc.exists) {
       currentUserPoints = 0;
       currentUserBlocked = false;
@@ -421,7 +428,6 @@ function listenToGifts() {
       const points = Number(gift.points) || 0;
       const name = gift.name || "هدية";
 
-      // إذا وصلت الكمية إلى صفر أو أقل، يتم إخفاؤها من المعرض تلقائياً
       if (quantity <= 0) {
         return;
       }
@@ -469,7 +475,7 @@ function listenToGifts() {
 }
 
 async function addToBasket(giftId) {
-  if (!currentUser) {
+  if (!currentUsername) {
     showToast("برجاء تسجيل الدخول أولاً", "error");
     return;
   }
@@ -479,7 +485,7 @@ async function addToBasket(giftId) {
     return;
   }
 
-  const userRef = db.collection("servants").doc(currentUser.uid);
+  const userRef = db.collection("users").doc(currentUsername);
   const giftRef = db.collection("gifts").doc(giftId);
   const basketRef = userRef.collection("basket").doc(giftId);
 
@@ -504,13 +510,13 @@ async function addToBasket(giftId) {
 
       const oldCount = basketDoc.exists ? Number(basketDoc.data().count) || 0 : 0;
 
-      // خصم النقاط من المستخدم
+      // خصم النقاط من المستخدم في كولكشن users
       transaction.update(userRef, {
         points: userPoints - giftPoints,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // تقليل كمية الهدية بمقدار 1 (وعندما تصل لصفر تختفي تلقائياً)
+      // تقليل كمية الهدية بمقدار 1
       transaction.update(giftRef, {
         quantity: giftQuantity - 1,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -522,6 +528,8 @@ async function addToBasket(giftId) {
         points: giftPoints,
         image: gift.image || "",
         count: oldCount + 1,
+        isApproved: false,
+        isDelivered: false,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       };
 
