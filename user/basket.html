@@ -3,789 +3,546 @@
 
 <head>
 
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>طلباتي - متجر الهدايا</title>
-
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
-          rel="stylesheet">
-
-
-    <style>
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        body {
-
-            margin: 0;
-
-            font-family: "Cairo", sans-serif;
-
-            background:
-                radial-gradient(
-                    circle at top right,
-                    #e0e7ff,
-                    transparent 35%
-                ),
-                radial-gradient(
-                    circle at bottom left,
-                    #f3e8ff,
-                    transparent 35%
-                ),
-                #f8fafc;
-
-            color: #172033;
-
-            min-height: 100vh;
-        }
-
-
-        /* =========================
-           HEADER
-        ========================= */
-
-        header {
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 100;
-
-            background: rgba(255,255,255,.92);
-
-            backdrop-filter: blur(18px);
-
-            border-bottom: 1px solid #e5e7eb;
-
-            box-shadow:
-                0 8px 30px rgba(15,23,42,.07);
-        }
-
-
-        .header-inner {
-
-            width: min(1100px, calc(100% - 30px));
-
-            margin: auto;
-
-            min-height: 80px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 15px;
-        }
-
-
-        .brand {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 13px;
-        }
-
-
-        .brand-icon {
-
-            width: 55px;
-
-            height: 55px;
-
-            border-radius: 17px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 27px;
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #6366f1,
-                    #8b5cf6
-                );
-
-            box-shadow:
-                0 10px 25px rgba(99,102,241,.25);
-        }
-
-
-        .brand h1 {
-
-            margin: 0;
-
-            font-size: 21px;
-
-            font-weight: 900;
-        }
-
-
-        .brand p {
-
-            margin: 1px 0 0;
-
-            color: #64748b;
-
-            font-size: 12px;
-        }
-
-
-        .live {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 8px;
-
-            background: #ecfdf5;
-
-            color: #047857;
-
-            padding: 8px 13px;
-
-            border-radius: 30px;
-
-            font-size: 12px;
-
-            font-weight: 800;
-        }
-
-
-        .live-dot {
-
-            width: 8px;
-
-            height: 8px;
-
-            border-radius: 50%;
-
-            background: #10b981;
-        }
-
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        .container {
-
-            width: min(1000px, calc(100% - 25px));
-
-            margin: 30px auto 60px;
-        }
-
-
-        .welcome {
-
-            margin-bottom: 25px;
-        }
-
-
-        .welcome h2 {
-
-            margin: 0;
-
-            font-size: 28px;
-
-            font-weight: 900;
-        }
-
-
-        .welcome p {
-
-            margin: 5px 0 0;
-
-            color: #64748b;
-
-            font-size: 14px;
-        }
-
-
-        /* =========================
-           STATS
-        ========================= */
-
-        .stats {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, 1fr);
-
-            gap: 15px;
-
-            margin-bottom: 25px;
-        }
-
-
-        .stat {
-
-            background: rgba(255,255,255,.92);
-
-            border: 1px solid #e5e7eb;
-
-            border-radius: 20px;
-
-            padding: 18px;
-
-            box-shadow:
-                0 10px 28px rgba(15,23,42,.06);
-        }
-
-
-        .stat-title {
-
-            color: #64748b;
-
-            font-size: 12px;
-
-            font-weight: 700;
-        }
-
-
-        .stat-number {
-
-            margin-top: 4px;
-
-            font-size: 28px;
-
-            font-weight: 900;
-        }
-
-
-        /* =========================
-           TABS
-        ========================= */
-
-        .tabs {
-
-            background: white;
-
-            border: 1px solid #e5e7eb;
-
-            border-radius: 18px;
-
-            padding: 6px;
-
-            display: flex;
-
-            gap: 6px;
-
-            margin-bottom: 20px;
-
-            box-shadow:
-                0 8px 25px rgba(15,23,42,.05);
-        }
-
-
-        .tab {
-
-            flex: 1;
-
-            border: 0;
-
-            background: transparent;
-
-            padding: 12px;
-
-            border-radius: 13px;
-
-            font-family: inherit;
-
-            font-weight: 800;
-
-            color: #64748b;
-
-            cursor: pointer;
-
-            transition: .2s;
-        }
-
-
-        .tab.active {
-
-            background: #6366f1;
-
-            color: white;
-
-            box-shadow:
-                0 7px 18px rgba(99,102,241,.22);
-        }
-
-
-        /* =========================
-           REQUEST CARD
-        ========================= */
-
-        #requests {
-
-            display: grid;
-
-            gap: 17px;
-        }
-
-
-        .request-card {
-
-            background: rgba(255,255,255,.96);
-
-            border: 1px solid #e5e7eb;
-
-            border-radius: 23px;
-
-            padding: 20px;
-
-            box-shadow:
-                0 10px 30px rgba(15,23,42,.07);
-
-            animation: showCard .3s ease;
-        }
-
-
-        @keyframes showCard {
-
-            from {
-
-                opacity: 0;
-
-                transform: translateY(10px);
-
-            }
-
-            to {
-
-                opacity: 1;
-
-                transform: translateY(0);
-
-            }
-
-        }
-
-
-        .request-header {
-
-            display: flex;
-
-            align-items: flex-start;
-
-            justify-content: space-between;
-
-            gap: 15px;
-
-            margin-bottom: 18px;
-        }
-
-
-        .gift-info {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 13px;
-        }
-
-
-        .gift-image {
-
-            width: 70px;
-
-            height: 70px;
-
-            border-radius: 18px;
-
-            object-fit: cover;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #eef2ff,
-                    #f5f3ff
-                );
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            font-size: 30px;
-
-            overflow: hidden;
-
-            flex-shrink: 0;
-        }
-
-
-        .gift-image img {
-
-            width: 100%;
-
-            height: 100%;
-
-            object-fit: cover;
-        }
-
-
-        .gift-name {
-
-            font-size: 19px;
-
-            font-weight: 900;
-
-            color: #111827;
-        }
-
-
-        .gift-id {
-
-            color: #94a3b8;
-
-            font-size: 11px;
-
-            direction: ltr;
-
-            margin-top: 2px;
-        }
-
-
-        /* =========================
-           STATUS
-        ========================= */
-
-        .status {
-
-            padding: 8px 14px;
-
-            border-radius: 30px;
-
-            font-size: 12px;
-
-            font-weight: 900;
-
-            white-space: nowrap;
-        }
-
-
-        .status.pending {
-
-            color: #92400e;
-
-            background: #fef3c7;
-        }
-
-
-        .status.accepted {
-
-            color: #047857;
-
-            background: #d1fae5;
-        }
-
-
-        .status.rejected {
-
-            color: #b91c1c;
-
-            background: #fee2e2;
-        }
-
-
-        .status.delivered {
-
-            color: #1d4ed8;
-
-            background: #dbeafe;
-        }
-
-
-        /* =========================
-           DETAILS
-        ========================= */
-
-        .details {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap: 10px;
-        }
-
-
-        .detail {
-
-            background: #f8fafc;
-
-            border-radius: 14px;
-
-            padding: 13px;
-        }
-
-
-        .detail-label {
-
-            color: #64748b;
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            margin-bottom: 3px;
-        }
-
-
-        .detail-value {
-
-            color: #111827;
-
-            font-size: 14px;
-
-            font-weight: 800;
-
-            word-break: break-word;
-        }
-
-
-        .points {
-
-            color: #7c3aed;
-        }
-
-
-        /* =========================
-           FOOTER
-        ========================= */
-
-        .request-footer {
-
-            border-top: 1px solid #eef2f7;
-
-            margin-top: 16px;
-
-            padding-top: 15px;
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            gap: 15px;
-        }
-
-
-        .date {
-
-            color: #64748b;
-
-            font-size: 11px;
-
-            font-weight: 600;
-        }
-
-
-        .note {
-
-            background: #f8fafc;
-
-            padding: 8px 12px;
-
-            border-radius: 10px;
-
-            font-size: 12px;
-
-            color: #475569;
-
-            font-weight: 700;
-        }
-
-
-        /* =========================
-           EMPTY
-        ========================= */
-
-        .empty {
-
-            text-align: center;
-
-            background: white;
-
-            border: 1px solid #e5e7eb;
-
-            border-radius: 22px;
-
-            padding: 60px 20px;
-
-            box-shadow:
-                0 10px 30px rgba(15,23,42,.05);
-        }
-
-
-        .empty-icon {
-
-            font-size: 55px;
-
-            margin-bottom: 10px;
-        }
-
-
-        .empty h3 {
-
-            margin: 0;
-
-            font-size: 20px;
-
-            font-weight: 900;
-
-            color: #334155;
-        }
-
-
-        .empty p {
-
-            margin: 6px 0 0;
-
-            color: #64748b;
-
-            font-size: 13px;
-        }
-
-
-        /* =========================
-           ERROR
-        ========================= */
-
-        .error {
-
-            background: #fef2f2;
-
-            border: 1px solid #fecaca;
-
-            color: #b91c1c;
-
-            border-radius: 18px;
-
-            padding: 20px;
-
-            text-align: center;
-
-            font-weight: 800;
-        }
-
-
-        /* =========================
-           MOBILE
-        ========================= */
-
-        @media (max-width: 700px) {
-
-            .stats {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-
-            .request-header {
-
-                flex-direction: column;
-
-            }
-
-
-            .details {
-
-                grid-template-columns:
-                    1fr;
-
-            }
-
-
-            .request-footer {
-
-                flex-direction: column;
-
-                align-items: stretch;
-
-            }
-
-
-            .live {
-
-                display: none;
-
-            }
-
-        }
-
-
-        @media (max-width: 450px) {
-
-            .header-inner {
-
-                min-height: 70px;
-            }
-
-
-            .brand-icon {
-
-                width: 48px;
-
-                height: 48px;
-
-                font-size: 23px;
-            }
-
-
-            .brand h1 {
-
-                font-size: 18px;
-            }
-
-
-            .container {
-
-                margin-top: 20px;
-            }
-
-
-            .tabs {
-
-                font-size: 12px;
-            }
-
-        }
-
-    </style>
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>طلباتي - متجر الهدايا</title>
+
+<link rel="preconnect"
+      href="https://fonts.googleapis.com">
+
+<link rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet">
+
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:"Cairo",sans-serif;
+    background:
+        radial-gradient(circle at top right,#e0e7ff,transparent 35%),
+        radial-gradient(circle at bottom left,#f3e8ff,transparent 35%),
+        #f8fafc;
+    color:#172033;
+    min-height:100vh;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(255,255,255,.94);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid #e5e7eb;
+    box-shadow:0 8px 30px rgba(15,23,42,.07);
+}
+
+.header-inner{
+    width:min(1100px,calc(100% - 30px));
+    margin:auto;
+    min-height:80px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.brand-icon{
+    width:55px;
+    height:55px;
+    border-radius:17px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:27px;
+    color:white;
+    background:linear-gradient(135deg,#6366f1,#8b5cf6);
+    box-shadow:0 10px 25px rgba(99,102,241,.25);
+}
+
+.brand h1{
+    margin:0;
+    font-size:21px;
+    font-weight:900;
+}
+
+.brand p{
+    margin:1px 0 0;
+    color:#64748b;
+    font-size:12px;
+}
+
+.live{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#ecfdf5;
+    color:#047857;
+    padding:8px 13px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:800;
+}
+
+.live-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#10b981;
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+    width:min(1000px,calc(100% - 25px));
+    margin:30px auto 60px;
+}
+
+.welcome{
+    margin-bottom:25px;
+}
+
+.welcome h2{
+    margin:0;
+    font-size:28px;
+    font-weight:900;
+}
+
+.welcome p{
+    margin:5px 0 0;
+    color:#64748b;
+    font-size:14px;
+}
+
+
+/* =========================
+   USER INFO
+========================= */
+
+.user-box{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:15px 18px;
+    margin-bottom:20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+    box-shadow:0 10px 28px rgba(15,23,42,.05);
+}
+
+.user-name{
+    font-weight:900;
+    font-size:16px;
+}
+
+.user-uid{
+    font-size:10px;
+    color:#94a3b8;
+    direction:ltr;
+    margin-top:3px;
+    word-break:break-all;
+}
+
+.auth-status{
+    background:#ecfdf5;
+    color:#047857;
+    border-radius:30px;
+    padding:7px 12px;
+    font-size:11px;
+    font-weight:800;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:rgba(255,255,255,.92);
+    border:1px solid #e5e7eb;
+    border-radius:20px;
+    padding:18px;
+    box-shadow:0 10px 28px rgba(15,23,42,.06);
+}
+
+.stat-title{
+    color:#64748b;
+    font-size:12px;
+    font-weight:700;
+}
+
+.stat-number{
+    margin-top:4px;
+    font-size:28px;
+    font-weight:900;
+}
+
+
+/* =========================
+   TABS
+========================= */
+
+.tabs{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:18px;
+    padding:6px;
+    display:flex;
+    gap:6px;
+    margin-bottom:20px;
+    box-shadow:0 8px 25px rgba(15,23,42,.05);
+}
+
+.tab{
+    flex:1;
+    border:0;
+    background:transparent;
+    padding:12px;
+    border-radius:13px;
+    font-family:inherit;
+    font-weight:800;
+    color:#64748b;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.tab:hover{
+    background:#f1f5f9;
+}
+
+.tab.active{
+    background:#6366f1;
+    color:white;
+    box-shadow:0 7px 18px rgba(99,102,241,.22);
+}
+
+
+/* =========================
+   REQUESTS
+========================= */
+
+#requests{
+    display:grid;
+    gap:17px;
+}
+
+.request-card{
+    background:rgba(255,255,255,.96);
+    border:1px solid #e5e7eb;
+    border-radius:23px;
+    padding:20px;
+    box-shadow:0 10px 30px rgba(15,23,42,.07);
+    animation:showCard .3s ease;
+}
+
+@keyframes showCard{
+
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.request-header{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:18px;
+}
+
+.gift-info{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.gift-image{
+    width:70px;
+    height:70px;
+    border-radius:18px;
+    object-fit:cover;
+    background:linear-gradient(135deg,#eef2ff,#f5f3ff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:30px;
+    overflow:hidden;
+    flex-shrink:0;
+}
+
+.gift-image img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.gift-name{
+    font-size:19px;
+    font-weight:900;
+    color:#111827;
+}
+
+.gift-id{
+    color:#94a3b8;
+    font-size:11px;
+    direction:ltr;
+    margin-top:2px;
+}
+
+
+/* =========================
+   STATUS
+========================= */
+
+.status{
+    padding:8px 14px;
+    border-radius:30px;
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+}
+
+.status.pending{
+    color:#92400e;
+    background:#fef3c7;
+}
+
+.status.accepted{
+    color:#047857;
+    background:#d1fae5;
+}
+
+.status.rejected{
+    color:#b91c1c;
+    background:#fee2e2;
+}
+
+.status.delivered{
+    color:#1d4ed8;
+    background:#dbeafe;
+}
+
+
+/* =========================
+   DETAILS
+========================= */
+
+.details{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.detail{
+    background:#f8fafc;
+    border-radius:14px;
+    padding:13px;
+}
+
+.detail-label{
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+    margin-bottom:3px;
+}
+
+.detail-value{
+    color:#111827;
+    font-size:14px;
+    font-weight:800;
+    word-break:break-word;
+}
+
+.points{
+    color:#7c3aed;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+.request-footer{
+    border-top:1px solid #eef2f7;
+    margin-top:16px;
+    padding-top:15px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:15px;
+}
+
+.date{
+    color:#64748b;
+    font-size:11px;
+    font-weight:600;
+}
+
+.note{
+    background:#f8fafc;
+    padding:8px 12px;
+    border-radius:10px;
+    font-size:12px;
+    color:#475569;
+    font-weight:700;
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.empty{
+    text-align:center;
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:22px;
+    padding:60px 20px;
+    box-shadow:0 10px 30px rgba(15,23,42,.05);
+}
+
+.empty-icon{
+    font-size:55px;
+    margin-bottom:10px;
+}
+
+.empty h3{
+    margin:0;
+    font-size:20px;
+    font-weight:900;
+    color:#334155;
+}
+
+.empty p{
+    margin:6px 0 0;
+    color:#64748b;
+    font-size:13px;
+}
+
+
+/* =========================
+   ERROR
+========================= */
+
+.error{
+    background:#fef2f2;
+    border:1px solid #fecaca;
+    color:#b91c1c;
+    border-radius:18px;
+    padding:20px;
+    text-align:center;
+    font-weight:800;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.loading{
+    text-align:center;
+    padding:40px;
+    color:#64748b;
+    font-weight:800;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px){
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .request-header{
+        flex-direction:column;
+    }
+
+    .details{
+        grid-template-columns:1fr;
+    }
+
+    .request-footer{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .live{
+        display:none;
+    }
+
+    .user-box{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+
+@media(max-width:450px){
+
+    .header-inner{
+        min-height:70px;
+    }
+
+    .brand-icon{
+        width:48px;
+        height:48px;
+        font-size:23px;
+    }
+
+    .brand h1{
+        font-size:18px;
+    }
+
+    .container{
+        margin-top:20px;
+    }
+
+}
+
+</style>
 
 </head>
 
@@ -793,168 +550,208 @@
 <body>
 
 
+<!-- =========================
+     HEADER
+========================= -->
+
 <header>
 
-    <div class="header-inner">
+<div class="header-inner">
 
-        <div class="brand">
+    <div class="brand">
 
-            <div class="brand-icon">
-                🎁
-            </div>
-
-            <div>
-
-                <h1>
-                    طلباتي
-                </h1>
-
-                <p>
-                    متابعة طلبات الهدايا
-                </p>
-
-            </div>
-
+        <div class="brand-icon">
+            🎁
         </div>
 
+        <div>
 
-        <div class="live">
-
-            <span class="live-dot"></span>
-
-            الطلبات تتحدث تلقائيًا
-
-        </div>
-
-    </div>
-
-</header>
-
-
-
-<main class="container">
-
-
-    <div class="welcome">
-
-        <h2>
-            🎁 طلبات الهدايا
-        </h2>
-
-        <p>
-            هنا تقدر تتابع حالة كل الهدايا التي طلبتها
-        </p>
-
-    </div>
-
-
-
-    <!-- =========================
-         STATS
-    ========================= -->
-
-    <div class="stats">
-
-
-        <div class="stat">
-
-            <div class="stat-title">
-                كل الطلبات
-            </div>
-
-            <div
-                class="stat-number"
-                id="totalCount">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-title">
-                قيد المراجعة
-            </div>
-
-            <div
-                class="stat-number"
-                id="pendingCount">
-                0
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-title">
-                تم القبول
-            </div>
-
-            <div
-                class="stat-number"
-                id="acceptedCount">
-                0
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-
-    <!-- =========================
-         TABS
-    ========================= -->
-
-    <div class="tabs">
-
-        <button
-            class="tab active"
-            data-tab="current">
-
-            الطلبات الحالية
-
-        </button>
-
-
-        <button
-            class="tab"
-            data-tab="old">
-
-            الطلبات القديمة
-
-        </button>
-
-    </div>
-
-
-
-    <!-- =========================
-         REQUESTS
-    ========================= -->
-
-    <div id="requests">
-
-        <div class="empty">
-
-            <div class="empty-icon">
-                ⏳
-            </div>
-
-            <h3>
-                جاري تحميل طلباتك...
-            </h3>
+            <h1>
+                طلباتي
+            </h1>
 
             <p>
-                انتظر لحظة
+                متابعة طلبات الهدايا
             </p>
 
         </div>
 
     </div>
+
+
+    <div class="live">
+
+        <span class="live-dot"></span>
+
+        تحديث مباشر
+
+    </div>
+
+</div>
+
+</header>
+
+
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<main class="container">
+
+
+<div class="welcome">
+
+    <h2>
+        🎁 طلبات الهدايا
+    </h2>
+
+    <p>
+        تابع حالة طلبات الهدايا الخاصة بك
+    </p>
+
+</div>
+
+
+
+<!-- =========================
+     USER
+========================= -->
+
+<div class="user-box">
+
+    <div>
+
+        <div
+            class="user-name"
+            id="userName">
+
+            جاري التعرف على الحساب...
+
+        </div>
+
+        <div
+            class="user-uid"
+            id="userUid">
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="auth-status">
+
+        ● مسجل الدخول
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================
+     STATS
+========================= -->
+
+<div class="stats">
+
+
+<div class="stat">
+
+    <div class="stat-title">
+        كل الطلبات
+    </div>
+
+    <div
+        class="stat-number"
+        id="totalCount">
+
+        0
+
+    </div>
+
+</div>
+
+
+<div class="stat">
+
+    <div class="stat-title">
+        قيد المراجعة
+    </div>
+
+    <div
+        class="stat-number"
+        id="pendingCount">
+
+        0
+
+    </div>
+
+</div>
+
+
+<div class="stat">
+
+    <div class="stat-title">
+        تم القبول
+    </div>
+
+    <div
+        class="stat-number"
+        id="acceptedCount">
+
+        0
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- =========================
+     TABS
+========================= -->
+
+<div class="tabs">
+
+<button
+    class="tab active"
+    data-tab="current">
+
+    الطلبات الحالية
+
+</button>
+
+
+<button
+    class="tab"
+    data-tab="old">
+
+    الطلبات القديمة
+
+</button>
+
+</div>
+
+
+
+<!-- =========================
+     REQUESTS
+========================= -->
+
+<div id="requests">
+
+    <div class="loading">
+
+        ⏳ جاري تحميل طلباتك...
+
+    </div>
+
+</div>
 
 
 </main>
@@ -964,338 +761,357 @@
 <script type="module">
 
 
-    /* =========================================
-       FIREBASE
-    ========================================= */
+/* =====================================================
+   FIREBASE
+===================================================== */
 
-    import {
-        initializeApp
+import {
+    initializeApp
+}
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    onSnapshot
+}
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+import {
+    getAuth,
+    onAuthStateChanged
+}
+from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+
+/* =====================================================
+   FIREBASE CONFIG
+===================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+
+    authDomain:
+        "church-7afe1.firebaseapp.com",
+
+    projectId:
+        "church-7afe1",
+
+    storageBucket:
+        "church-7afe1.firebasestorage.app",
+
+    messagingSenderId:
+        "1072334615357",
+
+    appId:
+        "1:1072334615357:web:c03b199f00ea9d19d40b54",
+
+    measurementId:
+        "G-E7Q76Z53SB"
+
+};
+
+
+
+/* =====================================================
+   INITIALIZE
+===================================================== */
+
+const app =
+    initializeApp(firebaseConfig);
+
+
+const db =
+    getFirestore(app);
+
+
+const auth =
+    getAuth(app);
+
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const requestsContainer =
+    document.getElementById("requests");
+
+
+const totalCount =
+    document.getElementById("totalCount");
+
+
+const pendingCount =
+    document.getElementById("pendingCount");
+
+
+const acceptedCount =
+    document.getElementById("acceptedCount");
+
+
+const userName =
+    document.getElementById("userName");
+
+
+const userUid =
+    document.getElementById("userUid");
+
+
+
+/* =====================================================
+   DATA
+===================================================== */
+
+let requests = [];
+
+let currentTab = "current";
+
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHTML(value){
+
+    if(
+        value === null ||
+        value === undefined
+    ){
+
+        return "";
+
     }
-    from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 
-    import {
-        getFirestore,
-        collection,
-        query,
-        where,
-        onSnapshot
+    return String(value)
+
+        .replaceAll("&","&amp;")
+
+        .replaceAll("<","&lt;")
+
+        .replaceAll(">","&gt;")
+
+        .replaceAll('"',"&quot;")
+
+        .replaceAll("'","&#039;");
+}
+
+
+
+/* =====================================================
+   DATE
+===================================================== */
+
+function formatDate(timestamp){
+
+    if(!timestamp){
+
+        return "غير محدد";
+
     }
-    from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+    try{
+
+        let date;
+
+
+        if(
+            timestamp &&
+            typeof timestamp.toDate === "function"
+        ){
+
+            date =
+                timestamp.toDate();
+
+        }
+
+        else if(
+            timestamp instanceof Date
+        ){
+
+            date =
+                timestamp;
+
+        }
+
+        else{
+
+            date =
+                new Date(timestamp);
+
+        }
+
+
+        if(
+            isNaN(date.getTime())
+        ){
+
+            return "غير محدد";
+
+        }
+
+
+        return new Intl.DateTimeFormat(
+            "ar-EG",
+            {
+                dateStyle:"medium",
+                timeStyle:"short"
+            }
+        ).format(date);
+
+    }
+
+    catch(error){
+
+        return "غير محدد";
+
+    }
+
+}
 
 
 
-    /* =========================================
-       FIREBASE CONFIG
-    ========================================= */
+/* =====================================================
+   STATUS
+===================================================== */
 
-    const firebaseConfig = {
+function getStatus(status){
 
-        apiKey:
-            "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+    if(status === "accepted"){
 
-        authDomain:
-            "church-7afe1.firebaseapp.com",
+        return {
 
-        projectId:
-            "church-7afe1",
+            text:"✅ تم قبول الطلب",
 
-        storageBucket:
-            "church-7afe1.firebasestorage.app",
+            className:"accepted"
 
-        messagingSenderId:
-            "1072334615357",
+        };
 
-        appId:
-            "1:1072334615357:web:c03b199f00ea9d19d40b54",
+    }
 
-        measurementId:
-            "G-E7Q76Z53SB"
+
+    if(status === "rejected"){
+
+        return {
+
+            text:"❌ تم رفض الطلب",
+
+            className:"rejected"
+
+        };
+
+    }
+
+
+    if(status === "delivered"){
+
+        return {
+
+            text:"📦 تم التسليم",
+
+            className:"delivered"
+
+        };
+
+    }
+
+
+    return {
+
+        text:"⏳ قيد المراجعة",
+
+        className:"pending"
 
     };
 
+}
 
-    const app =
-        initializeApp(firebaseConfig);
 
 
-    const db =
-        getFirestore(app);
+/* =====================================================
+   OLD REQUEST
+===================================================== */
 
+function isOldRequest(request){
 
+    return (
 
-    /* =========================================
-       بيانات المخدوم الحالي
-       
-       مهم:
-       غيّر الجزء ده ليتوافق مع الطريقة
-       التي تحفظ بها بيانات المخدوم عند تسجيل الدخول.
-    ========================================= */
+        request.status === "rejected" ||
 
-    let servantId =
-        localStorage.getItem("servantId");
+        request.status === "delivered"
 
+    );
 
-    let servantName =
-        localStorage.getItem("servantName");
+}
 
 
 
-    /*
-       لو عندك في مشروعك بيانات المخدوم
-       محفوظة باسم مختلف، يمكنك تعديل
-       المفتاحين فوق.
-    */
+/* =====================================================
+   STATS
+===================================================== */
 
+function updateStats(){
 
+    totalCount.textContent =
+        requests.length;
 
-    /* =========================================
-       عناصر الصفحة
-    ========================================= */
 
-    const requestsContainer =
-        document.getElementById("requests");
+    pendingCount.textContent =
 
+        requests.filter(
+            item =>
+                !item.status ||
+                item.status === "pending"
+        ).length;
 
-    const totalCount =
-        document.getElementById("totalCount");
 
+    acceptedCount.textContent =
 
-    const pendingCount =
-        document.getElementById("pendingCount");
+        requests.filter(
+            item =>
+                item.status === "accepted"
+        ).length;
 
+}
 
-    const acceptedCount =
-        document.getElementById("acceptedCount");
 
 
+/* =====================================================
+   IMAGE
+===================================================== */
 
-    /* =========================================
-       البيانات
-    ========================================= */
+function createGiftImage(request){
 
-    let requests = [];
+    const image =
+        request.giftImage ||
+        request.image ||
+        request.photo ||
+        "";
 
-    let currentTab = "current";
 
-
-
-    /* =========================================
-       حماية HTML
-    ========================================= */
-
-    function escapeHTML(value) {
-
-        if (
-            value === null ||
-            value === undefined
-        ) {
-
-            return "";
-
-        }
-
-
-        return String(value)
-
-            .replaceAll("&", "&amp;")
-
-            .replaceAll("<", "&lt;")
-
-            .replaceAll(">", "&gt;")
-
-            .replaceAll('"', "&quot;")
-
-            .replaceAll("'", "&#039;");
-
-    }
-
-
-
-    /* =========================================
-       التاريخ
-    ========================================= */
-
-    function formatDate(timestamp) {
-
-        if (!timestamp) {
-
-            return "لم يتم تحديد الوقت";
-
-        }
-
-
-        try {
-
-            const date =
-                timestamp.toDate();
-
-
-            return new Intl.DateTimeFormat(
-                "ar-EG",
-                {
-                    dateStyle: "medium",
-                    timeStyle: "short"
-                }
-            ).format(date);
-
-        } catch {
-
-            return "وقت غير معروف";
-
-        }
-
-    }
-
-
-
-    /* =========================================
-       الحالة
-    ========================================= */
-
-    function getStatus(status) {
-
-        switch (status) {
-
-
-            case "accepted":
-
-                return {
-
-                    text: "✅ تم قبول الطلب",
-
-                    className: "accepted"
-
-                };
-
-
-            case "rejected":
-
-                return {
-
-                    text: "❌ تم رفض الطلب",
-
-                    className: "rejected"
-
-                };
-
-
-            case "delivered":
-
-                return {
-
-                    text: "📦 تم التسليم",
-
-                    className: "delivered"
-
-                };
-
-
-            default:
-
-                return {
-
-                    text: "⏳ قيد المراجعة",
-
-                    className: "pending"
-
-                };
-
-        }
-
-    }
-
-
-
-    /* =========================================
-       هل الطلب قديم؟
-       
-       القديم هنا:
-       delivered أو rejected
-    ========================================= */
-
-    function isOldRequest(request) {
-
-        return (
-
-            request.status === "delivered" ||
-
-            request.status === "rejected"
-
-        );
-
-    }
-
-
-
-    /* =========================================
-       تحديث الإحصائيات
-    ========================================= */
-
-    function updateStats() {
-
-
-        totalCount.textContent =
-            requests.length;
-
-
-        pendingCount.textContent =
-
-            requests.filter(
-                item =>
-                    !item.status ||
-                    item.status === "pending"
-            ).length;
-
-
-        acceptedCount.textContent =
-
-            requests.filter(
-                item =>
-                    item.status === "accepted"
-            ).length;
-
-    }
-
-
-
-    /* =========================================
-       صورة الهدية
-    ========================================= */
-
-    function createGiftImage(request) {
-
-
-        const image =
-            request.giftImage ||
-            request.image ||
-            request.photo;
-
-
-        if (image) {
-
-            return `
-
-                <div class="gift-image">
-
-                    <img
-                        src="${escapeHTML(image)}"
-                        alt="الهدية">
-
-                </div>
-
-            `;
-
-        }
-
+    if(image){
 
         return `
 
             <div class="gift-image">
 
-                🎁
+                <img
+                    src="${escapeHTML(image)}"
+                    alt="الهدية"
+                    onerror="this.style.display='none'">
 
             </div>
 
@@ -1304,75 +1120,434 @@
     }
 
 
+    return `
 
-    /* =========================================
-       رسم الطلبات
-    ========================================= */
+        <div class="gift-image">
+            🎁
+        </div>
 
-    function renderRequests() {
+    `;
+
+}
 
 
-        let filtered;
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function renderRequests(){
+
+    let filtered;
 
 
-        if (currentTab === "current") {
+    if(currentTab === "current"){
 
-            filtered =
-                requests.filter(
-                    request =>
-                        !isOldRequest(request)
+        filtered =
+            requests.filter(
+                request =>
+                    !isOldRequest(request)
+            );
+
+    }
+
+    else{
+
+        filtered =
+            requests.filter(
+                request =>
+                    isOldRequest(request)
+            );
+
+    }
+
+
+
+    if(filtered.length === 0){
+
+        requestsContainer.innerHTML = `
+
+            <div class="empty">
+
+                <div class="empty-icon">
+
+                    ${
+                        currentTab === "current"
+                        ? "🎁"
+                        : "📦"
+                    }
+
+                </div>
+
+
+                <h3>
+
+                    ${
+                        currentTab === "current"
+                        ? "لا توجد طلبات حالية"
+                        : "لا توجد طلبات قديمة"
+                    }
+
+                </h3>
+
+
+                <p>
+
+                    ${
+                        currentTab === "current"
+                        ? "عندما تطلب هدية ستظهر هنا"
+                        : "الطلبات القديمة ستظهر هنا"
+                    }
+
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    requestsContainer.innerHTML =
+
+        filtered.map(request => {
+
+
+            const status =
+                getStatus(
+                    request.status
                 );
 
-        } else {
 
-            filtered =
-                requests.filter(
-                    request =>
-                        isOldRequest(request)
+            const giftName =
+                request.giftName ||
+                request.name ||
+                "هدية";
+
+
+            const quantity =
+                Number(
+                    request.quantity || 1
                 );
+
+
+            const points =
+                Number(
+                    request.points || 0
+                );
+
+
+            const totalPoints =
+                Number(
+                    request.totalPoints ||
+                    points * quantity
+                );
+
+
+            const stage =
+                request.stage ||
+                "غير محددة";
+
+
+            const grade =
+                request.grade ||
+                "غير محدد";
+
+
+            const note =
+                request.adminNote ||
+                request.note ||
+                request.rejectionReason ||
+                "";
+
+
+            return `
+
+<article class="request-card">
+
+
+    <div class="request-header">
+
+
+        <div class="gift-info">
+
+            ${createGiftImage(request)}
+
+
+            <div>
+
+                <div class="gift-name">
+
+                    ${escapeHTML(giftName)}
+
+                </div>
+
+
+                <div class="gift-id">
+
+                    رقم الطلب:
+                    ${escapeHTML(request.id)}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="status ${status.className}">
+
+            ${status.text}
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="details">
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                🔢 الكمية
+            </div>
+
+            <div class="detail-value">
+                ${quantity}
+            </div>
+
+        </div>
+
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                ⭐ سعر الهدية
+            </div>
+
+            <div class="detail-value points">
+
+                ${points}
+
+                نقطة
+
+            </div>
+
+        </div>
+
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                💰 إجمالي النقاط
+            </div>
+
+            <div class="detail-value points">
+
+                ${totalPoints}
+
+                نقطة
+
+            </div>
+
+        </div>
+
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                📚 المرحلة
+            </div>
+
+            <div class="detail-value">
+
+                ${escapeHTML(stage)}
+
+            </div>
+
+        </div>
+
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                🏫 الصف
+            </div>
+
+            <div class="detail-value">
+
+                ${escapeHTML(grade)}
+
+            </div>
+
+        </div>
+
+
+
+        <div class="detail">
+
+            <div class="detail-label">
+                🕐 تاريخ الطلب
+            </div>
+
+            <div class="detail-value">
+
+                ${formatDate(
+                    request.createdAt
+                )}
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+    <div class="request-footer">
+
+
+        <div class="date">
+
+            📅
+
+            ${formatDate(
+                request.createdAt
+            )}
+
+        </div>
+
+
+        ${
+            note
+
+            ?
+
+            `
+
+            <div class="note">
+
+                📝
+
+                ${escapeHTML(note)}
+
+            </div>
+
+            `
+
+            :
+
+            ""
 
         }
 
 
+    </div>
 
-        if (filtered.length === 0) {
+
+</article>
+
+            `;
+
+        }).join("");
+
+}
+
+
+
+/* =====================================================
+   TABS
+===================================================== */
+
+document
+.querySelectorAll(".tab")
+.forEach(tab => {
+
+    tab.addEventListener(
+        "click",
+        () => {
+
+
+            document
+            .querySelectorAll(".tab")
+            .forEach(item => {
+
+                item.classList.remove(
+                    "active"
+                );
+
+            });
+
+
+            tab.classList.add(
+                "active"
+            );
+
+
+            currentTab =
+                tab.dataset.tab;
+
+
+            renderRequests();
+
+        }
+    );
+
+});
+
+
+
+/* =====================================================
+   FIREBASE AUTH
+===================================================== */
+
+onAuthStateChanged(
+    auth,
+    user => {
+
+
+        console.log(
+            "Firebase Auth User:",
+            user
+        );
+
+
+
+        /* =========================================
+           USER NOT LOGGED IN
+        ========================================= */
+
+        if(!user){
+
+            userName.textContent =
+                "غير مسجل الدخول";
+
+            userUid.textContent =
+                "";
 
 
             requestsContainer.innerHTML = `
 
-                <div class="empty">
+                <div class="error">
 
-                    <div class="empty-icon">
+                    ❌ لم يتم تسجيل الدخول.
 
-                        ${
-                            currentTab === "current"
-                                ? "🎁"
-                                : "📦"
-                        }
+                    <br><br>
 
-                    </div>
-
-
-                    <h3>
-
-                        ${
-                            currentTab === "current"
-                                ? "لا توجد طلبات حالية"
-                                : "لا توجد طلبات قديمة"
-                        }
-
-                    </h3>
-
-
-                    <p>
-
-                        ${
-                            currentTab === "current"
-                                ? "عندما تطلب هدية ستظهر هنا"
-                                : "الطلبات التي تم رفضها أو تسليمها ستظهر هنا"
-                        }
-
-                    </p>
+                    سجل الدخول بحساب المخدوم
+                    ثم افتح الصفحة مرة أخرى.
 
                 </div>
 
@@ -1384,378 +1559,31 @@
 
 
 
-        requestsContainer.innerHTML =
-            filtered.map(request => {
+        /* =========================================
+           USER LOGGED IN
+        ========================================= */
 
+        userName.textContent =
+            user.displayName ||
+            user.email ||
+            "المخدوم";
 
-                const status =
-                    getStatus(
-                        request.status
-                    );
 
+        userUid.textContent =
+            "UID: " + user.uid;
 
-                const giftName =
-                    request.giftName ||
-                    request.name ||
-                    "هدية";
 
 
-                const quantity =
-                    Number(
-                        request.quantity || 1
-                    );
+        console.log(
+            "Servant UID:",
+            user.uid
+        );
 
 
-                const points =
-                    Number(
-                        request.points || 0
-                    );
 
-
-                const totalPoints =
-                    Number(
-                        request.totalPoints ||
-                        points * quantity
-                    );
-
-
-                const stage =
-                    request.stage ||
-                    "غير محددة";
-
-
-                const grade =
-                    request.grade ||
-                    "غير محدد";
-
-
-                const note =
-                    request.adminNote ||
-                    request.note ||
-                    request.rejectionReason ||
-                    "";
-
-
-                return `
-
-                    <article
-                        class="request-card">
-
-
-                        <div
-                            class="request-header">
-
-
-                            <div
-                                class="gift-info">
-
-
-                                ${createGiftImage(request)}
-
-
-                                <div>
-
-                                    <div
-                                        class="gift-name">
-
-                                        ${escapeHTML(
-                                            giftName
-                                        )}
-
-                                    </div>
-
-
-                                    <div
-                                        class="gift-id">
-
-                                        رقم الطلب:
-                                        ${escapeHTML(
-                                            request.id
-                                        )}
-
-                                    </div>
-
-                                </div>
-
-
-                            </div>
-
-
-                            <div
-                                class="status ${status.className}">
-
-                                ${status.text}
-
-                            </div>
-
-
-                        </div>
-
-
-
-                        <!-- تفاصيل الطلب -->
-
-                        <div
-                            class="details">
-
-
-                            <div class="detail">
-
-                                <div
-                                    class="detail-label">
-
-                                    🔢 الكمية
-
-                                </div>
-
-                                <div
-                                    class="detail-value">
-
-                                    ${quantity}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="detail">
-
-                                <div
-                                    class="detail-label">
-
-                                    ⭐ سعر القطعة
-
-                                </div>
-
-                                <div
-                                    class="detail-value points">
-
-                                    ${points}
-                                    نقطة
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="detail">
-
-                                <div
-                                    class="detail-label">
-
-                                    💰 إجمالي النقاط
-
-                                </div>
-
-                                <div
-                                    class="detail-value points">
-
-                                    ${totalPoints}
-                                    نقطة
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="detail">
-
-                                <div
-                                    class="detail-label">
-
-                                    📚 المرحلة
-
-                                </div>
-
-                                <div
-                                    class="detail-value">
-
-                                    ${escapeHTML(
-                                        stage
-                                    )}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="detail">
-
-                                <div
-                                    class="detail-label">
-
-                                    🏫 الصف
-
-                                </div>
-
-                                <div
-                                    class="detail-value">
-
-                                    ${escapeHTML(
-                                        grade
-                                    )}
-
-                                </div>
-
-                            </div>
-
-
-
-                            <div class="detail">
-
-                                <div
-                                    class="detail-label">
-
-                                    🕐 تاريخ الطلب
-
-                                </div>
-
-                                <div
-                                    class="detail-value">
-
-                                    ${formatDate(
-                                        request.createdAt
-                                    )}
-
-                                </div>
-
-                            </div>
-
-
-                        </div>
-
-
-
-                        <!-- أسفل الطلب -->
-
-                        <div
-                            class="request-footer">
-
-
-                            <div class="date">
-
-                                📅
-
-                                ${formatDate(
-                                    request.createdAt
-                                )}
-
-                            </div>
-
-
-
-                            ${
-                                note
-
-                                ?
-
-                                `
-                                <div class="note">
-
-                                    📝
-
-                                    ${escapeHTML(
-                                        note
-                                    )}
-
-                                </div>
-                                `
-
-                                :
-
-                                ""
-                            }
-
-
-                        </div>
-
-
-                    </article>
-
-                `;
-
-            }).join("");
-
-    }
-
-
-
-    /* =========================================
-       Tabs
-    ========================================= */
-
-    document
-        .querySelectorAll(".tab")
-        .forEach(tab => {
-
-
-            tab.addEventListener(
-                "click",
-                () => {
-
-
-                    document
-                        .querySelectorAll(".tab")
-                        .forEach(item => {
-
-                            item.classList.remove(
-                                "active"
-                            );
-
-                        });
-
-
-                    tab.classList.add(
-                        "active"
-                    );
-
-
-                    currentTab =
-                        tab.dataset.tab;
-
-
-                    renderRequests();
-
-                }
-            );
-
-        });
-
-
-
-    /* =========================================
-       التأكد من وجود رقم المخدوم
-    ========================================= */
-
-    if (!servantId) {
-
-
-        requestsContainer.innerHTML = `
-
-            <div class="error">
-
-                ❌ لم يتم العثور على حساب المخدوم.
-
-                <br><br>
-
-                يجب تسجيل الدخول أولًا حتى نستطيع
-                عرض طلبات الهدايا الخاصة بك.
-
-            </div>
-
-        `;
-
-
-    } else {
-
-
-        /* =====================================
-           جلب طلبات هذا المخدوم فقط
-        ===================================== */
+        /* =========================================
+           QUERY
+        ========================================= */
 
         const requestsQuery = query(
 
@@ -1767,16 +1595,16 @@
             where(
                 "servantId",
                 "==",
-                servantId
+                user.uid
             )
 
         );
 
 
 
-        /* =====================================
-           Real-Time Listener
-        ===================================== */
+        /* =========================================
+           REAL TIME LISTENER
+        ========================================= */
 
         onSnapshot(
 
@@ -1785,43 +1613,53 @@
             snapshot => {
 
 
-                requests =
-                    snapshot.docs.map(
-                        documentSnapshot => ({
-
-                            id:
-                                documentSnapshot.id,
-
-                            ...documentSnapshot.data()
-
-                        })
-                    );
+                console.log(
+                    "عدد الطلبات:",
+                    snapshot.size
+                );
 
 
-                /*
-                   ترتيب الطلبات من الأحدث للأقدم
-                   هنا نعمله في JavaScript
-                   حتى لا تحتاج Composite Index.
-                */
+                requests = snapshot.docs.map(
+                    doc => ({
+
+                        id:
+                            doc.id,
+
+                        ...doc.data()
+
+                    })
+                );
+
+
+
+                /* ترتيب من الأحدث للأقدم */
 
                 requests.sort(
-                    (a, b) => {
-
+                    (a,b) => {
 
                         const aTime =
-                            a.createdAt?.toMillis?.() ||
-                            0;
+                            a.createdAt &&
+                            typeof a.createdAt.toMillis === "function"
+
+                            ? a.createdAt.toMillis()
+
+                            : 0;
 
 
                         const bTime =
-                            b.createdAt?.toMillis?.() ||
-                            0;
+                            b.createdAt &&
+                            typeof b.createdAt.toMillis === "function"
+
+                            ? b.createdAt.toMillis()
+
+                            : 0;
 
 
                         return bTime - aTime;
 
                     }
                 );
+
 
 
                 updateStats();
@@ -1833,7 +1671,6 @@
 
             error => {
 
-
                 console.error(
                     "Firestore Error:",
                     error
@@ -1844,12 +1681,13 @@
 
                     <div class="error">
 
-                        ❌ حصل خطأ في تحميل طلباتك.
+                        ❌ حصل خطأ أثناء تحميل الطلبات.
 
                         <br><br>
 
-                        تأكد من اتصال Firebase
-                        وقواعد Firestore.
+                        ${escapeHTML(
+                            error.message
+                        )}
 
                     </div>
 
@@ -1861,9 +1699,10 @@
 
     }
 
+);
+
 
 </script>
-
 
 </body>
 
