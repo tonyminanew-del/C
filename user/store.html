@@ -125,6 +125,13 @@
       margin-top: auto;
     }
 
+    .gift-info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #94a3b8;
+    }
+
     .gift-price {
       font-size: 0.85rem;
       color: #38bdf8;
@@ -301,7 +308,10 @@
           const gift = doc.data();
           const giftId = doc.id;
           const giftPrice = Number(gift.points) || 0;
+          const giftQuantity = Number(gift.quantity) || 0;
+          
           const hasEnoughPoints = currentUserPoints >= giftPrice;
+          const isAvailable = giftQuantity > 0;
 
           const card = document.createElement('div');
           card.className = 'gift-card';
@@ -310,13 +320,27 @@
             ? `<img src="${gift.image}" alt="${gift.name}">` 
             : `<div class="gift-img-placeholder">🎁</div>`;
 
+          let btnText = 'شراء 🛒';
+          let isDisabled = false;
+
+          if (!isAvailable) {
+            btnText = 'نفدت الكمية ❌';
+            isDisabled = true;
+          } else if (!hasEnoughPoints) {
+            btnText = 'نقاط غير كافية 🔒';
+            isDisabled = true;
+          }
+
           card.innerHTML = `
             <div class="gift-img-box">${imgHTML}</div>
             <div class="gift-name">${gift.name || 'هدايا الكنيسة'}</div>
             <div class="gift-footer">
-              <div class="gift-price">⭐ ${giftPrice} نقطة</div>
-              <button class="buy-btn" ${!hasEnoughPoints ? 'disabled' : ''} onclick="buyGift('${giftId}', '${escapeHtml(gift.name || '')}', ${giftPrice}, '${gift.image || ''}')">
-                ${hasEnoughPoints ? 'شراء 🛒' : 'نقاط غير كافية 🔒'}
+              <div class="gift-info-row">
+                <span>المتبقي: ${giftQuantity}</span>
+                <span class="gift-price">⭐ ${giftPrice} نقطة</span>
+              </div>
+              <button class="buy-btn" ${isDisabled ? 'disabled' : ''} onclick="buyGift('${giftId}', '${escapeHtml(gift.name || '')}', ${giftPrice}, '${gift.image || ''}')">
+                ${btnText}
               </button>
             </div>
           `;
@@ -329,7 +353,7 @@
       });
     }
 
-    // عملية شراء الهدية وخصم النقاط وإضافتها لسلة المستخدم
+    // عملية شراء الهدية وخصم النقاط وخصم الكمية من المخزون وإضافتها لسلة المستخدم
     async function buyGift(giftId, giftName, giftPrice, giftImage) {
       if (!currentUsername) return;
 
@@ -343,23 +367,47 @@
 
       try {
         const userRef = db.collection('users').doc(currentUsername);
+        const giftRef = giftId ? db.collection('gifts').doc(giftId) : null;
         const basketRef = userRef.collection('basket').doc();
 
-        // استخدام Transaction لضمان خصم النقاط وإضافة الطلب بدقة
+        // استخدام Transaction لضمان ترابط العمليات بدقة تامة
         await db.runTransaction(async (transaction) => {
+          // 1. القراءة أولاً
           const userDoc = await transaction.get(userRef);
           if (!userDoc.exists) throw new Error("مستخدم غير موجود!");
+
+          let giftDoc = null;
+          if (giftRef) {
+            giftDoc = await transaction.get(giftRef);
+          }
 
           const currentPoints = Number(userDoc.data().points) || 0;
           if (currentPoints < giftPrice) {
             throw new Error("نقاطك غير كافية!");
           }
 
-          // خصم النقاط من حساب المستخدم في كولكشن users
+          let currentQty = 1;
+          if (giftDoc && giftDoc.exists) {
+            currentQty = Number(giftDoc.data().quantity) || 0;
+            if (currentQty <= 0) {
+              throw new Error("عذراً، هذه الهدية نفدت من المتجر!");
+            }
+          }
+
+          // 2. الكتابة والتحديث
+          // خصم النقاط من حساب المستخدم
           transaction.update(userRef, {
             points: currentPoints - giftPrice,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
+
+          // خصم 1 من كمية الهدية في المتجر
+          if (giftRef && giftDoc && giftDoc.exists) {
+            transaction.update(giftRef, {
+              quantity: currentQty - 1,
+              updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+          }
 
           // إضافة الهدية إلى سلة المستخدم الفرعية
           transaction.set(basketRef, {
@@ -369,6 +417,7 @@
             image: giftImage,
             count: 1,
             isDelivered: false,
+            isApproved: false,
             addedAt: firebase.firestore.FieldValue.serverTimestamp()
           });
         });
