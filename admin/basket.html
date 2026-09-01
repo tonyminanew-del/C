@@ -477,13 +477,19 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
   try {
     const userRef = db.collection("users").doc(userId);
     const orderRef = userRef.collection("basket").doc(orderId);
-    // التحقق من أن giftId نص صالح وليس نصاً فارغاً
     const giftRef = (giftId && giftId !== "undefined" && giftId !== "null") ? db.collection("gifts").doc(giftId) : null;
 
     await db.runTransaction(async (transaction) => {
+      // 1. تنفيذ كافة عمليات القراءة (Reads) أولاً قبل أي عملية كتابة (Writes)
       const userDoc = await transaction.get(userRef);
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
-      
+
+      let giftDoc = null;
+      if (giftRef) {
+        giftDoc = await transaction.get(giftRef);
+      }
+
+      // 2. تنفيذ عمليات الكتابة (Writes) بعد القراءة مباشرة
       const currentPoints = Number(userDoc.data().points) || 0;
       const pointsToRefund = Number(giftPoints) * Number(orderCount);
 
@@ -493,16 +499,13 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // إذا كانت الهدية مرتبطة بـ giftId وموجودة، قم بإرجاع الكمية
-      if (giftRef) {
-        const giftDoc = await transaction.get(giftRef);
-        if (giftDoc.exists) {
-          const currentQty = Number(giftDoc.data().quantity) || 0;
-          transaction.update(giftRef, {
-            quantity: currentQty + Number(orderCount),
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
+      // إرجاع كمية الهدية للمتجر إذا كانت موجودة
+      if (giftRef && giftDoc && giftDoc.exists) {
+        const currentQty = Number(giftDoc.data().quantity) || 0;
+        transaction.update(giftRef, {
+          quantity: currentQty + Number(orderCount),
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
       }
 
       // حذف الطلب من سلة المستخدم
