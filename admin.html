@@ -131,7 +131,10 @@
 
     <div id="formFieldsContainer">
       <input type="text" id="usernameInput" class="input-box" placeholder="اسم المستخدم (Username)">
-      <input type="password" id="passwordInput" class="input-box" placeholder="كلمة المرور (Password)">
+      <input type="password" id="passwordInput" class="input-box" placeholder="كلمة المرور الخاصة بحسابك">
+      
+      <!-- حقل كلمة سر الخادم المطلوبة stmina -->
+      <input type="password" id="serverSecretInput" class="input-box" placeholder="كلمة سر الخوادم السرية (stmina)">
       
       <div id="confirmPassBox">
         <input type="password" id="confirmPasswordInput" class="input-box" placeholder="إعادة كتابة كلمة المرور">
@@ -195,10 +198,17 @@
     async function handleAuthAction() {
       const username = document.getElementById('usernameInput').value.trim();
       const password = document.getElementById('passwordInput').value.trim();
+      const serverSecret = document.getElementById('serverSecretInput').value.trim();
       const errorMsg = document.getElementById('errorMsg');
 
-      if (!username || !password) {
+      if (!username || !password || !serverSecret) {
         errorMsg.innerText = "يرجى ملء جميع الحقول المطلوبة ❌";
+        return;
+      }
+
+      // التحقق من كلمة السر السرية للخادم
+      if (serverSecret !== "stmina") {
+        errorMsg.innerText = "كلمة سر الخوادم (stmina) غير صحيحة ❌";
         return;
       }
 
