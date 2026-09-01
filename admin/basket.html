@@ -392,6 +392,7 @@ async function toggleUserBasket(userId) {
       const giftPoints = Number(order.points) || 0;
       const orderCount = Number(order.count) || 1;
       const giftId = order.giftId || "";
+      const giftImage = order.image || "";
 
       let statusHtml = `<span class="status pending">قيد الانتظار ⏳</span>`;
       if (isDelivered) {
@@ -429,7 +430,7 @@ async function toggleUserBasket(userId) {
           approveOrder(userId, orderId, giftName);
         });
         itemDiv.querySelector(`#rej-${orderId}`).addEventListener("click", () => {
-          rejectOrder(userId, orderId, giftName, giftPoints, orderCount, giftId);
+          rejectOrder(userId, orderId, giftName, giftPoints, orderCount, giftId, giftImage);
         });
       } else if (isApproved && !isDelivered) {
         itemDiv.querySelector(`#del-${orderId}`).addEventListener("click", () => {
@@ -470,7 +471,7 @@ async function approveOrder(userId, orderId, giftName) {
   }
 }
 
-async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, giftId) {
+async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, giftId, giftImage) {
   const reason = prompt("الرجاء كتابة سبب رفض الهدية:");
   if (reason === null) return;
 
@@ -479,39 +480,51 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
     const orderRef = userRef.collection("basket").doc(orderId);
     const giftRef = (giftId && giftId !== "undefined" && giftId !== "null") ? db.collection("gifts").doc(giftId) : null;
 
+    // جلب مستند الهدية خارج الـ transaction لتحديد ما إذا كانت موجودة أم لا
+    let giftDoc = null;
+    if (giftRef) {
+      giftDoc = await giftRef.get();
+    }
+
     await db.runTransaction(async (transaction) => {
-      // 1. تنفيذ كافة عمليات القراءة (Reads) أولاً قبل أي عملية كتابة (Writes)
       const userDoc = await transaction.get(userRef);
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
 
-      let giftDoc = null;
-      if (giftRef) {
-        giftDoc = await transaction.get(giftRef);
-      }
-
-      // 2. تنفيذ عمليات الكتابة (Writes) بعد القراءة مباشرة
       const currentPoints = Number(userDoc.data().points) || 0;
       const pointsToRefund = Number(giftPoints) * Number(orderCount);
 
-      // إرجاع النقاط لحساب المستخدم
+      // 1. إرجاع النقاط لحساب المستخدم
       transaction.update(userRef, {
         points: currentPoints + pointsToRefund,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
 
-      // إرجاع كمية الهدية للمتجر إذا كانت موجودة
-      if (giftRef && giftDoc && giftDoc.exists) {
-        const currentQty = Number(giftDoc.data().quantity) || 0;
-        transaction.update(giftRef, {
-          quantity: currentQty + Number(orderCount),
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+      // 2. إرجاع الكمية للمتجر (أو إعادة إنشاء الهدية إذا تم حذفها نهائياً لأن كميتها وصلت لصفر)
+      if (giftRef) {
+        const freshGiftDoc = await transaction.get(giftRef);
+        if (freshGiftDoc.exists) {
+          const currentQty = Number(freshGiftDoc.data().quantity) || 0;
+          transaction.update(giftRef, {
+            quantity: currentQty + Number(orderCount),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        } else {
+          // إذا كانت الهدية قد حذفت تماماً من المتجر لأن كميتها نفدت، يتم إرجاعها وإنشائها مرة أخرى
+          transaction.set(giftRef, {
+            name: giftName,
+            points: Number(giftPoints),
+            image: giftImage || "",
+            quantity: Number(orderCount),
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
       }
 
-      // حذف الطلب من سلة المستخدم
+      // 3. حذف الطلب من سلة المستخدم
       transaction.delete(orderRef);
     });
 
+    // إرسال إشعار للمخدوم برفض الطلب وإعادة نقاطه
     await db.collection("myNewCollection").add({
       title: "عذراً، تم رفض طلب الهدية ❌",
       body: `تم رفض طلبك لـ (${giftName}). السبب: ${reason || "لم يكتب سبب"}. تمت إعادة النقاط لحسابك.`,
@@ -520,7 +533,7 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    alert("تم رفض الطلب، إرجاع النقاط للمخدوم، وحذفه من السلة ✅");
+    alert("تم رفض الطلب، إرجاع النقاط للمخدوم، وإرجاع الهدية للمتجر بنجاح ✅");
     document.getElementById(`basket-${userId}`).style.display = "none";
     toggleUserBasket(userId);
   } catch (error) {
