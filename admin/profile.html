@@ -289,9 +289,9 @@
 
   <div class="container">
 
-    <!-- البروفايل الرئيسي (أيقونة ثابتة) -->
+    <!-- البروفايل الرئيسي -->
     <div class="profile-card">
-      <div class="avatar">👤</div>
+      <div class="avatar" id="profileAvatar">👤</div>
       <div class="name" id="profileName">جاري التحميل...</div>
       <div class="title" id="profileTitle">...</div>
     </div>
@@ -381,6 +381,7 @@
 
     const db = firebase.firestore();
     let currentUserData = {};
+    let currentCollectionName = "users"; // لتخزين الكولكشن الذي تم جلب البيانات منه
     let isEditing = false;
 
     function escapeHtml(value) {
@@ -414,16 +415,26 @@
     });
 
     async function loadProfileData() {
-      const currentUsername = localStorage.getItem("currentAdminUser");
+      // استخدام currentUsername بدلاً من currentAdminUser ليتوافق مع صفحة تسجيل الدخول
+      const currentUsername = localStorage.getItem("currentUsername");
+      const userRole = localStorage.getItem("userRole");
 
       if (!currentUsername) {
-        window.location.href = "../admin.html";
+        window.location.href = "../t.html"; // مسار صفحة تسجيل الدخول
         return;
       }
 
       try {
-        const docRef = db.collection("users").doc(currentUsername);
-        const docSnap = await docRef.get();
+        // تحديد الكولكشن ديناميكياً حسب الـ role، أو البحث في الاثنين احتياطياً
+        currentCollectionName = (userRole === "admin") ? "admins" : "users";
+        let docRef = db.collection(currentCollectionName).doc(currentUsername);
+        let docSnap = await docRef.get();
+
+        if (!docSnap.exists) {
+          currentCollectionName = (currentCollectionName === "admins") ? "users" : "admins";
+          docRef = db.collection(currentCollectionName).doc(currentUsername);
+          docSnap = await docRef.get();
+        }
 
         if (!docSnap.exists) {
           document.getElementById("profileData").innerHTML = `
@@ -439,13 +450,17 @@
         document.getElementById("profileName").innerText = currentUserData.username || currentUsername;
         document.getElementById("profileTitle").innerText = currentUserData.title || "مستخدم بالكنيسة";
 
-        // تعبئة حقول الفورم للتعديل لاحقاً
+        if (currentUserData.photo) {
+          document.getElementById("profileAvatar").innerHTML = `<img src="${currentUserData.photo}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        }
+
+        // تعبئة حقول الفورم للتعديل
         document.getElementById("editUsername").value = currentUserData.username || currentUsername;
         document.getElementById("editPassword").value = currentUserData.password || "";
         document.getElementById("editTitle").value = currentUserData.title || "";
         document.getElementById("editPhone").value = currentUserData.phone || "";
 
-        // بناء قائمة البيانات (مع استبعاد الصورة و createdAt والـ photo)
+        // بناء قائمة البيانات
         const profileData = document.getElementById("profileData");
         profileData.innerHTML = "";
 
@@ -492,7 +507,7 @@
 
     async function updateProfile(event) {
       event.preventDefault();
-      const currentUsername = localStorage.getItem("currentAdminUser");
+      const currentUsername = localStorage.getItem("currentUsername");
 
       const newUsername = document.getElementById("editUsername").value.trim();
       const password = document.getElementById("editPassword").value.trim();
@@ -506,10 +521,10 @@
       saveBtn.innerText = "جاري الحفظ...";
 
       try {
-        const userRef = db.collection("users").doc(currentUsername);
+        const userRef = db.collection(currentCollectionName).doc(currentUsername);
 
         if (newUsername !== currentUsername) {
-          const newUserRef = db.collection("users").doc(newUsername);
+          const newUserRef = db.collection(currentCollectionName).doc(newUsername);
           const checkSnap = await newUserRef.get();
           
           if (checkSnap.exists) {
@@ -530,7 +545,7 @@
           });
 
           await userRef.delete();
-          localStorage.setItem("currentAdminUser", newUsername);
+          localStorage.setItem("currentUsername", newUsername);
         } else {
           // تحديث عادي لنفس المستند
           await userRef.update({
@@ -554,14 +569,15 @@
         console.error("Update error:", error);
         msgDiv.className = "message error";
         msgDiv.innerText = "❌ حدث خطأ: " + error.message;
-        saveBtn.disabled = false;
+        saveBtn.disabled, saveBtn.disabled = false;
         saveBtn.innerText = "حفظ 💾";
       }
     }
 
     function logout() {
-      localStorage.removeItem("currentAdminUser");
-      window.location.href = "../admin.html";
+      localStorage.removeItem("currentUsername");
+      localStorage.removeItem("userRole");
+      window.location.href = "../t.html"; // مسار صفحة تسجيل الدخول
     }
   </script>
 
