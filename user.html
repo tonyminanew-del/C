@@ -2,377 +2,877 @@
 <html lang="ar" dir="rtl">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول - بوابة الكنيسة</title>
 
-  <!-- GOOGLE FONT -->
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <!-- FIREBASE FIRESTORE ONLY -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <title>بوابة الكنيسة</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+
 
   <style>
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    html, body {
+
+    html,
+    body {
       width: 100%;
       min-height: 100%;
     }
 
+
     body {
+
       min-height: 100vh;
+
       font-family: "Cairo", sans-serif;
+
       color: white;
+
       display: flex;
+
       justify-content: center;
+
       align-items: center;
+
       overflow: hidden;
-      background: radial-gradient(circle at 15% 20%, rgba(0, 140, 255, .20), transparent 35%),
-                  radial-gradient(circle at 85% 80%, rgba(125, 60, 255, .22), transparent 35%),
-                  #050816;
+
+      background:
+
+        radial-gradient(
+          circle at 15% 20%,
+          rgba(0, 140, 255, .20),
+          transparent 35%
+        ),
+
+        radial-gradient(
+          circle at 85% 80%,
+          rgba(125, 60, 255, .22),
+          transparent 35%
+        ),
+
+        #050816;
     }
 
+
+    /* =========================
+       BACKGROUND
+    ========================= */
+
     .background {
+
       position: fixed;
+
       inset: 0;
+
       overflow: hidden;
+
       z-index: -10;
     }
 
+
     .orb {
+
       position: absolute;
+
       border-radius: 50%;
+
       filter: blur(80px);
+
       opacity: .45;
-      animation: floatOrb 7s ease-in-out infinite;
+
+      animation:
+        floatOrb 7s ease-in-out infinite;
     }
 
-    .orb1 { width: 320px; height: 320px; background: #0077ff; left: -120px; top: -120px; }
-    .orb2 { width: 360px; height: 360px; background: #7c3aed; right: -130px; bottom: -130px; animation-delay: 2s; }
-    .orb3 { width: 180px; height: 180px; background: #06b6d4; right: 30%; top: 5%; opacity: .18; animation-delay: 4s; }
+
+    .orb1 {
+
+      width: 320px;
+
+      height: 320px;
+
+      background: #0077ff;
+
+      left: -120px;
+
+      top: -120px;
+    }
+
+
+    .orb2 {
+
+      width: 360px;
+
+      height: 360px;
+
+      background: #7c3aed;
+
+      right: -130px;
+
+      bottom: -130px;
+
+      animation-delay: 2s;
+    }
+
+
+    .orb3 {
+
+      width: 180px;
+
+      height: 180px;
+
+      background: #06b6d4;
+
+      right: 30%;
+
+      top: 5%;
+
+      opacity: .18;
+
+      animation-delay: 4s;
+    }
+
 
     @keyframes floatOrb {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-35px) scale(1.08); }
+
+      0%,
+      100% {
+        transform:
+          translateY(0)
+          scale(1);
+      }
+
+      50% {
+        transform:
+          translateY(-35px)
+          scale(1.08);
+      }
+
     }
 
+
+    /* =========================
+       SCENE
+    ========================= */
+
     .scene {
-      width: 430px;
+
+      width: 440px;
+
       max-width: 92vw;
-      height: 520px;
+
+      height: 570px;
+
+      perspective: 1400px;
+
       position: relative;
     }
 
-    .side {
+
+    /* =========================
+       CARD
+    ========================= */
+
+    .card {
+
       width: 100%;
+
       height: 100%;
-      padding: 34px 35px;
-      border-radius: 32px;
-      background: linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.035));
-      border: 1px solid rgba(255,255,255,.16);
-      backdrop-filter: blur(25px);
-      -webkit-backdrop-filter: blur(25px);
-      box-shadow: 0 40px 100px rgba(0,0,0,.55), inset 0 1px 1px rgba(255,255,255,.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+
+      position: relative;
+
+      transform-style: preserve-3d;
+
+      transition:
+        transform .25s ease;
     }
+
+
+    /* =========================
+       MAIN BOX
+    ========================= */
+
+    .main-box {
+
+      width: 100%;
+
+      height: 100%;
+
+      padding: 45px 38px;
+
+      border-radius: 34px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      align-items: center;
+
+      justify-content: center;
+
+      text-align: center;
+
+      background:
+
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.15),
+          rgba(255,255,255,.035)
+        );
+
+      border:
+        1px solid
+        rgba(255,255,255,.16);
+
+      backdrop-filter:
+        blur(25px);
+
+      -webkit-backdrop-filter:
+        blur(25px);
+
+      box-shadow:
+
+        0 40px 100px
+        rgba(0,0,0,.55),
+
+        inset 0 1px 1px
+        rgba(255,255,255,.2);
+
+      transform:
+        translateZ(0);
+    }
+
+
+    /* =========================
+       LOGO
+    ========================= */
 
     .logo {
-      width: 82px;
-      height: 82px;
-      border-radius: 25px;
+
+      width: 100px;
+
+      height: 100px;
+
+      border-radius: 30px;
+
       display: flex;
+
       justify-content: center;
+
       align-items: center;
-      font-size: 40px;
-      background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.05));
-      border: 1px solid rgba(255,255,255,.2);
-      box-shadow: 0 15px 35px rgba(0,0,0,.35), inset 0 2px 5px rgba(255,255,255,.2);
-      margin-bottom: 15px;
-      flex-shrink: 0;
+
+      font-size: 48px;
+
+      margin-bottom: 24px;
+
+      background:
+
+        linear-gradient(
+          145deg,
+          rgba(255,255,255,.25),
+          rgba(255,255,255,.05)
+        );
+
+      border:
+        1px solid
+        rgba(255,255,255,.2);
+
+      box-shadow:
+
+        0 20px 45px
+        rgba(0,0,0,.35),
+
+        inset 0 2px 5px
+        rgba(255,255,255,.2);
+
+      transform:
+        translateZ(45px);
     }
+
+
+    /* =========================
+       TITLE
+    ========================= */
 
     h1 {
-      font-size: 27px;
+
+      font-size: 30px;
+
       font-weight: 900;
-      text-align: center;
-      margin-bottom: 5px;
+
+      margin-bottom: 8px;
+
+      transform:
+        translateZ(30px);
     }
+
 
     .subtitle {
+
       color: #aeb8d0;
-      text-align: center;
+
       font-size: 13px;
-      line-height: 1.8;
-      margin-bottom: 18px;
+
+      line-height: 2;
+
+      margin-bottom: 30px;
+
+      transform:
+        translateZ(20px);
     }
 
-    .input-box {
+
+    /* =========================
+       BUTTONS
+    ========================= */
+
+    .buttons {
+
       width: 100%;
-      margin-bottom: 15px;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 16px;
+
+      transform:
+        translateZ(30px);
     }
 
-    .input-box label {
+
+    .choice {
+
+      width: 100%;
+
+      min-height: 85px;
+
+      padding: 14px 18px;
+
+      border-radius: 21px;
+
+      border:
+        1px solid
+        rgba(255,255,255,.13);
+
+      background:
+        rgba(255,255,255,.055);
+
+      color: white;
+
+      font-family: inherit;
+
+      cursor: pointer;
+
+      display: flex;
+
+      align-items: center;
+
+      text-align: right;
+
+      gap: 16px;
+
+      transition: .3s;
+
+      box-shadow:
+
+        0 12px 30px
+        rgba(0,0,0,.18);
+    }
+
+
+    .choice:hover {
+
+      transform:
+        translateY(-5px)
+        scale(1.015);
+
+      border-color:
+        rgba(56,189,248,.45);
+
+      background:
+        rgba(255,255,255,.09);
+
+      box-shadow:
+
+        0 20px 40px
+        rgba(0,0,0,.30);
+    }
+
+
+    .icon {
+
+      width: 55px;
+
+      height: 55px;
+
+      flex-shrink: 0;
+
+      border-radius: 17px;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      font-size: 27px;
+
+      background:
+        rgba(56,189,248,.12);
+
+      border:
+        1px solid
+        rgba(56,189,248,.15);
+    }
+
+
+    .text {
+
+      flex: 1;
+    }
+
+
+    .title {
+
       display: block;
-      margin-bottom: 6px;
-      font-size: 13px;
-      color: #cbd5e1;
+
+      font-size: 16px;
+
+      font-weight: 900;
+
+      margin-bottom: 3px;
+    }
+
+
+    .desc {
+
+      display: block;
+
+      color: #94a3b8;
+
+      font-size: 11px;
+
       font-weight: 600;
     }
 
-    .input-box input {
-      width: 100%;
-      height: 51px;
-      border-radius: 15px;
-      border: 1px solid rgba(255,255,255,.12);
-      outline: none;
-      background: rgba(0,0,0,.25);
-      color: white;
-      padding: 0 17px;
-      font-family: inherit;
-      font-size: 14px;
+
+    .arrow {
+
+      color: #38bdf8;
+
+      font-size: 24px;
+
       transition: .3s;
     }
 
-    .input-box input:focus {
-      border-color: #38bdf8;
-      box-shadow: 0 0 0 3px rgba(56,189,248,.1), 0 8px 25px rgba(0,0,0,.25);
-      transform: translateY(-2px);
+
+    .choice:hover .arrow {
+
+      transform:
+        translateX(-6px);
     }
 
-    .input-box input::placeholder {
-      color: #667085;
-    }
 
-    .main-btn {
-      width: 100%;
-      height: 55px;
-      border: none;
-      border-radius: 16px;
-      color: white;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 900;
-      cursor: pointer;
-      background: linear-gradient(135deg, #0ea5e9, #6366f1);
-      box-shadow: 0 12px 30px rgba(14,165,233,.25), 0 5px 0 rgba(0,0,0,.25);
-      transition: .25s;
-      margin-top: 4px;
-    }
-
-    .main-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 18px 40px rgba(14,165,233,.35), 0 5px 0 rgba(0,0,0,.25);
-    }
-
-    .main-btn:active {
-      transform: translateY(2px);
-    }
-
-    .main-btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .status {
-      width: 100%;
-      min-height: 25px;
-      margin-top: 10px;
-      text-align: center;
-      font-size: 12px;
-      font-weight: 700;
-      line-height: 1.7;
-    }
+    /* =========================
+       FLOATING OBJECTS
+    ========================= */
 
     .floating {
+
       position: absolute;
+
       width: 75px;
+
       height: 75px;
+
       border-radius: 22px;
-      background: rgba(255,255,255,.055);
-      border: 1px solid rgba(255,255,255,.1);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 20px 50px rgba(0,0,0,.25);
-      animation: floating 5s ease-in-out infinite;
+
+      background:
+        rgba(255,255,255,.055);
+
+      border:
+        1px solid
+        rgba(255,255,255,.1);
+
+      backdrop-filter:
+        blur(10px);
+
+      box-shadow:
+
+        0 20px 50px
+        rgba(0,0,0,.25);
+
+      animation:
+        floating 5s ease-in-out infinite;
+
+      pointer-events: none;
     }
 
-    .floating1 { left: -105px; top: 80px; transform: rotate(15deg); }
-    .floating2 { right: -105px; bottom: 90px; transform: rotate(-20deg); animation-delay: 1.5s; }
+
+    .floating1 {
+
+      left: -105px;
+
+      top: 80px;
+
+      transform:
+        rotate(15deg);
+    }
+
+
+    .floating2 {
+
+      right: -105px;
+
+      bottom: 90px;
+
+      transform:
+        rotate(-20deg);
+
+      animation-delay: 1.5s;
+    }
+
 
     @keyframes floating {
-      0%, 100% { margin-top: 0; }
-      50% { margin-top: -20px; }
+
+      0%,
+      100% {
+        margin-top: 0;
+      }
+
+      50% {
+        margin-top: -20px;
+      }
+
     }
 
+
+    /* =========================
+       MOBILE
+    ========================= */
+
     @media(max-width:600px) {
-      .scene { width: 92vw; height: 510px; }
-      .side { padding: 30px 25px; }
-      h1 { font-size: 24px; }
-      .floating { display: none; }
+
+      .scene {
+
+        width: 92vw;
+
+        height: 550px;
+      }
+
+
+      .main-box {
+
+        padding:
+          35px 23px;
+      }
+
+
+      h1 {
+
+        font-size: 25px;
+      }
+
+
+      .logo {
+
+        width: 85px;
+
+        height: 85px;
+
+        font-size: 40px;
+      }
+
+
+      .floating {
+
+        display: none;
+      }
+
     }
+
   </style>
+
 </head>
+
 
 <body>
 
+
   <!-- BACKGROUND -->
+
   <div class="background">
+
     <div class="orb orb1"></div>
+
     <div class="orb orb2"></div>
+
     <div class="orb orb3"></div>
+
   </div>
 
-  <!-- SCENE -->
-  <div class="scene">
+
+
+  <!-- MAIN -->
+
+  <div class="scene" id="scene">
+
     <div class="floating floating1"></div>
+
     <div class="floating floating2"></div>
 
-    <section class="side signin">
-      <div class="logo">🔐</div>
-      <h1>تسجيل الدخول</h1>
-      <p class="subtitle">أهلاً بك مرة أخرى 👋<br>ادخل إلى حسابك</p>
 
-      <div class="input-box">
-        <label>اسم المستخدم</label>
-        <input type="text" id="loginUsername" placeholder="مثال: توني" autocomplete="username">
+    <div class="card" id="card">
+
+      <div class="main-box">
+
+
+        <!-- LOGO -->
+
+        <div class="logo">
+          ⛪
+        </div>
+
+
+        <!-- TITLE -->
+
+        <h1>
+          أهلاً بك 👋
+        </h1>
+
+
+        <p class="subtitle">
+
+          مرحباً بك في بوابة الكنيسة
+
+          <br>
+
+          اختر الطريقة التي تريد المتابعة بها
+
+        </p>
+
+
+
+        <!-- BUTTONS -->
+
+        <div class="buttons">
+
+
+          <!-- إنشاء حساب -->
+
+          <button
+            class="choice"
+            id="createAccount"
+            type="button"
+          >
+
+            <div class="icon">
+              ✨
+            </div>
+
+
+            <div class="text">
+
+              <span class="title">
+                إنشاء حساب
+              </span>
+
+              <span class="desc">
+                ليس لديك حساب؟ أنشئ حسابًا جديدًا
+              </span>
+
+            </div>
+
+
+            <div class="arrow">
+              ←
+            </div>
+
+          </button>
+
+
+
+          <!-- لدي حساب -->
+
+          <button
+            class="choice"
+            id="haveAccount"
+            type="button"
+          >
+
+            <div class="icon">
+              🔐
+            </div>
+
+
+            <div class="text">
+
+              <span class="title">
+                لدي حساب بالفعل
+              </span>
+
+              <span class="desc">
+                سجل الدخول إلى حسابك
+              </span>
+
+            </div>
+
+
+            <div class="arrow">
+              ←
+            </div>
+
+          </button>
+
+
+        </div>
+
+
       </div>
 
-      <div class="input-box">
-        <label>كلمة المرور</label>
-        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
-      </div>
+    </div>
 
-      <button class="main-btn" id="loginBtn" type="button">🔐 Sign In</button>
-
-      <div class="status" id="loginStatus"></div>
-    </section>
   </div>
 
+
+
   <script>
-    /* FIREBASE CONFIG */
-    const firebaseConfig = {
-      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
-      authDomain: "church-7afe1.firebaseapp.com",
-      projectId: "church-7afe1",
-      storageBucket: "church-7afe1.firebasestorage.app",
-      messagingSenderId: "1072334615357",
-      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
-      measurementId: "G-E7Q76Z53SB"
-    };
 
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    /* ================================
+       BUTTONS
+    ================================= */
 
-    const db = firebase.firestore();
+    const createAccount =
+      document.getElementById(
+        "createAccount"
+      );
 
-    const loginBtn = document.getElementById("loginBtn");
-    const loginStatus = document.getElementById("loginStatus");
 
-    function normalizeUsername(username) {
-      return username.trim().toLowerCase();
-    }
+    const haveAccount =
+      document.getElementById(
+        "haveAccount"
+      );
 
-    /* SIGN IN WITH SMART COLLECTION SEARCH & REDIRECT */
-    loginBtn.addEventListener("click", async () => {
-      const username = document.getElementById("loginUsername").value.trim();
-      const password = document.getElementById("loginPassword").value;
 
-      loginStatus.innerText = "";
 
-      if (!username || !password) {
-        loginStatus.style.color = "#f87171";
-        loginStatus.innerText = "⚠️ اكتب اسم المستخدم وكلمة المرور";
-        return;
+    /* ================================
+       إنشاء حساب
+       
+       ➜ n.html
+    ================================= */
+
+    createAccount.addEventListener(
+      "click",
+      () => {
+
+        window.location.href =
+          "n.html";
+
       }
+    );
 
-      loginBtn.disabled = true;
-      loginBtn.innerText = "⏳ جاري تسجيل الدخول...";
 
-      try {
-        const cleanUsername = normalizeUsername(username);
-        
-        // 1. البحث في كولكشن الـ admins أولاً
-        let docRef = db.collection("admins").doc(cleanUsername);
-        let docSnap = await docRef.get();
-        let role = "admin";
 
-        // 2. إذا لم يوجد في الـ admins، ابحث في كولكشن الـ users
-        if (!docSnap.exists) {
-          docRef = db.collection("users").doc(cleanUsername);
-          docSnap = await docRef.get();
-          role = "user";
-        }
+    /* ================================
+       لدي حساب بالفعل
+       
+       ➜ t.html
+    ================================= */
 
-        // إذا لم يوجد في الاثنين معاً
-        if (!docSnap.exists) {
-          loginStatus.style.color = "#f87171";
-          loginStatus.innerText = "❌ اسم المستخدم غير موجود";
-          loginBtn.disabled = false;
-          loginBtn.innerText = "🔐 Sign In";
-          return;
-        }
+    haveAccount.addEventListener(
+      "click",
+      () => {
 
-        const userData = docSnap.data();
+        window.location.href =
+          "t.html";
 
-        // التحقق من كلمة المرور
-        if (userData.password !== password) {
-          loginStatus.style.color = "#f87171";
-          loginStatus.innerText = "❌ كلمة المرور غير صحيحة";
-          loginBtn.disabled = false;
-          loginBtn.innerText = "🔐 Sign In";
-          return;
-        }
-
-        // حفظ اسم المستخدم ودوره في الـ localStorage
-        localStorage.setItem("currentUsername", cleanUsername);
-        localStorage.setItem("userRole", role);
-
-        loginStatus.style.color = "#4ade80";
-        loginStatus.innerText = "✅ تم تسجيل الدخول بنجاح!";
-
-        setTimeout(() => {
-          if (role === "admin") {
-            // توجيه الأدمن: لو عنده بيانات كاملة (مثلا fullName أو role) يروح admin/home.html، لو ملوش يروح admin.html
-            if (userData.fullName || userData.role) {
-              window.location.href = "admin/home.html";
-            } else {
-              window.location.href = "admin.html";
-            }
-          } else {
-            // توجيه المستخدم العادي: لو عنده بيانات (مثل fullName و userPhone و stage) يروح user/home.html، لو ملوش يروح user.html
-            if (userData.fullName && userData.userPhone && userData.stage) {
-              window.location.href = "user/home.html";
-            } else {
-              window.location.href = "user/question.html";
-            }
-          }
-        }, 900);
-
-      } catch (error) {
-        console.error("LOGIN ERROR:", error);
-        loginStatus.style.color = "#f87171";
-        loginStatus.innerText = "❌ حدث خطأ أثناء تسجيل الدخول";
-        loginBtn.disabled = false;
-        loginBtn.innerText = "🔐 Sign In";
       }
-    });
+    );
 
-    /* ENTER KEY SUPPORT */
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        loginBtn.click();
+
+
+    /* ================================
+       3D MOUSE EFFECT
+    ================================= */
+
+    const scene =
+      document.getElementById(
+        "scene"
+      );
+
+
+    const card =
+      document.getElementById(
+        "card"
+      );
+
+
+    scene.addEventListener(
+      "mousemove",
+      (event) => {
+
+        const rect =
+          scene.getBoundingClientRect();
+
+
+        const x =
+          event.clientX -
+          rect.left;
+
+
+        const y =
+          event.clientY -
+          rect.top;
+
+
+        const rotateY =
+          ((x / rect.width) - .5)
+          * 8;
+
+
+        const rotateX =
+          ((y / rect.height) - .5)
+          * -8;
+
+
+        card.style.transform =
+          `
+          rotateX(${rotateX}deg)
+          rotateY(${rotateY}deg)
+          translateZ(10px)
+          `;
+
       }
-    });
+    );
+
+
+    scene.addEventListener(
+      "mouseleave",
+      () => {
+
+        card.style.transform =
+          "rotateX(0deg) rotateY(0deg)";
+
+      }
+    );
+
   </script>
 
 </body>
+
 </html>
