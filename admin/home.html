@@ -123,7 +123,7 @@
       margin-top: 2px;
     }
 
-    /* شبكة الوصول السريع (محدثة لتعرض 3 عناصر في الصف أو شبكة متوازنة) */
+    /* شبكة الوصول السريع */
     .quick-access-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -161,7 +161,7 @@
       font-weight: 700;
     }
 
-    /* الشريط السفلي للتنقل (محدث ليشمل 5 عناصر بوزن متساوي) */
+    /* الشريط السفلي للتنقل */
     .bottom-nav {
       position: fixed;
       bottom: 15px;
@@ -290,23 +290,34 @@
     }
     const db = firebase.firestore();
 
-    // التحقق من وجود المستخدم وجلب بياناته من قاعدة البيانات
+    // التحقق من وجود المستخدم وجلب بياناته من قاعدة البيانات الصحيحة
     window.addEventListener('DOMContentLoaded', async () => {
-      const currentUsername = localStorage.getItem("currentAdminUser");
+      // قراءة اسم المستخدم الصحيح المخزن من صفحة تسجيل الدخول
+      const currentUsername = localStorage.getItem("currentUsername");
+      const userRole = localStorage.getItem("userRole");
 
       if (!currentUsername) {
-        window.location.href = "../admin.html";
+        window.location.href = "../t.html"; // عدل المسار لصفحة تسجيل الدخول الخاصة بك
         return;
       }
 
       try {
-        const docRef = db.collection('users').doc(currentUsername);
-        const docSnap = await docRef.get();
+        // تحديد الكولكشن بناءً على الـ role أو البحث في الأدمين أولاً ثم المستخدمين
+        let collectionName = (userRole === "admin") ? "admins" : "users";
+        let docRef = db.collection(collectionName).doc(currentUsername);
+        let docSnap = await docRef.get();
+
+        // لو لم يجده في الكولكشن الأول، يبحث في الآخر للاحتياط
+        if (!docSnap.exists) {
+          collectionName = (collectionName === "admins") ? "users" : "admins";
+          docRef = db.collection(collectionName).doc(currentUsername);
+          docSnap = await docRef.get();
+        }
 
         if (docSnap.exists) {
           const data = docSnap.data();
           const title = data.title || ""; 
-          const name = data.username || currentUsername;
+          const name = data.fullName || data.username || currentUsername;
           
           if (title) {
             document.getElementById('servantDisplayName').innerText = `${title} / ${name}`;
@@ -325,11 +336,11 @@
         document.getElementById('servantDisplayName').innerText = currentUsername;
       }
 
-      // تفعيل الاستماع الفوري للإشعارات باستخدام نظام الـ Compat
+      // تفعيل الاستماع الفوري للإشعارات
       initRealtimeNotifications();
     });
 
-    // دالة الاستماع الفوري للإشعارات المتوافقة مع الكود
+    // دالة الاستماع الفوري للإشعارات
     function initRealtimeNotifications() {
       db.collection("servantNotifications")
         .where("read", "==", false)
@@ -362,7 +373,6 @@
       
       container.appendChild(alertBox);
 
-      // إخفاء التنبيه تلقائياً بعد 6 ثوانٍ
       setTimeout(() => {
         alertBox.remove();
       }, 6000);
