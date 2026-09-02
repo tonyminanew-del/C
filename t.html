@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>إنشاء حساب - بوابة الكنيسة</title>
+  <title>تسجيل الدخول - بوابة الكنيسة</title>
 
   <!-- GOOGLE FONT -->
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -65,7 +65,7 @@
     .scene {
       width: 430px;
       max-width: 92vw;
-      height: 570px;
+      height: 520px;
       position: relative;
     }
 
@@ -116,12 +116,12 @@
 
     .input-box {
       width: 100%;
-      margin-bottom: 12px;
+      margin-bottom: 15px;
     }
 
     .input-box label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
       font-size: 13px;
       color: #cbd5e1;
       font-weight: 600;
@@ -129,7 +129,7 @@
 
     .input-box input {
       width: 100%;
-      height: 48px;
+      height: 51px;
       border-radius: 15px;
       border: 1px solid rgba(255,255,255,.12);
       outline: none;
@@ -153,7 +153,7 @@
 
     .main-btn {
       width: 100%;
-      height: 52px;
+      height: 55px;
       border: none;
       border-radius: 16px;
       color: white;
@@ -164,7 +164,7 @@
       background: linear-gradient(135deg, #0ea5e9, #6366f1);
       box-shadow: 0 12px 30px rgba(14,165,233,.25), 0 5px 0 rgba(0,0,0,.25);
       transition: .25s;
-      margin-top: 6px;
+      margin-top: 4px;
     }
 
     .main-btn:hover {
@@ -184,8 +184,8 @@
 
     .status {
       width: 100%;
-      min-height: 22px;
-      margin-top: 8px;
+      min-height: 25px;
+      margin-top: 10px;
       text-align: center;
       font-size: 12px;
       font-weight: 700;
@@ -213,8 +213,8 @@
     }
 
     @media(max-width:600px) {
-      .scene { width: 92vw; height: 560px; }
-      .side { padding: 25px 20px; }
+      .scene { width: 92vw; height: 510px; }
+      .side { padding: 30px 25px; }
       h1 { font-size: 24px; }
       .floating { display: none; }
     }
@@ -235,29 +235,24 @@
     <div class="floating floating1"></div>
     <div class="floating floating2"></div>
 
-    <section class="side signup">
-      <div class="logo">✨</div>
-      <h1>إنشاء حساب جديد</h1>
-      <p class="subtitle">أنشئ حسابك في البرنامج 🚀<br>وابدأ رحلتك معنا</p>
+    <section class="side signin">
+      <div class="logo">🔐</div>
+      <h1>تسجيل الدخول</h1>
+      <p class="subtitle">أهلاً بك مرة أخرى 👋<br>ادخل إلى حسابك</p>
 
       <div class="input-box">
         <label>اسم المستخدم</label>
-        <input type="text" id="signupUsername" placeholder="مثال: توني" maxlength="30" autocomplete="username">
+        <input type="text" id="loginUsername" placeholder="مثال: توني" autocomplete="username">
       </div>
 
       <div class="input-box">
         <label>كلمة المرور</label>
-        <input type="password" id="signupPassword" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
       </div>
 
-      <div class="input-box">
-        <label>إعادة كتابة كلمة المرور</label>
-        <input type="password" id="confirmPassword" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password">
-      </div>
+      <button class="main-btn" id="loginBtn" type="button">🔐 Sign In</button>
 
-      <button class="main-btn" id="signupBtn" type="button">✨ Sign Up</button>
-
-      <div class="status" id="signupStatus"></div>
+      <div class="status" id="loginStatus"></div>
     </section>
   </div>
 
@@ -279,93 +274,102 @@
 
     const db = firebase.firestore();
 
-    const signupBtn = document.getElementById("signupBtn");
-    const signupStatus = document.getElementById("signupStatus");
+    const loginBtn = document.getElementById("loginBtn");
+    const loginStatus = document.getElementById("loginStatus");
 
     function normalizeUsername(username) {
       return username.trim().toLowerCase();
     }
 
-    /* SIGN UP (Direct Firestore Check) */
-    signupBtn.addEventListener("click", async () => {
-      const username = document.getElementById("signupUsername").value.trim();
-      const password = document.getElementById("signupPassword").value;
-      const confirmPassword = document.getElementById("confirmPassword").value;
+    /* SIGN IN WITH SMART COLLECTION SEARCH & REDIRECT */
+    loginBtn.addEventListener("click", async () => {
+      const username = document.getElementById("loginUsername").value.trim();
+      const password = document.getElementById("loginPassword").value;
 
-      signupStatus.innerText = "";
+      loginStatus.innerText = "";
 
-      if (!username || !password || !confirmPassword) {
-        signupStatus.style.color = "#f87171";
-        signupStatus.innerText = "⚠️ من فضلك املأ جميع البيانات";
+      if (!username || !password) {
+        loginStatus.style.color = "#f87171";
+        loginStatus.innerText = "⚠️ اكتب اسم المستخدم وكلمة المرور";
         return;
       }
 
-      if (username.length < 2) {
-        signupStatus.style.color = "#f87171";
-        signupStatus.innerText = "❌ اسم المستخدم قصير جدًا";
-        return;
-      }
-
-      if (password.length < 6) {
-        signupStatus.style.color = "#f87171";
-        signupStatus.innerText = "❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل";
-        return;
-      }
-
-      if (password !== confirmPassword) {
-        signupStatus.style.color = "#f87171";
-        signupStatus.innerText = "❌ كلمتا المرور غير متطابقتين";
-        return;
-      }
-
-      signupBtn.disabled = true;
-      signupBtn.innerText = "⏳ جاري إنشاء الحساب...";
+      loginBtn.disabled = true;
+      loginBtn.innerText = "⏳ جاري تسجيل الدخول...";
 
       try {
         const cleanUsername = normalizeUsername(username);
-        const userRef = db.collection("users").doc(cleanUsername);
-        const userDoc = await userRef.get();
+        
+        // 1. البحث في كولكشن الـ admins أولاً
+        let docRef = db.collection("admins").doc(cleanUsername);
+        let docSnap = await docRef.get();
+        let role = "admin";
 
-        if (userDoc.exists) {
-          signupStatus.style.color = "#f87171";
-          signupStatus.innerText = "❌ اسم المستخدم مستخدم بالفعل";
-          signupBtn.disabled = false;
-          signupBtn.innerText = "✨ Sign Up";
+        // 2. إذا لم يوجد في الـ admins، ابحث في كولكشن الـ users
+        if (!docSnap.exists) {
+          docRef = db.collection("users").doc(cleanUsername);
+          docSnap = await docRef.get();
+          role = "user";
+        }
+
+        // إذا لم يوجد في الاثنين معاً
+        if (!docSnap.exists) {
+          loginStatus.style.color = "#f87171";
+          loginStatus.innerText = "❌ اسم المستخدم غير موجود";
+          loginBtn.disabled = false;
+          loginBtn.innerText = "🔐 Sign In";
           return;
         }
 
-        // حفظ بيانات الحساب الأساسية في Firestore
-        await userRef.set({
-          username: username,
-          usernameLower: cleanUsername,
-          password: password,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        const userData = docSnap.data();
 
-        // حفظ اسم المستخدم في الـ localStorage
+        // التحقق من كلمة المرور
+        if (userData.password !== password) {
+          loginStatus.style.color = "#f87171";
+          loginStatus.innerText = "❌ كلمة المرور غير صحيحة";
+          loginBtn.disabled = false;
+          loginBtn.innerText = "🔐 Sign In";
+          return;
+        }
+
+        // حفظ اسم المستخدم ودوره في الـ localStorage
         localStorage.setItem("currentUsername", cleanUsername);
+        localStorage.setItem("userRole", role);
 
-        signupStatus.style.color = "#4ade80";
-        signupStatus.innerText = "🎉 تم إنشاء الحساب بنجاح!";
+        loginStatus.style.color = "#4ade80";
+        loginStatus.innerText = "✅ تم تسجيل الدخول بنجاح!";
 
         setTimeout(() => {
-          window.location.href = "user/question.html";
+          if (role === "admin") {
+            // توجيه الأدمن: لو عنده بيانات كاملة (مثلا fullName أو role) يروح admin/home.html، لو ملوش يروح admin.html
+            if (userData.fullName || userData.role) {
+              window.location.href = "admin/home.html";
+            } else {
+              window.location.href = "admin.html";
+            }
+          } else {
+            // توجيه المستخدم العادي: لو عنده بيانات (مثل fullName و userPhone و stage) يروح user/home.html، لو ملوش يروح user.html
+            if (userData.fullName && userData.userPhone && userData.stage) {
+              window.location.href = "user/home.html";
+            } else {
+              window.location.href = "user.html";
+            }
+          }
         }, 900);
 
       } catch (error) {
-        console.error("SIGN UP ERROR:", error);
-        signupStatus.style.color = "#f87171";
-        signupStatus.innerText = "❌ حدث خطأ أثناء إنشاء الحساب";
+        console.error("LOGIN ERROR:", error);
+        loginStatus.style.color = "#f87171";
+        loginStatus.innerText = "❌ حدث خطأ أثناء تسجيل الدخول";
+        loginBtn.disabled = false;
+        loginBtn.innerText = "🔐 Sign In";
       }
-
-      signupBtn.disabled = false;
-      signupBtn.innerText = "✨ Sign Up";
     });
 
-    /* ENTER KEY */
+    /* ENTER KEY SUPPORT */
     document.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
-        signupBtn.click();
+        loginBtn.click();
       }
     });
   </script>
