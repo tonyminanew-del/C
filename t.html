@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إنشاء حساب - بوابة الكنيسة</title>
+
+  <!-- GOOGLE FONT -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- FIREBASE FIRESTORE ONLY -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Cairo", sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: radial-gradient(circle at 15% 20%, rgba(0, 140, 255, .20), transparent 35%),
+                  radial-gradient(circle at 85% 80%, rgba(125, 60, 255, .22), transparent 35%),
+                  #050816;
+    }
+
+    .background {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: -10;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: .45;
+      animation: floatOrb 7s ease-in-out infinite;
+    }
+
+    .orb1 { width: 320px; height: 320px; background: #0077ff; left: -120px; top: -120px; }
+    .orb2 { width: 360px; height: 360px; background: #7c3aed; right: -130px; bottom: -130px; animation-delay: 2s; }
+    .orb3 { width: 180px; height: 180px; background: #06b6d4; right: 30%; top: 5%; opacity: .18; animation-delay: 4s; }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-35px) scale(1.08); }
+    }
+
+    .scene {
+      width: 430px;
+      max-width: 92vw;
+      height: 570px;
+      position: relative;
+    }
+
+    .side {
+      width: 100%;
+      height: 100%;
+      padding: 34px 35px;
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(255,255,255,.15), rgba(255,255,255,.035));
+      border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      box-shadow: 0 40px 100px rgba(0,0,0,.55), inset 0 1px 1px rgba(255,255,255,.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .logo {
+      width: 82px;
+      height: 82px;
+      border-radius: 25px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      background: linear-gradient(145deg, rgba(255,255,255,.25), rgba(255,255,255,.05));
+      border: 1px solid rgba(255,255,255,.2);
+      box-shadow: 0 15px 35px rgba(0,0,0,.35), inset 0 2px 5px rgba(255,255,255,.2);
+      margin-bottom: 15px;
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 27px;
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #aeb8d0;
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.8;
+      margin-bottom: 18px;
+    }
+
+    .input-box {
+      width: 100%;
+      margin-bottom: 12px;
+    }
+
+    .input-box label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
+
+    .input-box input {
+      width: 100%;
+      height: 48px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.12);
+      outline: none;
+      background: rgba(0,0,0,.25);
+      color: white;
+      padding: 0 17px;
+      font-family: inherit;
+      font-size: 14px;
+      transition: .3s;
+    }
+
+    .input-box input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56,189,248,.1), 0 8px 25px rgba(0,0,0,.25);
+      transform: translateY(-2px);
+    }
+
+    .input-box input::placeholder {
+      color: #667085;
+    }
+
+    .main-btn {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: 16px;
+      color: white;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      box-shadow: 0 12px 30px rgba(14,165,233,.25), 0 5px 0 rgba(0,0,0,.25);
+      transition: .25s;
+      margin-top: 6px;
+    }
+
+    .main-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(14,165,233,.35), 0 5px 0 rgba(0,0,0,.25);
+    }
+
+    .main-btn:active {
+      transform: translateY(2px);
+    }
+
+    .main-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .status {
+      width: 100%;
+      min-height: 22px;
+      margin-top: 8px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+
+    .floating {
+      position: absolute;
+      width: 75px;
+      height: 75px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 50px rgba(0,0,0,.25);
+      animation: floating 5s ease-in-out infinite;
+    }
+
+    .floating1 { left: -105px; top: 80px; transform: rotate(15deg); }
+    .floating2 { right: -105px; bottom: 90px; transform: rotate(-20deg); animation-delay: 1.5s; }
+
+    @keyframes floating {
+      0%, 100% { margin-top: 0; }
+      50% { margin-top: -20px; }
+    }
+
+    @media(max-width:600px) {
+      .scene { width: 92vw; height: 560px; }
+      .side { padding: 25px 20px; }
+      h1 { font-size: 24px; }
+      .floating { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- BACKGROUND -->
+  <div class="background">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <!-- SCENE -->
+  <div class="scene">
+    <div class="floating floating1"></div>
+    <div class="floating floating2"></div>
+
+    <section class="side signup">
+      <div class="logo">✨</div>
+      <h1>إنشاء حساب جديد</h1>
+      <p class="subtitle">أنشئ حسابك في البرنامج 🚀<br>وابدأ رحلتك معنا</p>
+
+      <div class="input-box">
+        <label>اسم المستخدم</label>
+        <input type="text" id="signupUsername" placeholder="مثال: توني" maxlength="30" autocomplete="username">
+      </div>
+
+      <div class="input-box">
+        <label>كلمة المرور</label>
+        <input type="password" id="signupPassword" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+      </div>
+
+      <div class="input-box">
+        <label>إعادة كتابة كلمة المرور</label>
+        <input type="password" id="confirmPassword" placeholder="أعد كتابة كلمة المرور" autocomplete="new-password">
+      </div>
+
+      <button class="main-btn" id="signupBtn" type="button">✨ Sign Up</button>
+
+      <div class="status" id="signupStatus"></div>
+    </section>
+  </div>
+
+  <script>
+    /* FIREBASE CONFIG */
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    const signupBtn = document.getElementById("signupBtn");
+    const signupStatus = document.getElementById("signupStatus");
+
+    function normalizeUsername(username) {
+      return username.trim().toLowerCase();
+    }
+
+    /* SIGN UP (Direct Firestore Check) */
+    signupBtn.addEventListener("click", async () => {
+      const username = document.getElementById("signupUsername").value.trim();
+      const password = document.getElementById("signupPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      signupStatus.innerText = "";
+
+      if (!username || !password || !confirmPassword) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "⚠️ من فضلك املأ جميع البيانات";
+        return;
+      }
+
+      if (username.length < 2) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ اسم المستخدم قصير جدًا";
+        return;
+      }
+
+      if (password.length < 6) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ كلمتا المرور غير متطابقتين";
+        return;
+      }
+
+      signupBtn.disabled = true;
+      signupBtn.innerText = "⏳ جاري إنشاء الحساب...";
+
+      try {
+        const cleanUsername = normalizeUsername(username);
+        const userRef = db.collection("users").doc(cleanUsername);
+        const userDoc = await userRef.get();
+
+        if (userDoc.exists) {
+          signupStatus.style.color = "#f87171";
+          signupStatus.innerText = "❌ اسم المستخدم مستخدم بالفعل";
+          signupBtn.disabled = false;
+          signupBtn.innerText = "✨ Sign Up";
+          return;
+        }
+
+        // حفظ بيانات الحساب الأساسية في Firestore
+        await userRef.set({
+          username: username,
+          usernameLower: cleanUsername,
+          password: password,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // حفظ اسم المستخدم في الـ localStorage
+        localStorage.setItem("currentUsername", cleanUsername);
+
+        signupStatus.style.color = "#4ade80";
+        signupStatus.innerText = "🎉 تم إنشاء الحساب بنجاح!";
+
+        setTimeout(() => {
+          window.location.href = "user/question.html";
+        }, 900);
+
+      } catch (error) {
+        console.error("SIGN UP ERROR:", error);
+        signupStatus.style.color = "#f87171";
+        signupStatus.innerText = "❌ حدث خطأ أثناء إنشاء الحساب";
+      }
+
+      signupBtn.disabled = false;
+      signupBtn.innerText = "✨ Sign Up";
+    });
+
+    /* ENTER KEY */
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        signupBtn.click();
+      }
+    });
+  </script>
+
+</body>
+</html>
