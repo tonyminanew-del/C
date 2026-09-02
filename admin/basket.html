@@ -6,7 +6,6 @@
 <title>طلبات الهدايا - الخادم</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 * {
@@ -281,26 +280,32 @@ const firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-const auth = firebase.auth();
+
 const db = firebase.firestore();
-let currentAdmin = null;
+let currentAdminUsername = null;
 let allUsers = [];
 
-auth.onAuthStateChanged(async (user) => {
-  if (!user) {
-    window.location.href = "../admin.html";
+// التحقق من الجلسة الموحدة عبر LocalStorage
+window.addEventListener("DOMContentLoaded", async () => {
+  currentAdminUsername = localStorage.getItem("currentUsername");
+  const userRole = localStorage.getItem("userRole");
+
+  if (!currentAdminUsername) {
+    window.location.href = "../t.html";
     return;
   }
+
   try {
-    const adminDoc = await db.collection("admins").doc(user.uid).get();
-    if (!adminDoc.exists) {
-      alert("هذا الحساب ليس حساب خادم.");
-      await auth.signOut();
-      return;
+    const adminRef = db.collection("admins").doc(currentAdminUsername);
+    const adminDoc = await adminRef.get();
+
+    if (!adminDoc.exists && userRole !== "admin") {
+      alert("هذا الحساب ليس لديه صلاحية خادم.");
+      localStorage.clear();
+      window.location.href = "../t.html";
     }
-    currentAdmin = user;
   } catch (error) {
-    console.error(error);
+    console.error("Auth check error:", error);
   }
 });
 
@@ -343,7 +348,7 @@ function renderUsers(users) {
   document.getElementById("ordersCount").innerText = users.length;
 
   if (users.length === 0) {
-    list.innerHTML = `<div class="empty">لا يوجد مخدومين في هذه المرحلة.</div>`;
+    list.innerHTML = `<div class="empty">لا يوجد مخدومين في هذه المرحلة مطابقي للبحث.</div>`;
     return;
   }
 
@@ -351,8 +356,8 @@ function renderUsers(users) {
     const card = document.createElement("div");
     card.className = "order-card";
     card.innerHTML = `
-      <div class="servant-name">👤 ${escapeHtml(userItem.fullName || userItem.id || "بدون اسم")}</div>
-      <div style="font-size: .78rem; color: #94a3b8;">الصف: ${escapeHtml(userItem.grade || "غير محدد")} | النقاط: ${userItem.points || 0} ⭐ | اضغط لعرض الطلبات</div>
+      <div class="servant-name">👤 ${escapeHtml(userItem.username || userItem.fullName || userItem.id || "بدون اسم")}</div>
+      <div style="font-size: .78rem; color: #94a3b8;">اللقب/الصفة: ${escapeHtml(userItem.title || "غير محدد")} | النقاط: ${userItem.points || 0} ⭐ | اضغط لعرض الطلبات</div>
       <div class="sub-orders-container" id="basket-${escapeHtml(userItem.id)}">
         <div class="loading">جاري التحميل...</div>
       </div>
@@ -481,7 +486,6 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
     const giftRef = (giftId && giftId !== "undefined" && giftId !== "null") ? db.collection("gifts").doc(giftId) : null;
 
     await db.runTransaction(async (transaction) => {
-      // 1. تنفيذ جميع عمليات القراءة (Reads) أولاً بالكامل
       const userDoc = await transaction.get(userRef);
       if (!userDoc.exists) throw new Error("USER_NOT_FOUND");
 
@@ -490,11 +494,9 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
         freshGiftDoc = await transaction.get(giftRef);
       }
 
-      // 2. حساب القيم الجديدة
       const currentPoints = Number(userDoc.data().points) || 0;
       const pointsToRefund = Number(giftPoints) * Number(orderCount);
 
-      // 3. تنفيذ عمليات الكتابة (Writes) والتحديثات بعدها
       transaction.update(userRef, {
         points: currentPoints + pointsToRefund,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -521,7 +523,6 @@ async function rejectOrder(userId, orderId, giftName, giftPoints, orderCount, gi
       transaction.delete(orderRef);
     });
 
-    // إرسال إشعار للمخدوم برفض الطلب وإعادة نقاطه
     await db.collection("myNewCollection").add({
       title: "عذراً، تم رفض طلب الهدية ❌",
       body: `تم رفض طلبك لـ (${giftName}). السبب: ${reason || "لم يكتب سبب"}. تمت إعادة النقاط لحسابك.`,
@@ -545,7 +546,7 @@ async function markDelivered(userId, orderId, giftName) {
     await db.collection("users").doc(userId).collection("basket").doc(orderId).update({
       isDelivered: true,
       deliveredAt: firebase.firestore.FieldValue.serverTimestamp(),
-      deliveredBy: currentAdmin.uid
+      deliveredBy: currentAdminUsername
     });
 
     await db.collection("myNewCollection").add({
@@ -567,7 +568,11 @@ async function markDelivered(userId, orderId, giftName) {
 
 document.getElementById("searchInput").addEventListener("input", function() {
   const query = this.value.trim().toLowerCase();
-  const filtered = allUsers.filter(u => (u.fullName || u.id || "").toLowerCase().includes(query));
+  const filtered = allUsers.filter(u => 
+    (u.username || "").toLowerCase().includes(query) || 
+    (u.fullName || "").toLowerCase().includes(query) || 
+    (u.id || "").toLowerCase().includes(query)
+  );
   renderUsers(filtered);
 });
 
