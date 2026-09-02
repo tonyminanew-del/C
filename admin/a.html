@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نقل وترقية المخدوم إلى أدمن</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Cairo", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, rgba(99,102,241,.12), transparent 35%),
+                  radial-gradient(circle at bottom left, rgba(139,92,246,.10), transparent 35%),
+                  #f8fafc;
+      color: #111827;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 22px;
+      padding: 25px;
+      box-shadow: 0 15px 35px rgba(15,23,42,.06);
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+      color: #111827;
+    }
+
+    p {
+      color: #64748b;
+      font-size: .85rem;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 8px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 13px 15px;
+      border-radius: 14px;
+      font-size: .9rem;
+      font-family: "Cairo", sans-serif;
+    }
+
+    select {
+      border: 1px solid #cbd5e1;
+      background: #f8fafc;
+      color: #111827;
+      outline: none;
+      cursor: pointer;
+    }
+
+    button {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: white;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(99,102,241,.25);
+      transition: .25s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 25px rgba(99,102,241,.35);
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: .85rem;
+      font-weight: 700;
+      text-align: center;
+      display: none;
+    }
+
+    .message.success {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+      display: block;
+    }
+
+    .message.error {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>نقل المخدوم إلى الأدمن ⚙️</h2>
+    <p>اختر المخدوم لحذف كافة بياناته القديمة ونقله ليكون مسؤولاً بملف جديد.</p>
+
+    <div class="form-group">
+      <label for="userSelect">اختر المستخدم:</label>
+      <select id="userSelect">
+        <option value="">جاري تحميل المستخدمين...</option>
+      </select>
+    </div>
+
+    <button onclick="moveToAdmins()">نقل إلى admins وحذف البيانات القديمة</button>
+
+    <div id="statusMessage" class="message"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA6yuTr41CyGKu2WoR1AvBFWtIADmnsG7c",
+      authDomain: "church-7afe1.firebaseapp.com",
+      projectId: "church-7afe1",
+      storageBucket: "church-7afe1.firebasestorage.app",
+      messagingSenderId: "1072334615357",
+      appId: "1:1072334615357:web:c03b199f00ea9d19d40b54",
+      measurementId: "G-E7Q76Z53SB"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.firestore();
+
+    // جلب المستخدمين من كولكشن "users"
+    function loadUsers() {
+      const selectElement = document.getElementById("userSelect");
+
+      db.collection("users").get().then((querySnapshot) => {
+        selectElement.innerHTML = '<option value="">-- اختر مخدوماً --</option>';
+        
+        if (querySnapshot.empty) {
+          selectElement.innerHTML = '<option value="">لا توجد بيانات في كولكشن users</option>';
+          return;
+        }
+
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const userId = doc.id;
+          const name = data.username || data.fullName || data.name || userId;
+
+          const option = document.createElement("option");
+          option.value = userId;
+          option.text = `${name} (${userId})`;
+          selectElement.appendChild(option);
+        });
+      }).catch((error) => {
+        selectElement.innerHTML = '<option value="">خطأ في تحميل المستخدمين</option>';
+        showMsg("خطأ في جلب البيانات: " + error.message, "error");
+      });
+    }
+
+    // نقل المستخدم: إنشاؤه في admins ببيانات الدخول فقط وحذفه تماماً من users
+    async function moveToAdmins() {
+      const selectedUserId = document.getElementById("userSelect").value;
+
+      if (!selectedUserId) {
+        showMsg("الرجاء اختيار مستخدم أولاً.", "error");
+        return;
+      }
+
+      try {
+        const userDocRef = db.collection("users").doc(selectedUserId);
+        const userDoc = await userDocRef.get();
+
+        if (!userDoc.exists) {
+          showMsg("هذا المستخدم غير موجود في قاعدة البيانات.", "error");
+          return;
+        }
+
+        const userData = userDoc.data();
+
+        // 1. إنشاؤه في كولكشن "admins" بكلمة المرور فقط بدون بيانات المخدوم القديمة
+        await db.collection("admins").doc(selectedUserId).set({
+          username: selectedUserId,
+          password: userData.password || "", 
+          isAdmin: true,
+          role: "admin",
+          upgradedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // 2. حذف ملفه تماماً من كولكشن "users" بكل تفاصيله القديمة
+        await userDocRef.delete();
+
+        showMsg("تم النقل إلى admins ومسح جميع بيانات المخدوم القديمة بنجاح!", "success");
+        loadUsers(); // تحديث القائمة
+      } catch (error) {
+        showMsg("حدث خطأ أثناء عملية النقل: " + error.message, "error");
+      }
+    }
+
+    function showMsg(text, type) {
+      const msgBox = document.getElementById("statusMessage");
+      msgBox.className = "message " + type;
+      msgBox.innerText = text;
+    }
+
+    window.addEventListener("DOMContentLoaded", loadUsers);
+  </script>
+</body>
+</html>
