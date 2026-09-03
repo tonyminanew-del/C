@@ -19,38 +19,37 @@
   <main class="main-container">
     <header class="hero-section">
       <div class="logo-badge">⛪</div>
-      <!-- تم إضافة معرف id للعنوان لبرمجته -->
-      <h1>اهلا ببرنامج كنيسه الشهيد <span id="adminTrigger" style="cursor: pointer; user-select: none;">استيفانوس</span> ومارمينا العجايبي</h1>
+      <h1>اهلا ببرنامج كنيسه الشهيد استيفانوس ومارمينا العجايبي</h1>
+       
     </header>
 
     <!-- الوييدجيتس (الكارتات) الخاصة باختيار الدخول -->
     <div class="cards-grid">
       
-      <!-- كارت المستخدم / المخدوم -->
-      <a href="user.html" class="glass-card user-card" style="grid-column: 1 / -1; max-width: 420px; margin: 0 auto; width: 100%;">
+      <!-- كارت المستخدم / الخادم -->
+      <a href="user.html" class="glass-card user-card">
         <div class="icon-box">👤</div>
         <div class="card-content">
           <h2>دخول مخدوم</h2>
+    </div>
+       
+      </a>
+
+      <!-- كارت الأدمن / المسؤول -->
+      <a href="admin.html" class="glass-card admin-card">
+        <div class="icon-box">⚙️</div>
+        <div class="card-content">
+          <h2>دخول خادم
         </div>
+     
       </a>
 
     </div>
 
     <footer class="footer-note">
+       
     </footer>
   </main>
-
-  <!-- كود جافاسكريبت للتحكم في عدد النقرات -->
-  <script>
-    let clickCount = 0;
-    const triggerElement = document.getElementById('adminTrigger');
-
-    triggerElement.addEventListener('click', function() {
-      clickCount++;
-      // إذا وصل عدد النقرات إلى 5 مرات
-    
-    });
-  </script>
 
 </body>
 </html>
