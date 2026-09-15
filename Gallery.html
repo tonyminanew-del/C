@@ -1,0 +1,2147 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Tajawal", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(199, 154, 50, .10), transparent 35%),
+                linear-gradient(135deg, #f8fafc, #eef2f7);
+            color: #172554;
+            min-height: 100vh;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        .topbar {
+            width: 100%;
+            background: linear-gradient(135deg, #172554, #741b24);
+            color: white;
+            padding: 18px 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .18);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .topbar-content {
+            max-width: 1100px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, .12);
+            border: 1px solid rgba(255, 255, 255, .2);
+            color: #f6d36b;
+            font-size: 22px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .brand span {
+            display: block;
+            margin-top: 2px;
+            font-size: 12px;
+            opacity: .75;
+        }
+
+        .profile-btn {
+            border: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .12);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .container {
+            width: min(1100px, calc(100% - 30px));
+            margin: 25px auto 100px;
+        }
+
+        /* ================= USER INFO ================= */
+
+        .welcome-card {
+            background: linear-gradient(135deg, #172554, #741b24);
+            border-radius: 24px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 12px 30px rgba(23, 37, 84, .20);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card::before {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 35px solid rgba(255, 255, 255, .04);
+            right: -90px;
+            top: -100px;
+        }
+
+        .welcome-card h2 {
+            margin: 0 0 7px;
+            font-size: 25px;
+            position: relative;
+        }
+
+        .welcome-card p {
+            margin: 0;
+            opacity: .82;
+            position: relative;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 22px;
+            position: relative;
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, .10);
+            border: 1px solid rgba(255, 255, 255, .15);
+            border-radius: 18px;
+            padding: 16px;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, .12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 9px;
+            color: #f6d36b;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: .72;
+        }
+
+        .stat-value {
+            margin-top: 4px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        /* ================= BANNED ================= */
+
+        .banned {
+            display: none;
+            background: #fff1f2;
+            border: 1px solid #fecdd3;
+            color: #9f1239;
+            padding: 16px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .banned.show {
+            display: flex;
+        }
+
+        .banned i {
+            font-size: 22px;
+        }
+
+        /* ================= STORE HEADER ================= */
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 25px 0 15px;
+        }
+
+        .section-title {
+            margin: 0;
+            font-size: 23px;
+            font-weight: 800;
+        }
+
+        .gift-count {
+            background: #172554;
+            color: white;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 12px;
+        }
+
+        /* ================= GIFTS ================= */
+
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .gift-card {
+            background: rgba(255, 255, 255, .9);
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(15, 23, 42, .08);
+            transition: .25s ease;
+        }
+
+        .gift-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(15, 23, 42, .13);
+        }
+
+        .gift-image {
+            height: 190px;
+            background: #e2e8f0;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .gift-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .gift-no-image {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 45px;
+        }
+
+        .quantity-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(23, 37, 84, .92);
+            color: white;
+            border-radius: 999px;
+            padding: 6px 9px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .gift-body {
+            padding: 17px;
+        }
+
+        .gift-name {
+            margin: 0 0 9px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #172554;
+        }
+
+        .gift-note {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+            min-height: 40px;
+        }
+
+        .target-label {
+            margin-top: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 7px 9px;
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .gift-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .points-box {
+            color: #8a6415;
+            background: #fff8df;
+            border: 1px solid #f0d67d;
+            border-radius: 12px;
+            padding: 8px 10px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .buy-btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 10px 14px;
+            background: linear-gradient(135deg, #172554, #741b24);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .buy-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .buy-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ================= EMPTY / LOADING ================= */
+
+        .loading,
+        .empty {
+            grid-column: 1 / -1;
+            background: white;
+            border-radius: 20px;
+            padding: 45px 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            color: #64748b;
+        }
+
+        .loading i {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .empty i {
+            font-size: 45px;
+            margin-bottom: 12px;
+            color: #cbd5e1;
+        }
+
+        /* ================= MODAL ================= */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, .82);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-box {
+            width: min(600px, 100%);
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            animation: modalIn .2s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(.92);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-image {
+            width: 100%;
+            max-height: 75vh;
+            object-fit: contain;
+            display: block;
+            background: #0f172a;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, .6);
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 2;
+        }
+
+        /* ================= BOTTOM NAV ================= */
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, .96);
+            backdrop-filter: blur(12px);
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: center;
+            z-index: 90;
+        }
+
+        .bottom-inner {
+            width: min(600px, 100%);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .nav-item {
+            border: 0;
+            background: transparent;
+            padding: 11px 5px;
+            color: #64748b;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .nav-item i {
+            display: block;
+            font-size: 19px;
+            margin-bottom: 4px;
+        }
+
+        .nav-item span {
+            font-size: 11px;
+        }
+
+        .nav-item.active {
+            color: #741b24;
+            font-weight: 800;
+        }
+
+        /* ================= RESPONSIVE ================= */
+
+        @media (max-width: 900px) {
+            .gifts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .gifts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .gift-image {
+                height: 165px;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .container {
+                width: min(100% - 20px, 1100px);
+                margin-top: 15px;
+            }
+
+            .topbar {
+                padding: 14px;
+            }
+
+            .brand h1 {
+                font-size: 17px;
+            }
+
+            .brand span {
+                font-size: 10px;
+            }
+
+            .welcome-card {
+                padding: 20px;
+                border-radius: 20px;
+            }
+
+            .gifts-grid {
+                gap: 10px;
+            }
+
+            .gift-card {
+                border-radius: 17px;
+            }
+
+            .gift-image {
+                height: 145px;
+            }
+
+            .gift-body {
+                padding: 12px;
+            }
+
+            .gift-name {
+                font-size: 15px;
+            }
+
+            .gift-note {
+                font-size: 11px;
+            }
+
+            .gift-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .buy-btn {
+                width: 100%;
+            }
+
+            .points-box {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+        <div class="topbar-content">
+
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+
+                <div>
+                    <span>Chanters School</span>
+                </div>
+            </div>
+
+            <button class="profile-btn" id="profileBtn">
+                <i class="fa-solid fa-user"></i>
+            </button>
+
+        </div>
+    </header>
+
+
+    <main class="container">
+
+        <!-- WELCOME -->
+        <section class="welcome-card">
+
+            <h2 id="welcomeName">Welcome 👋</h2>
+
+            <p>
+                Choose a gift and spend your points.
+            </p>
+
+            <div class="stats">
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+
+                    <div class="stat-label">
+                        Stage
+                    </div>
+
+                    <div class="stat-value" id="stageValue">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+
+                    <div class="stat-label">
+                        Grade
+                    </div>
+
+                    <div class="stat-value" id="gradeValue">
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="stat">
+
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-star"></i>
+                    </div>
+
+                    <div class="stat-label">
+                        Points
+                    </div>
+
+                    <div class="stat-value" id="pointsValue">
+                        0
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- BANNED -->
+        <div class="banned" id="bannedBox">
+
+            <i class="fa-solid fa-ban"></i>
+
+            <div>
+                <strong>Account Restricted</strong>
+                <div>
+                    You cannot buy gifts while your account is restricted.
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- STORE -->
+        <div class="section-header">
+
+            <h2 class="section-title">
+                Gift Store
+            </h2>
+
+            <span class="gift-count" id="giftCount">
+                0 Gifts
+            </span>
+
+        </div>
+
+
+        <section class="gifts-grid" id="giftsGrid">
+
+            <div class="loading">
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                <div>
+                    Loading gifts...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- IMAGE MODAL -->
+    <div class="modal" id="imageModal">
+
+        <div class="modal-box">
+
+            <button class="close-modal" id="closeModal">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <img
+                class="modal-image"
+                id="modalImage"
+                src=""
+                alt="Gift">
+
+        </div>
+
+    </div>
+
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+
+        <div class="bottom-inner">
+
+            <button class="nav-item active" id="storeNav">
+                <i class="fa-solid fa-store"></i>
+                <span>Store</span>
+            </button>
+
+            <button class="nav-item" id="notificationsNav">
+                <i class="fa-solid fa-bell"></i>
+                <span>Notifications</span>
+            </button>
+
+            <button class="nav-item" id="profileNav">
+                <i class="fa-solid fa-user"></i>
+                <span>Profile</span>
+            </button>
+
+        </div>
+
+    </nav>
+
+
+    <script>
+
+        /* =====================================================
+           FIREBASE
+        ===================================================== */
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDk8JXHvo9up6Hof7d6S_Or8ICnaGnuIUg",
+            authDomain: "tony-c78c0.firebaseapp.com",
+            projectId: "tony-c78c0",
+            storageBucket: "tony-c78c0.firebasestorage.app",
+            messagingSenderId: "182062544524",
+            appId: "1:182062544524:web:59afdba4f0d1dfd929ada9",
+            measurementId: "G-4FER9HW0JS"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.firestore();
+
+
+        /* =====================================================
+           CURRENT USER
+        ===================================================== */
+
+        const loggedInUsername =
+            localStorage.getItem("currentUser") ||
+            localStorage.getItem("current_user_username") ||
+            localStorage.getItem("current_servant_username");
+
+
+        let currentUserData = null;
+        let currentUserDocId = null;
+
+        let currentUserPoints = 0;
+        let currentUserStage = "";
+        let currentUserGrade = "";
+        let currentUserBanned = false;
+
+
+        /* =====================================================
+           NORMALIZE
+        ===================================================== */
+
+        function normalizeText(value) {
+
+            return String(value || "")
+                .trim()
+                .replace(/\s+/g, " ");
+
+        }
+
+
+        function normalizeStage(value) {
+
+            let stage = normalizeText(value);
+
+            if (
+                stage === "اعدادي" ||
+                stage === "إعدادى" ||
+                stage === "الاعدادي" ||
+                stage === "الإعدادي"
+            ) {
+                return "إعدادي";
+            }
+
+            if (
+                stage === "ابتدائي" ||
+                stage === "الابتدائي"
+            ) {
+                return "ابتدائي";
+            }
+
+            if (
+                stage === "ثانوي" ||
+                stage === "الثانوي"
+            ) {
+                return "ثانوي";
+            }
+
+            return stage;
+        }
+
+
+        function normalizeGrade(value) {
+
+            return normalizeText(value)
+                .replace(/^ال/, "");
+        }
+
+
+        /* =====================================================
+           ESCAPE HTML
+        ===================================================== */
+
+        function escapeHTML(value) {
+
+            return String(value || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        /* =====================================================
+           GET USER
+        ===================================================== */
+
+        async function getCurrentUser() {
+
+            if (!loggedInUsername) {
+
+                alert("Please login first.");
+
+                window.location.href = "../index.html";
+
+                return null;
+            }
+
+
+            const username = normalizeText(loggedInUsername);
+
+
+            /*
+             * First try document ID
+             */
+
+            try {
+
+                const directDoc =
+                    await db.collection("users")
+                        .doc(username)
+                        .get();
+
+                if (directDoc.exists) {
+
+                    return {
+                        id: directDoc.id,
+                        data: directDoc.data()
+                    };
+
+                }
+
+            } catch (error) {
+
+                console.error("Direct user lookup error:", error);
+
+            }
+
+
+            /*
+             * Then search all users
+             */
+
+            const snapshot =
+                await db.collection("users").get();
+
+
+            let found = null;
+
+
+            snapshot.forEach(doc => {
+
+                const data = doc.data() || {};
+
+                const docUsername =
+                    normalizeText(
+                        data.username ||
+                        data.userName ||
+                        data.usernameLower
+                    );
+
+                if (
+                    normalizeText(doc.id).toLowerCase() ===
+                    username.toLowerCase()
+                    ||
+                    docUsername.toLowerCase() ===
+                    username.toLowerCase()
+                ) {
+
+                    found = {
+                        id: doc.id,
+                        data: data
+                    };
+
+                }
+
+            });
+
+
+            return found;
+        }
+
+
+        /* =====================================================
+           LOAD USER
+        ===================================================== */
+
+        async function loadUser() {
+
+            try {
+
+                const result = await getCurrentUser();
+
+                if (!result) {
+
+                    alert("User account not found.");
+
+                    return;
+                }
+
+
+                currentUserDocId = result.id;
+                currentUserData = result.data || {};
+
+
+                currentUserPoints =
+                    Number(currentUserData.points || 0);
+
+
+                currentUserStage =
+                    normalizeStage(
+                        currentUserData.stage ||
+                        currentUserData.targetStage
+                    );
+
+
+                currentUserGrade =
+                    normalizeGrade(
+                        currentUserData.grade ||
+                        currentUserData.targetGrade
+                    );
+
+
+                currentUserBanned =
+                    currentUserData.isBlocked === true ||
+                    currentUserData.banned === true;
+
+
+                /*
+                 * User name
+                 */
+
+                const displayName =
+                    currentUserData.fullName ||
+                    currentUserData.name ||
+                    currentUserData.username ||
+                    loggedInUsername;
+
+
+                document.getElementById("welcomeName").textContent =
+                    `Welcome, ${displayName} 👋`;
+
+
+                /*
+                 * Stage
+                 */
+
+                document.getElementById("stageValue").textContent =
+                    currentUserStage || "-";
+
+
+                /*
+                 * Grade
+                 */
+
+                document.getElementById("gradeValue").textContent =
+                    currentUserGrade || "-";
+
+
+                /*
+                 * Points
+                 */
+
+                document.getElementById("pointsValue").textContent =
+                    currentUserPoints;
+
+
+                /*
+                 * Banned
+                 */
+
+                const bannedBox =
+                    document.getElementById("bannedBox");
+
+
+                if (currentUserBanned) {
+
+                    bannedBox.classList.add("show");
+
+                } else {
+
+                    bannedBox.classList.remove("show");
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Unable to load your account. Please try again."
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           GET GIFT TARGET
+        ===================================================== */
+
+        function getGiftTarget(gift) {
+
+            /*
+             * New system
+             */
+
+            const targetStage =
+                normalizeStage(
+                    gift.targetStage ||
+                    gift.stage
+                );
+
+
+            const targetGrade =
+                normalizeGrade(
+                    gift.targetGrade ||
+                    gift.grade
+                );
+
+
+            const targetType =
+                normalizeText(
+                    gift.targetType
+                ).toLowerCase();
+
+
+            /*
+             * If targetType explicitly exists
+             */
+
+            if (targetType === "grade") {
+
+                return {
+                    type: "grade",
+                    stage: targetStage,
+                    grade: targetGrade
+                };
+
+            }
+
+
+            if (targetType === "stage") {
+
+                return {
+                    type: "stage",
+                    stage: targetStage,
+                    grade: ""
+                };
+
+            }
+
+
+            /*
+             * Legacy system:
+             *
+             * Primary + grade = specific grade
+             * Other stages = whole stage
+             */
+
+            if (
+                targetStage === "ابتدائي" &&
+                targetGrade
+            ) {
+
+                return {
+                    type: "grade",
+                    stage: targetStage,
+                    grade: targetGrade
+                };
+
+            }
+
+
+            return {
+                type: "stage",
+                stage: targetStage,
+                grade: ""
+            };
+
+        }
+
+
+        /* =====================================================
+           CHECK GIFT VISIBILITY
+        ===================================================== */
+
+        function giftBelongsToUser(gift) {
+
+            const target =
+                getGiftTarget(gift);
+
+
+            const userStage =
+                normalizeStage(currentUserStage);
+
+
+            const userGrade =
+                normalizeGrade(currentUserGrade);
+
+
+            /*
+             * Stage must match
+             */
+
+            if (
+                target.stage &&
+                normalizeStage(target.stage) !== userStage
+            ) {
+
+                return false;
+
+            }
+
+
+            /*
+             * Stage-wide gift
+             */
+
+            if (target.type === "stage") {
+
+                return true;
+
+            }
+
+
+            /*
+             * Grade-specific gift
+             */
+
+            if (target.type === "grade") {
+
+                if (!target.grade) {
+                    return true;
+                }
+
+                return (
+                    normalizeGrade(target.grade) ===
+                    userGrade
+                );
+
+            }
+
+
+            return false;
+        }
+
+
+        /* =====================================================
+           TARGET TEXT
+        ===================================================== */
+
+        function getTargetText(gift) {
+
+            const target =
+                getGiftTarget(gift);
+
+
+            if (!target.stage) {
+
+                return "Available for all users";
+
+            }
+
+
+            if (target.type === "grade" && target.grade) {
+
+                return `For: ${target.stage} - ${target.grade}`;
+
+            }
+
+
+            return `For: ${target.stage} - All Grades`;
+
+        }
+
+
+        /* =====================================================
+           GET GIFT IMAGE
+        ===================================================== */
+
+        function getGiftImage(gift) {
+
+            if (
+                Array.isArray(gift.images) &&
+                gift.images.length > 0
+            ) {
+
+                return gift.images[0];
+
+            }
+
+
+            if (gift.image) {
+
+                return gift.image;
+
+            }
+
+
+            return "";
+
+        }
+
+
+        /* =====================================================
+           LOAD GIFTS
+        ===================================================== */
+
+        async function loadGifts() {
+
+            const grid =
+                document.getElementById("giftsGrid");
+
+
+            grid.innerHTML = `
+                <div class="loading">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <div>Loading gifts...</div>
+                </div>
+            `;
+
+
+            try {
+
+                const snapshot =
+                    await db.collection("gifts").get();
+
+
+                const gifts = [];
+
+
+                snapshot.forEach(doc => {
+
+                    const gift = {
+                        id: doc.id,
+                        ...doc.data()
+                    };
+
+
+                    const quantity =
+                        Number(gift.quantity || 0);
+
+
+                    /*
+                     * Don't show empty gifts
+                     */
+
+                    if (quantity <= 0) {
+
+                        return;
+
+                    }
+
+
+                    /*
+                     * Show only gifts assigned
+                     * to this user's stage/grade
+                     */
+
+                    if (!giftBelongsToUser(gift)) {
+
+                        return;
+
+                    }
+
+
+                    gifts.push(gift);
+
+                });
+
+
+                /*
+                 * Count
+                 */
+
+                document.getElementById("giftCount").textContent =
+                    `${gifts.length} Gifts`;
+
+
+                if (gifts.length === 0) {
+
+                    grid.innerHTML = `
+                        <div class="empty">
+                            <i class="fa-solid fa-gift"></i>
+
+                            <div>
+                                There are no gifts available
+                                for your stage or grade right now.
+                            </div>
+                        </div>
+                    `;
+
+                    return;
+
+                }
+
+
+                grid.innerHTML = "";
+
+
+                gifts.forEach(gift => {
+
+                    renderGift(gift);
+
+                });
+
+            } catch (error) {
+
+                console.error("Gift loading error:", error);
+
+
+                grid.innerHTML = `
+                    <div class="empty">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        <div>
+                            Failed to load gifts.
+                        </div>
+                    </div>
+                `;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           RENDER GIFT
+        ===================================================== */
+
+        function renderGift(gift) {
+
+            const grid =
+                document.getElementById("giftsGrid");
+
+
+            const quantity =
+                Number(gift.quantity || 0);
+
+
+            const points =
+                Number(gift.points || 0);
+
+
+            const name =
+                escapeHTML(gift.name || "Gift");
+
+
+            const note =
+                escapeHTML(gift.note || "A special gift for you.");
+
+
+            const targetText =
+                escapeHTML(
+                    getTargetText(gift)
+                );
+
+
+            const image =
+                getGiftImage(gift);
+
+
+            const card =
+                document.createElement("article");
+
+
+            card.className = "gift-card";
+
+
+            card.innerHTML = `
+
+                <div class="gift-image">
+
+                    ${
+                        image
+                        ?
+                        `<img
+                            src="${image}"
+                            alt="${name}"
+                            class="gift-img"
+                        >`
+                        :
+                        `
+                        <div class="gift-no-image">
+                            <i class="fa-solid fa-gift"></i>
+                        </div>
+                        `
+                    }
+
+                    <div class="quantity-badge">
+                        ${quantity} Available
+                    </div>
+
+                </div>
+
+
+                <div class="gift-body">
+
+                    <h3 class="gift-name">
+                        ${name}
+                    </h3>
+
+
+                    <div class="gift-note">
+                        ${note}
+                    </div>
+
+
+                    <div class="target-label">
+                        <i class="fa-solid fa-users"></i>
+                        ${targetText}
+                    </div>
+
+
+                    <div class="gift-footer">
+
+                        <div class="points-box">
+                            ⭐ ${points} Points
+                        </div>
+
+
+                        <button
+                            class="buy-btn"
+                            data-gift-id="${gift.id}"
+                        >
+                            <i class="fa-solid fa-cart-shopping"></i>
+                            Buy
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+
+            /*
+             * Image click
+             */
+
+            const imageElement =
+                card.querySelector(".gift-img");
+
+
+            if (imageElement) {
+
+                imageElement.addEventListener(
+                    "click",
+                    () => {
+
+                        openImage(image);
+
+                    }
+                );
+
+            }
+
+
+            /*
+             * Buy click
+             */
+
+            const buyButton =
+                card.querySelector(".buy-btn");
+
+
+            buyButton.addEventListener(
+                "click",
+                () => {
+
+                    buyGift(
+                        gift.id,
+                        gift.name || "Gift",
+                        points
+                    );
+
+                }
+            );
+
+
+            grid.appendChild(card);
+
+        }
+
+
+        /* =====================================================
+           BUY GIFT
+        ===================================================== */
+
+        async function buyGift(
+            giftId,
+            giftName,
+            giftPoints
+        ) {
+
+            if (!currentUserDocId) {
+
+                alert("User account not found.");
+
+                return;
+
+            }
+
+
+            if (currentUserBanned) {
+
+                alert(
+                    "Your account is restricted. You cannot buy gifts."
+                );
+
+                return;
+
+            }
+
+
+            giftPoints =
+                Number(giftPoints || 0);
+
+
+            if (currentUserPoints < giftPoints) {
+
+                alert(
+                    `Not Enough Points.\n\nGift Cost: ${giftPoints} Points\nYour Points: ${currentUserPoints}`
+                );
+
+                return;
+
+            }
+
+
+            const confirmed =
+                confirm(
+                    `Buy "${giftName}"?\n\nGift Cost: ${giftPoints} Points\nYour Points: ${currentUserPoints}`
+                );
+
+
+            if (!confirmed) {
+
+                return;
+
+            }
+
+
+            try {
+
+                /*
+                 * Firestore transaction
+                 *
+                 * This prevents two users from
+                 * buying the last gift at the same time.
+                 */
+
+                await db.runTransaction(
+                    async transaction => {
+
+                        const userRef =
+                            db.collection("users")
+                                .doc(currentUserDocId);
+
+
+                        const giftRef =
+                            db.collection("gifts")
+                                .doc(giftId);
+
+
+                        const userSnap =
+                            await transaction.get(userRef);
+
+
+                        const giftSnap =
+                            await transaction.get(giftRef);
+
+
+                        if (!userSnap.exists) {
+
+                            throw new Error(
+                                "USER_NOT_FOUND"
+                            );
+
+                        }
+
+
+                        if (!giftSnap.exists) {
+
+                            throw new Error(
+                                "GIFT_NOT_FOUND"
+                            );
+
+                        }
+
+
+                        const user =
+                            userSnap.data() || {};
+
+
+                        const gift =
+                            giftSnap.data() || {};
+
+
+                        const points =
+                            Number(user.points || 0);
+
+
+                        const quantity =
+                            Number(gift.quantity || 0);
+
+
+                        const isBanned =
+                            user.isBlocked === true ||
+                            user.banned === true;
+
+
+                        if (isBanned) {
+
+                            throw new Error(
+                                "USER_BANNED"
+                            );
+
+                        }
+
+
+                        if (quantity <= 0) {
+
+                            throw new Error(
+                                "OUT_OF_STOCK"
+                            );
+
+                        }
+
+
+                        if (points < giftPoints) {
+
+                            throw new Error(
+                                "NOT_ENOUGH_POINTS"
+                            );
+
+                        }
+
+
+                        /*
+                         * Deduct Points
+                         */
+
+                        transaction.update(
+                            userRef,
+                            {
+                                points:
+                                    points - giftPoints
+                            }
+                        );
+
+
+                        /*
+                         * Decrease Quantity
+                         */
+
+                        transaction.update(
+                            giftRef,
+                            {
+                                quantity:
+                                    quantity - 1,
+
+                                updatedAt:
+                                    firebase.firestore.FieldValue
+                                        .serverTimestamp()
+                            }
+                        );
+
+                    }
+                );
+
+
+                /*
+                 * Reload user data
+                 */
+
+                const updatedUser =
+                    await db.collection("users")
+                        .doc(currentUserDocId)
+                        .get();
+
+
+                if (updatedUser.exists) {
+
+                    const data =
+                        updatedUser.data() || {};
+
+
+                    currentUserData = data;
+
+
+                    currentUserPoints =
+                        Number(data.points || 0);
+
+
+                    currentUserStage =
+                        normalizeStage(data.stage);
+
+
+                    currentUserGrade =
+                        normalizeGrade(data.grade);
+
+
+                    currentUserBanned =
+                        data.isBlocked === true ||
+                        data.banned === true;
+
+
+                    document.getElementById(
+                        "pointsValue"
+                    ).textContent =
+                        currentUserPoints;
+
+                }
+
+
+                /*
+                 * Create notification
+                 *
+                 * Rich fields are included so the
+                 * servant/admin pages can identify
+                 * the user and purchased gift.
+                 */
+
+                await db.collection("notifications").add({
+
+                    type: "gift_purchase",
+
+                    title: "New Gift Purchase",
+
+                    message:
+                        `User ${loggedInUsername} bought "${giftName}" for ${giftPoints} Points.`,
+
+                    username:
+                        loggedInUsername,
+
+                    recipientUsername:
+                        loggedInUsername,
+
+                    userId:
+                        currentUserData.userId || "",
+
+                    userDocId:
+                        currentUserDocId,
+
+                    fullName:
+                        currentUserData.fullName || "",
+
+                    stage:
+                        currentUserStage,
+
+                    grade:
+                        currentUserGrade,
+
+                    giftId:
+                        giftId,
+
+                    giftName:
+                        giftName,
+
+                    pointsSpent:
+                        giftPoints,
+
+                    timestamp:
+                        firebase.firestore.FieldValue
+                            .serverTimestamp(),
+
+                    isRead: false
+
+                });
+
+
+                /*
+                 * Browser notification
+                 */
+
+                showBrowserNotification(
+                    "Gift Purchased 🎁",
+                    `${giftName} - ${giftPoints} Points`
+                );
+
+
+                alert(
+                    `Gift purchased successfully! 🎁\n\nPoints Spent: ${giftPoints}\nRemaining Points: ${currentUserPoints}`
+                );
+
+
+                /*
+                 * Reload store
+                 */
+
+                await loadGifts();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Purchase error:",
+                    error
+                );
+
+
+                if (
+                    error.message ===
+                    "NOT_ENOUGH_POINTS"
+                ) {
+
+                    alert(
+                        "Not Enough Points."
+                    );
+
+                } else if (
+                    error.message ===
+                    "OUT_OF_STOCK"
+                ) {
+
+                    alert(
+                        "Sorry, this gift is no longer available."
+                    );
+
+                } else if (
+                    error.message ===
+                    "USER_BANNED"
+                ) {
+
+                    alert(
+                        "Your account is restricted."
+                    );
+
+                } else if (
+                    error.message ===
+                    "GIFT_NOT_FOUND"
+                ) {
+
+                    alert(
+                        "Gift not found."
+                    );
+
+                } else {
+
+                    alert(
+                        "Something went wrong while buying the gift. Please try again."
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        /* =====================================================
+           IMAGE MODAL
+        ===================================================== */
+
+        function openImage(src) {
+
+            if (!src) {
+                return;
+            }
+
+
+            document.getElementById(
+                "modalImage"
+            ).src = src;
+
+
+            document.getElementById(
+                "imageModal"
+            ).classList.add("show");
+
+        }
+
+
+        function closeImage() {
+
+            document.getElementById(
+                "imageModal"
+            ).classList.remove("show");
+
+
+            document.getElementById(
+                "modalImage"
+            ).src = "";
+
+        }
+
+
+        document.getElementById(
+            "closeModal"
+        ).addEventListener(
+            "click",
+            closeImage
+        );
+
+
+        document.getElementById(
+            "imageModal"
+        ).addEventListener(
+            "click",
+            event => {
+
+                if (
+                    event.target.id ===
+                    "imageModal"
+                ) {
+
+                    closeImage();
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           BROWSER NOTIFICATION
+        ===================================================== */
+
+        async function requestNotificationPermission() {
+
+            if (
+                !("Notification" in window)
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                Notification.permission ===
+                "default"
+            ) {
+
+                try {
+
+                    await Notification.requestPermission();
+
+                } catch (error) {
+
+                    console.log(
+                        "Notification permission error:",
+                        error
+                    );
+
+                }
+
+            }
+
+        }
+
+
+        function showBrowserNotification(
+            title,
+            message
+        ) {
+
+            if (
+                !("Notification" in window)
+            ) {
+
+                return;
+
+            }
+
+
+            if (
+                Notification.permission !==
+                "granted"
+            ) {
+
+                return;
+
+            }
+
+
+            try {
+
+                new Notification(
+                    title,
+                    {
+                        body: message,
+                        icon: "icon.png"
+                    }
+                );
+
+            } catch (error) {
+
+                console.log(
+                    "Browser notification error:",
+                    error
+                );
+
+            }
+
+        }
+
+
+        /* =====================================================
+           NAVIGATION
+        ===================================================== */
+
+        document.getElementById(
+            "profileBtn"
+        ).addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "profile.html";
+
+            }
+        );
+
+
+        document.getElementById(
+            "profileNav"
+        ).addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "profile.html";
+
+            }
+        );
+
+
+        document.getElementById(
+            "notificationsNav"
+        ).addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "notifications.html";
+
+            }
+        );
+
+
+        document.getElementById(
+            "storeNav"
+        ).addEventListener(
+            "click",
+            () => {
+
+                window.location.reload();
+
+            }
+        );
+
+
+        /* =====================================================
+           START
+        ===================================================== */
+
+        async function startApp() {
+
+            await loadUser();
+
+            await loadGifts();
+
+            requestNotificationPermission();
+
+        }
+
+
+        startApp();
+
+    </script>
+
+</body>
+
+</html>

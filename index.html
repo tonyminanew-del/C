@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مدرسة شمامسة مارجرجس بالمنصورة</title>
+    <!-- استدعاء خطوط عربية فخمة من Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <!-- مكتبة الأيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-deep: #0a0e17;
+            --bg-gradient: radial-gradient(circle at 50% 10%, #1e2538 0%, #0d121c 60%, #07090f 100%);
+            --primary-gold: #c5a059;
+            --gold-light: #dfbc77;
+            --gold-dark: #967433;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --card-radius: 36px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            background-image: var(--bg-gradient);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* خلفية ضوئية ناعمة وخاصة بالكارت */
+        .ambient-glow {
+            position: absolute;
+            width: 380px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(197, 160, 89, 0.15) 0%, rgba(13, 18, 28, 0) 70%);
+            filter: blur(50px);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* حاوية التطبيق المتوافقة مع الموبايل والديسكفري */
+        .app-wrapper {
+            width: 100%;
+            max-width: 440px;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* الكارت الرئيسي الأبيض الفخم (Card) */
+        .main-card {
+            width: 100%;
+            background: var(--card-bg);
+            border-radius: var(--card-radius);
+            padding: 32px 24px 28px 24px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                        0 0 40px rgba(197, 160, 89, 0.12);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        /* Drag Handle العلوي */
+        .drag-handle {
+            width: 40px;
+            height: 5px;
+            background-color: #e5e7eb;
+            border-radius: 10px;
+            margin-bottom: 22px;
+        }
+
+        /* الشعار الثلاثي الأبعاد */
+        .logo-container {
+            position: relative;
+            width: 78px;
+            height: 78px;
+            background: linear-gradient(135deg, #fcf8f2 0%, #f3ebd8 100%);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 25px rgba(197, 160, 89, 0.25),
+                        inset 0 2px 3px rgba(255, 255, 255, 0.8),
+                        inset 0 -2px 3px rgba(197, 160, 89, 0.2);
+            animation: floatLogo 4s ease-in-out infinite;
+        }
+
+        .logo-container i {
+            font-size: 32px;
+            color: var(--primary-gold);
+            filter: drop-shadow(0 2px 5px rgba(197, 160, 89, 0.4));
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* العناوين والوصف */
+        .title-section {
+            margin-bottom: 28px;
+            width: 100%;
+        }
+
+        .main-heading {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.45;
+            margin-bottom: 8px;
+        }
+
+        .church-name {
+            display: block;
+            font-family: 'Amiri', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            margin-top: 4px;
+            letter-spacing: 0.2px;
+        }
+
+        .sub-description {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 310px;
+            margin: 0 auto;
+        }
+
+        /* أزرار الاختيار (Actions Grid/List) */
+        .actions-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .action-btn {
+            position: relative;
+            width: 100%;
+            height: 72px;
+            background: linear-gradient(135deg, #161e2d 0%, #0d121c 100%);
+            border: none;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(13, 18, 28, 0.3),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.15);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 30px rgba(13, 18, 28, 0.4),
+                        0 0 20px rgba(197, 160, 89, 0.3);
+        }
+
+        .action-btn:hover::before {
+            opacity: 0.15;
+        }
+
+        .action-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 5px 15px rgba(13, 18, 28, 0.3);
+        }
+
+        .btn-icon-wrapper {
+            position: relative;
+            z-index: 2;
+            width: 48px;
+            height: 48px;
+            background: rgba(197, 160, 89, 0.15);
+            border: 1px solid rgba(197, 160, 89, 0.3);
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 16px;
+            font-size: 20px;
+            color: var(--gold-light);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover .btn-icon-wrapper {
+            background: var(--primary-gold);
+            color: #0d121c;
+            border-color: var(--primary-gold);
+        }
+
+        .btn-text-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .btn-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2px;
+        }
+
+        .btn-subtitle {
+            font-size: 11.5px;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .btn-arrow-icon {
+            position: relative;
+            z-index: 2;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .action-btn:hover .btn-arrow-icon {
+            color: var(--primary-gold);
+            transform: translateX(-4px);
+        }
+
+        /* أسفل الكارت (Footer) */
+        .card-footer-info {
+            border-top: 1px solid #f3f4f6;
+            padding-top: 16px;
+            width: 100%;
+        }
+
+        .footer-church {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 0.2px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- تأثير الإضاءة المحيطة الخلفية -->
+    <div class="ambient-glow"></div>
+
+    <div class="app-wrapper">
+        <!-- الكارت الرئيسي الأبيض الفخم -->
+        <div class="main-card">
+            
+            <!-- مؤشر السحب العلوي -->
+            <div class="drag-handle"></div>
+
+            <!-- الشعار الثلاثي الأبعاد -->
+            <div class="logo-container">
+                <i class="fa-solid fa-cross"></i>
+            </div>
+
+            <!-- العنوان والوصف -->
+            <div class="title-section">
+                <h1 class="main-heading">
+                    أهلاً بكم في خدمة مدرسة شمامسة
+                    <span class="church-name">كنيسة الشهيد العظيم مارجرجس بالمنصورة</span>
+                </h1>
+                <p class="sub-description">
+                    بوابتك لخدمة مدرسة الشمامسة ومتابعة كل ما يخص الخدمة
+                </p>
+            </div>
+
+            <!-- أزرار الاختيار الرئيسية -->
+            <div class="actions-container">
+                <!-- زر دخول خادم -->
+                <a href="a/sign.html" class="action-btn">
+                    <div class="btn-icon-wrapper">
+                        <i class="fa-solid fa-user-tie"></i>
+                    </div>
+                    <div class="btn-text-content">
+                        <span class="btn-title">دخول خادم</span>
+                        <span class="btn-subtitle">إدارة الفصول، الحضور، ومتابعة المخدومين</span>
+                    </div>
+                    <div class="btn-arrow-icon">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </div>
+                </a>
+
+                <!-- زر دخول مخدوم -->
+                <a href="u/sign.html" class="action-btn">
+                    <div class="btn-icon-wrapper">
+                        <i class="fa-solid fa-child-reaching"></i>
+                    </div>
+                    <div class="btn-text-content">
+                        <span class="btn-title">دخول مخدوم</span>
+                        <span class="btn-subtitle">الدروس، الألحان، النقاط، والمتابعة</span>
+                    </div>
+                    <div class="btn-arrow-icon">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- تذييل الكارت الهادئ -->
+            <div class="card-footer-info">
+                <span class="footer-church">كنيسة الشهيد العظيم مارجرجس بالمنصورة</span>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

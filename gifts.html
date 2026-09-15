@@ -1,0 +1,3150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <title>إضافة هدية - مدرسة الشمامسة</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Tajawal", sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(199, 154, 50, 0.12), transparent 30%),
+                radial-gradient(circle at bottom left, rgba(116, 27, 36, 0.15), transparent 35%),
+                #080d1c;
+            color: #fff;
+            min-height: 100vh;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================== */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            min-height: 70px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 12px 22px;
+
+            background: rgba(13, 20, 43, 0.92);
+            border-bottom: 1px solid rgba(242, 216, 137, 0.18);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 45px;
+            height: 45px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
+            background: linear-gradient(
+                135deg,
+                #c79a32,
+                #f2d889
+            );
+
+            color: #172554;
+
+            font-size: 21px;
+
+            box-shadow:
+                0 8px 22px rgba(199, 154, 50, 0.25);
+        }
+
+        .brand-text h2 {
+            margin: 0;
+            font-family: "Amiri", serif;
+            font-size: 22px;
+            color: #f2d889;
+        }
+
+        .brand-text span {
+            display: block;
+            margin-top: 1px;
+
+            color: #b9c0d5;
+            font-size: 12px;
+        }
+
+        .servant-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 9px 13px;
+
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 14px;
+        }
+
+        .servant-info i {
+            color: #f2d889;
+        }
+
+        .servant-info span {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* =========================
+           MAIN
+        ========================== */
+
+        .container {
+            width: min(1100px, calc(100% - 28px));
+            margin: 30px auto 60px;
+        }
+
+        /* =========================
+           HERO
+        ========================== */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+
+            padding: 32px 25px;
+
+            border-radius: 25px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(23, 37, 84, 0.98),
+                    rgba(55, 20, 38, 0.97)
+                );
+
+            border: 1px solid rgba(242, 216, 137, 0.17);
+
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        .hero::before {
+            content: "";
+
+            position: absolute;
+
+            width: 250px;
+            height: 250px;
+
+            top: -120px;
+            left: -80px;
+
+            background: rgba(242, 216, 137, 0.07);
+
+            border-radius: 50%;
+        }
+
+        .hero::after {
+            content: "";
+
+            position: absolute;
+
+            width: 200px;
+            height: 200px;
+
+            bottom: -100px;
+            right: -70px;
+
+            background: rgba(116, 27, 36, 0.15);
+
+            border-radius: 50%;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+
+            font-family: "Amiri", serif;
+            font-size: clamp(28px, 5vw, 40px);
+
+            color: #f2d889;
+        }
+
+        .hero p {
+            margin: 0;
+
+            color: #dce2f1;
+
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* =========================
+           CARDS
+        ========================== */
+
+        .card {
+            margin-top: 22px;
+
+            padding: 25px;
+
+            border-radius: 24px;
+
+            background: rgba(15, 24, 48, 0.88);
+
+            border: 1px solid rgba(255, 255, 255, 0.07);
+
+            box-shadow:
+                0 18px 50px rgba(0, 0, 0, 0.22);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            margin-bottom: 22px;
+        }
+
+        .section-title .icon {
+            width: 42px;
+            height: 42px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 13px;
+
+            background: rgba(199, 154, 50, 0.13);
+            color: #f2d889;
+
+            border: 1px solid rgba(199, 154, 50, 0.15);
+        }
+
+        .section-title h2 {
+            margin: 0;
+
+            font-family: "Amiri", serif;
+            font-size: 25px;
+
+            color: #fff;
+        }
+
+        .section-title p {
+            margin: 2px 0 0;
+
+            font-size: 12px;
+            color: #9fa9c2;
+        }
+
+        /* =========================
+           FORM
+        ========================== */
+
+        .form-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            color: #dfe5f4;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .required {
+            color: #e56c76;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+
+            border: 1px solid rgba(255, 255, 255, 0.1);
+
+            background: rgba(255, 255, 255, 0.055);
+
+            color: #fff;
+
+            border-radius: 14px;
+
+            padding: 14px 15px;
+
+            outline: none;
+
+            font-size: 14px;
+
+            transition: 0.25s;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #8e97ad;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: rgba(242, 216, 137, 0.65);
+
+            background: rgba(255, 255, 255, 0.075);
+
+            box-shadow:
+                0 0 0 4px rgba(199, 154, 50, 0.08);
+        }
+
+        select option {
+            background: #10182e;
+            color: #fff;
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        /* =========================
+           TARGET
+        ========================== */
+
+        .target-box {
+            margin-top: 8px;
+
+            padding: 20px;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(116, 27, 36, 0.16),
+                    rgba(23, 37, 84, 0.28)
+                );
+
+            border: 1px solid rgba(242, 216, 137, 0.12);
+        }
+
+        .target-title {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+
+            margin-bottom: 15px;
+
+            color: #f2d889;
+            font-weight: 800;
+        }
+
+        .stage-buttons {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 12px;
+        }
+
+        .stage-btn {
+            border: 1px solid rgba(255, 255, 255, 0.09);
+
+            background: rgba(255, 255, 255, 0.045);
+
+            color: #cbd3e6;
+
+            padding: 14px;
+
+            border-radius: 15px;
+
+            font-size: 15px;
+            font-weight: 800;
+
+            transition: 0.25s;
+        }
+
+        .stage-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stage-btn.active {
+            color: #172554;
+
+            background: linear-gradient(
+                135deg,
+                #f2d889,
+                #c79a32
+            );
+
+            border-color: transparent;
+
+            box-shadow:
+                0 10px 25px rgba(199, 154, 50, 0.2);
+        }
+
+        .grade-wrapper {
+            margin-top: 16px;
+        }
+
+        .grade-options {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 10px;
+
+            margin-top: 10px;
+        }
+
+        .grade-btn {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            background: rgba(255, 255, 255, 0.045);
+
+            color: #cbd3e6;
+
+            padding: 12px 10px;
+
+            border-radius: 13px;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: 0.2s;
+        }
+
+        .grade-btn.active {
+            background: rgba(116, 27, 36, 0.75);
+
+            color: #fff;
+
+            border-color: #c79a32;
+
+            box-shadow:
+                0 0 0 3px rgba(199, 154, 50, 0.07);
+        }
+
+        .all-grade {
+            background: rgba(199, 154, 50, 0.08);
+            color: #f2d889;
+        }
+
+        .target-summary {
+            margin-top: 15px;
+
+            padding: 13px 15px;
+
+            border-radius: 13px;
+
+            background: rgba(0, 0, 0, 0.18);
+
+            color: #dce2f1;
+
+            font-size: 13px;
+
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .target-summary i {
+            color: #f2d889;
+        }
+
+        /* =========================
+           FILES
+        ========================== */
+
+        .file-box {
+            position: relative;
+
+            border: 1px dashed rgba(242, 216, 137, 0.35);
+
+            border-radius: 17px;
+
+            padding: 25px;
+
+            text-align: center;
+
+            background: rgba(199, 154, 50, 0.035);
+
+            transition: 0.25s;
+        }
+
+        .file-box:hover {
+            border-color: rgba(242, 216, 137, 0.7);
+        }
+
+        .file-box i {
+            font-size: 35px;
+            color: #f2d889;
+            margin-bottom: 10px;
+        }
+
+        .file-box strong {
+            display: block;
+
+            color: #fff;
+
+            margin-bottom: 6px;
+        }
+
+        .file-box span {
+            color: #8f99b1;
+            font-size: 12px;
+        }
+
+        .file-box input {
+            margin-top: 14px;
+            padding: 10px;
+        }
+
+        .preview-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(100px, 1fr));
+
+            gap: 10px;
+
+            margin-top: 15px;
+        }
+
+        .preview-item {
+            position: relative;
+
+            height: 100px;
+
+            overflow: hidden;
+
+            border-radius: 14px;
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            background: #080d1c;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+        .preview-item .remove-preview {
+            position: absolute;
+
+            top: 5px;
+            left: 5px;
+
+            width: 27px;
+            height: 27px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: rgba(116, 27, 36, 0.92);
+
+            color: #fff;
+        }
+
+        /* =========================
+           BUTTON
+        ========================== */
+
+        .submit-area {
+            margin-top: 22px;
+
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .submit-btn {
+            min-width: 210px;
+
+            border: none;
+
+            padding: 15px 22px;
+
+            border-radius: 15px;
+
+            background: linear-gradient(
+                135deg,
+                #f2d889,
+                #c79a32
+            );
+
+            color: #172554;
+
+            font-size: 15px;
+            font-weight: 900;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            box-shadow:
+                0 12px 28px rgba(199, 154, 50, 0.2);
+
+            transition: 0.25s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* =========================
+           RECENT GIFTS
+        ========================== */
+
+        .gifts-list {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 15px;
+        }
+
+        .gift-card {
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 17px;
+
+            border-radius: 19px;
+
+            background: rgba(255, 255, 255, 0.045);
+
+            border: 1px solid rgba(255, 255, 255, 0.07);
+
+            transition: 0.25s;
+        }
+
+        .gift-card:hover {
+            transform: translateY(-2px);
+
+            border-color:
+                rgba(242, 216, 137, 0.2);
+        }
+
+        .gift-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+
+            gap: 12px;
+        }
+
+        .gift-name {
+            margin: 0;
+
+            font-family: "Amiri", serif;
+
+            font-size: 21px;
+
+            color: #fff;
+        }
+
+        .gift-points {
+            flex-shrink: 0;
+
+            padding: 7px 10px;
+
+            border-radius: 10px;
+
+            background: rgba(199, 154, 50, 0.13);
+
+            color: #f2d889;
+
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .gift-meta {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-top: 12px;
+        }
+
+        .meta {
+            padding: 7px 9px;
+
+            border-radius: 9px;
+
+            background: rgba(255, 255, 255, 0.045);
+
+            color: #aeb8cf;
+
+            font-size: 11px;
+        }
+
+        .meta i {
+            margin-left: 4px;
+            color: #f2d889;
+        }
+
+        .gift-images {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(70px, 1fr));
+
+            gap: 7px;
+
+            margin-top: 13px;
+        }
+
+        .gift-images img {
+            width: 100%;
+            height: 75px;
+
+            object-fit: cover;
+
+            border-radius: 10px;
+        }
+
+        .empty {
+            padding: 40px 20px;
+
+            text-align: center;
+
+            color: #8993aa;
+        }
+
+        .empty i {
+            display: block;
+
+            font-size: 40px;
+
+            color: #555f78;
+
+            margin-bottom: 12px;
+        }
+
+        /* =========================
+           ALERT
+        ========================== */
+
+        .alert {
+            position: fixed;
+
+            top: 85px;
+            left: 50%;
+
+            transform:
+                translateX(-50%)
+                translateY(-20px);
+
+            z-index: 3000;
+
+            width: min(450px, calc(100% - 30px));
+
+            padding: 15px 17px;
+
+            border-radius: 15px;
+
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: 0.3s;
+
+            box-shadow:
+                0 15px 45px rgba(0, 0, 0, 0.35);
+        }
+
+        .alert.show {
+            opacity: 1;
+            visibility: visible;
+
+            transform:
+                translateX(-50%)
+                translateY(0);
+        }
+
+        .alert.success {
+            background: #123d2b;
+            border: 1px solid #2d9c6b;
+        }
+
+        .alert.error {
+            background: #451b22;
+            border: 1px solid #b94a57;
+        }
+
+        .alert.info {
+            background: #172f55;
+            border: 1px solid #4b7ec4;
+        }
+
+        .alert i {
+            font-size: 19px;
+        }
+
+        /* =========================
+           LOADER
+        ========================== */
+
+        .loading-overlay {
+            position: fixed;
+
+            inset: 0;
+
+            z-index: 5000;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(4, 8, 18, 0.78);
+
+            backdrop-filter: blur(8px);
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loader-box {
+            width: min(330px, calc(100% - 40px));
+
+            padding: 25px;
+
+            text-align: center;
+
+            border-radius: 20px;
+
+            background: #111a32;
+
+            border: 1px solid rgba(242, 216, 137, 0.12);
+        }
+
+        .spinner {
+            width: 42px;
+            height: 42px;
+
+            margin: 0 auto 15px;
+
+            border: 4px solid rgba(255, 255, 255, 0.12);
+
+            border-top-color: #f2d889;
+
+            border-radius: 50%;
+
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-box p {
+            margin: 0;
+
+            color: #dce2f1;
+
+            font-size: 14px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 800px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+                grid-column: auto;
+            }
+
+            .gifts-list {
+                grid-template-columns: 1fr;
+            }
+
+            .stage-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .grade-options {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .topbar {
+                padding: 10px 13px;
+            }
+
+            .brand-text h2 {
+                font-size: 18px;
+            }
+
+            .brand-text span {
+                font-size: 10px;
+            }
+
+            .servant-info {
+                padding: 8px 9px;
+            }
+
+            .servant-info span {
+                max-width: 80px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .container {
+                width: min(100% - 18px, 1100px);
+                margin-top: 15px;
+            }
+
+            .hero,
+            .card {
+                border-radius: 19px;
+            }
+
+            .hero {
+                padding: 24px 18px;
+            }
+
+            .card {
+                padding: 17px;
+            }
+
+            .submit-btn {
+                width: 100%;
+            }
+
+            .submit-area {
+                justify-content: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         TOPBAR
+    ========================== -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+
+            <div class="brand-text">
+                <h2>مدرسة الشمامسة</h2>
+                <span>لوحة الخادم</span>
+            </div>
+
+        </div>
+
+        <div class="servant-info">
+            <i class="fa-solid fa-user-shield"></i>
+            <span id="servantName">الخادم</span>
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         MAIN
+    ========================== -->
+
+    <main class="container">
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <h1>
+                    إضافة هدية 🎁
+                </h1>
+
+                <p>
+                    أضف الهدية وحدد المرحلة أو الصف الذي تريد إرسالها إليه.
+                    سيتم إرسال إشعار تلقائيًا للمخدومين المطابقين.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- FORM -->
+
+        <section class="card">
+
+            <div class="section-title">
+
+                <div class="icon">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
+
+                <div>
+                    <h2>بيانات الهدية</h2>
+                    <p>اكتب بيانات الهدية ثم حدد المستهدفين</p>
+                </div>
+
+            </div>
+
+
+            <form id="giftForm">
+
+                <div class="form-grid">
+
+                    <!-- Gift Name -->
+
+                    <div class="field">
+
+                        <label>
+                            اسم الهدية
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="giftName"
+                            placeholder="مثال: كتاب مقدس"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Quantity -->
+
+                    <div class="field">
+
+                        <label>
+                            الكمية
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="quantity"
+                            min="1"
+                            value="1"
+                            placeholder="عدد الهدايا"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Points -->
+
+                    <div class="field">
+
+                        <label>
+                            عدد النقاط
+                            <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="points"
+                            min="0"
+                            value="0"
+                            placeholder="مثال: 100"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- Note -->
+
+                    <div class="field">
+
+                        <label>
+                            ملاحظة
+                        </label>
+
+                        <input
+                            type="text"
+                            id="note"
+                            placeholder="ملاحظة اختيارية"
+                        >
+
+                    </div>
+
+
+                    <!-- TARGET -->
+
+                    <div class="field full">
+
+                        <div class="target-box">
+
+                            <div class="target-title">
+                                <i class="fa-solid fa-users"></i>
+                                إرسال الهدية إلى
+                            </div>
+
+
+                            <!-- Stages -->
+
+                            <div class="stage-buttons">
+
+                                <button
+                                    type="button"
+                                    class="stage-btn"
+                                    data-stage="ابتدائي">
+                                    ابتدائي
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="stage-btn"
+                                    data-stage="إعدادي">
+                                    إعدادي
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="stage-btn"
+                                    data-stage="ثانوي">
+                                    ثانوي
+                                </button>
+
+                            </div>
+
+
+                            <!-- Grades -->
+
+                            <div
+                                class="grade-wrapper"
+                                id="gradeWrapper"
+                                style="display:none;">
+
+                                <label>
+                                    اختر الصف
+                                </label>
+
+                                <div
+                                    class="grade-options"
+                                    id="gradeOptions">
+                                </div>
+
+                            </div>
+
+
+                            <!-- Summary -->
+
+                            <div class="target-summary">
+
+                                <i class="fa-solid fa-bullseye"></i>
+
+                                <span id="targetSummary">
+                                    لم يتم اختيار المرحلة بعد
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Images -->
+
+                    <div class="field full">
+
+                        <label>
+                            صور الهدية
+                        </label>
+
+                        <div class="file-box">
+
+                            <i class="fa-solid fa-images"></i>
+
+                            <strong>
+                                اختر صور الهدية
+                            </strong>
+
+                            <span>
+                                يمكنك اختيار أكثر من صورة
+                            </span>
+
+                            <input
+                                type="file"
+                                id="giftImages"
+                                accept="image/*"
+                                multiple
+                            >
+
+                        </div>
+
+                        <div
+                            class="preview-grid"
+                            id="previewGrid">
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <div class="submit-area">
+
+                    <button
+                        type="submit"
+                        class="submit-btn"
+                        id="submitBtn">
+
+                        <i class="fa-solid fa-paper-plane"></i>
+
+                        إضافة وإرسال الهدية
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+
+        <!-- RECENT GIFTS -->
+
+        <section class="card">
+
+            <div class="section-title">
+
+                <div class="icon">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                </div>
+
+                <div>
+                    <h2>الهدايا التي أضفتها</h2>
+                    <p>آخر الهدايا التي قام الخادم بإضافتها</p>
+                </div>
+
+            </div>
+
+
+            <div
+                class="gifts-list"
+                id="giftsList">
+
+                <div class="empty">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    جاري تحميل الهدايا...
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ALERT -->
+
+    <div
+        class="alert"
+        id="alert">
+
+        <i id="alertIcon"></i>
+
+        <span id="alertMessage"></span>
+
+    </div>
+
+
+    <!-- LOADING -->
+
+    <div
+        class="loading-overlay"
+        id="loadingOverlay">
+
+        <div class="loader-box">
+
+            <div class="spinner"></div>
+
+            <p id="loadingText">
+                جاري حفظ الهدية وإرسال الإشعارات...
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+        /* =====================================================
+           FIREBASE
+        ====================================================== */
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyDkJ8HvxX9up6Hof7d6S_Or8ICnaGnuIUg",
+
+            authDomain: "tony-c78c0.firebaseapp.com",
+
+            projectId: "tony-c78c0",
+
+            storageBucket: "tony-c78c0.firebasestorage.app",
+
+            messagingSenderId: "182062544524",
+
+            appId: "1:182062544524:web:59afdba4f0d1dfd929ada9",
+
+            measurementId: "G-4FER9HW0JS"
+
+        };
+
+
+        /* Initialize Firebase */
+
+        if (!firebase.apps.length) {
+
+            firebase.initializeApp(firebaseConfig);
+
+        }
+
+        const db = firebase.firestore();
+
+
+        /* =====================================================
+           COLLECTIONS
+        ====================================================== */
+
+        const GIFTS_COLLECTION = "gifts";
+
+        const USERS_COLLECTION = "users";
+
+        const NOTIFICATIONS_COLLECTION = "notifications";
+
+
+        /* =====================================================
+           CURRENT SERVANT
+        ====================================================== */
+
+        const currentUsername = (
+            localStorage.getItem("currentUser") ||
+            localStorage.getItem("current_servant_username") ||
+            ""
+        ).trim();
+
+
+        /* =====================================================
+           ELEMENTS
+        ====================================================== */
+
+        const giftForm =
+            document.getElementById("giftForm");
+
+        const giftName =
+            document.getElementById("giftName");
+
+        const quantity =
+            document.getElementById("quantity");
+
+        const points =
+            document.getElementById("points");
+
+        const note =
+            document.getElementById("note");
+
+        const giftImages =
+            document.getElementById("giftImages");
+
+        const previewGrid =
+            document.getElementById("previewGrid");
+
+        const gradeWrapper =
+            document.getElementById("gradeWrapper");
+
+        const gradeOptions =
+            document.getElementById("gradeOptions");
+
+        const targetSummary =
+            document.getElementById("targetSummary");
+
+        const giftsList =
+            document.getElementById("giftsList");
+
+        const servantName =
+            document.getElementById("servantName");
+
+        const submitBtn =
+            document.getElementById("submitBtn");
+
+        const loadingOverlay =
+            document.getElementById("loadingOverlay");
+
+        const loadingText =
+            document.getElementById("loadingText");
+
+
+        /* =====================================================
+           STATE
+        ====================================================== */
+
+        let selectedStage = "";
+
+        let selectedGrade = "";
+
+        let selectedTargetType = "";
+
+        let base64Images = [];
+
+
+        /* =====================================================
+           NORMALIZATION
+        ====================================================== */
+
+        function normalizeText(value) {
+
+            return String(value || "")
+                .trim()
+                .replace(/\s+/g, " ");
+
+        }
+
+
+        function normalizeStage(value) {
+
+            const stage =
+                normalizeText(value);
+
+            if (
+                stage === "اعدادي" ||
+                stage === "إعدادي" ||
+                stage === "الاعدادي" ||
+                stage === "الإعدادي"
+            ) {
+
+                return "إعدادي";
+
+            }
+
+            if (
+                stage === "ابتدائى" ||
+                stage === "ابتدائي" ||
+                stage === "الابتدائي"
+            ) {
+
+                return "ابتدائي";
+
+            }
+
+            if (
+                stage === "ثانوى" ||
+                stage === "ثانوي" ||
+                stage === "الثانوي"
+            ) {
+
+                return "ثانوي";
+
+            }
+
+            return stage;
+
+        }
+
+
+        /* =====================================================
+           GRADE DATA
+        ====================================================== */
+
+        const grades = {
+
+            "ابتدائي": [
+
+                "أولى ابتدائي",
+                "تانية ابتدائي",
+                "تالتة ابتدائي",
+                "رابعة ابتدائي",
+                "خامسة ابتدائي",
+                "سادسة ابتدائي"
+
+            ],
+
+            "إعدادي": [
+
+                "أولى إعدادي",
+                "تانية إعدادي",
+                "تالتة إعدادي"
+
+            ],
+
+            "ثانوي": [
+
+                "أولى ثانوي",
+                "تانية ثانوي",
+                "تالتة ثانوي"
+
+            ]
+
+        };
+
+
+        /* =====================================================
+           TARGET KEY
+        ====================================================== */
+
+        function createTargetKey(stage, grade) {
+
+            stage =
+                normalizeStage(stage);
+
+            grade =
+                normalizeText(grade);
+
+            if (grade) {
+
+                return `grade:${grade}`;
+
+            }
+
+            return `stage:${stage}`;
+
+        }
+
+
+        /* =====================================================
+           DISPLAY SERVANT
+        ====================================================== */
+
+        servantName.textContent =
+            currentUsername || "الخادم";
+
+
+        /* =====================================================
+           STAGE BUTTONS
+        ====================================================== */
+
+        document
+            .querySelectorAll(".stage-btn")
+            .forEach(button => {
+
+                button.addEventListener("click", () => {
+
+                    document
+                        .querySelectorAll(".stage-btn")
+                        .forEach(btn => {
+                            btn.classList.remove("active");
+                        });
+
+                    button.classList.add("active");
+
+                    selectedStage =
+                        normalizeStage(
+                            button.dataset.stage
+                        );
+
+                    selectedGrade = "";
+
+                    selectedTargetType = "stage";
+
+                    renderGrades();
+
+                    updateTargetSummary();
+
+                });
+
+            });
+
+
+        /* =====================================================
+           RENDER GRADES
+        ====================================================== */
+
+        function renderGrades() {
+
+            gradeOptions.innerHTML = "";
+
+            if (!selectedStage) {
+
+                gradeWrapper.style.display = "none";
+
+                return;
+
+            }
+
+            gradeWrapper.style.display = "block";
+
+
+            /* ALL STAGE */
+
+            const allButton =
+                document.createElement("button");
+
+            allButton.type = "button";
+
+            allButton.className =
+                "grade-btn all-grade";
+
+            allButton.innerHTML =
+                `<i class="fa-solid fa-users"></i>
+                 كل ${selectedStage}`;
+
+            allButton.addEventListener("click", () => {
+
+                selectedGrade = "";
+
+                selectedTargetType = "stage";
+
+                document
+                    .querySelectorAll(".grade-btn")
+                    .forEach(btn => {
+                        btn.classList.remove("active");
+                    });
+
+                allButton.classList.add("active");
+
+                updateTargetSummary();
+
+            });
+
+            gradeOptions.appendChild(allButton);
+
+
+            /* SPECIFIC GRADES */
+
+            grades[selectedStage].forEach(grade => {
+
+                const button =
+                    document.createElement("button");
+
+                button.type = "button";
+
+                button.className =
+                    "grade-btn";
+
+                button.textContent =
+                    grade;
+
+                button.addEventListener("click", () => {
+
+                    selectedGrade =
+                        normalizeText(grade);
+
+                    selectedTargetType =
+                        "grade";
+
+                    document
+                        .querySelectorAll(".grade-btn")
+                        .forEach(btn => {
+                            btn.classList.remove("active");
+                        });
+
+                    button.classList.add("active");
+
+                    updateTargetSummary();
+
+                });
+
+                gradeOptions.appendChild(button);
+
+            });
+
+
+            /* Default = All */
+
+            setTimeout(() => {
+
+                allButton.click();
+
+            }, 0);
+
+        }
+
+
+        /* =====================================================
+           TARGET SUMMARY
+        ====================================================== */
+
+        function updateTargetSummary() {
+
+            if (!selectedStage) {
+
+                targetSummary.textContent =
+                    "لم يتم اختيار المرحلة بعد";
+
+                return;
+
+            }
+
+            if (selectedGrade) {
+
+                targetSummary.textContent =
+                    `سيتم إرسال الهدية إلى مخدومي: ${selectedGrade}`;
+
+            } else {
+
+                targetSummary.textContent =
+                    `سيتم إرسال الهدية إلى جميع مخدومي مرحلة ${selectedStage}`;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           IMAGE UPLOAD
+        ====================================================== */
+
+        giftImages.addEventListener("change", async event => {
+
+            const files =
+                Array.from(event.target.files || []);
+
+            base64Images = [];
+
+            previewGrid.innerHTML = "";
+
+            if (!files.length) {
+                return;
+            }
+
+            for (const file of files) {
+
+                if (!file.type.startsWith("image/")) {
+                    continue;
+                }
+
+                try {
+
+                    const compressed =
+                        await compressImage(file);
+
+                    base64Images.push(compressed);
+
+                    addPreview(compressed);
+
+                } catch (error) {
+
+                    console.error(
+                        "Image error:",
+                        error
+                    );
+
+                }
+
+            }
+
+        });
+
+
+        /* =====================================================
+           IMAGE COMPRESSION
+        ====================================================== */
+
+        function compressImage(file) {
+
+            return new Promise((resolve, reject) => {
+
+                const reader =
+                    new FileReader();
+
+                reader.onload = event => {
+
+                    const img =
+                        new Image();
+
+                    img.onload = () => {
+
+                        const maxWidth = 900;
+
+                        const maxHeight = 900;
+
+                        let width =
+                            img.width;
+
+                        let height =
+                            img.height;
+
+
+                        if (width > maxWidth) {
+
+                            height =
+                                height *
+                                (maxWidth / width);
+
+                            width =
+                                maxWidth;
+
+                        }
+
+
+                        if (height > maxHeight) {
+
+                            width =
+                                width *
+                                (maxHeight / height);
+
+                            height =
+                                maxHeight;
+
+                        }
+
+
+                        const canvas =
+                            document.createElement("canvas");
+
+                        canvas.width =
+                            Math.round(width);
+
+                        canvas.height =
+                            Math.round(height);
+
+
+                        const ctx =
+                            canvas.getContext("2d");
+
+                        ctx.drawImage(
+                            img,
+                            0,
+                            0,
+                            canvas.width,
+                            canvas.height
+                        );
+
+
+                        const result =
+                            canvas.toDataURL(
+                                "image/jpeg",
+                                0.75
+                            );
+
+                        resolve(result);
+
+                    };
+
+
+                    img.onerror =
+                        reject;
+
+                    img.src =
+                        event.target.result;
+
+                };
+
+
+                reader.onerror =
+                    reject;
+
+                reader.readAsDataURL(file);
+
+            });
+
+        }
+
+
+        /* =====================================================
+           PREVIEW
+        ====================================================== */
+
+        function addPreview(src) {
+
+            const item =
+                document.createElement("div");
+
+            item.className =
+                "preview-item";
+
+            item.innerHTML = `
+
+                <img src="${src}" alt="preview">
+
+                <button
+                    type="button"
+                    class="remove-preview">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                </button>
+
+            `;
+
+            item
+                .querySelector(".remove-preview")
+                .addEventListener("click", () => {
+
+                    const index =
+                        base64Images.indexOf(src);
+
+                    if (index !== -1) {
+
+                        base64Images.splice(
+                            index,
+                            1
+                        );
+
+                    }
+
+                    item.remove();
+
+                });
+
+            previewGrid.appendChild(item);
+
+        }
+
+
+        /* =====================================================
+           ALERT
+        ====================================================== */
+
+        let alertTimer = null;
+
+
+        function showAlert(
+            message,
+            type = "info"
+        ) {
+
+            const alert =
+                document.getElementById("alert");
+
+            const icon =
+                document.getElementById("alertIcon");
+
+            const messageElement =
+                document.getElementById("alertMessage");
+
+
+            alert.className =
+                `alert ${type}`;
+
+
+            if (type === "success") {
+
+                icon.className =
+                    "fa-solid fa-circle-check";
+
+            } else if (type === "error") {
+
+                icon.className =
+                    "fa-solid fa-circle-xmark";
+
+            } else {
+
+                icon.className =
+                    "fa-solid fa-circle-info";
+
+            }
+
+
+            messageElement.textContent =
+                message;
+
+
+            requestAnimationFrame(() => {
+
+                alert.classList.add("show");
+
+            });
+
+
+            clearTimeout(alertTimer);
+
+            alertTimer =
+                setTimeout(() => {
+
+                    alert.classList.remove("show");
+
+                }, 4500);
+
+        }
+
+
+        /* =====================================================
+           LOADING
+        ====================================================== */
+
+        function setLoading(show, text) {
+
+            if (show) {
+
+                loadingText.textContent =
+                    text ||
+                    "جاري التنفيذ...";
+
+                loadingOverlay.classList.add("show");
+
+            } else {
+
+                loadingOverlay.classList.remove("show");
+
+            }
+
+        }
+
+
+        /* =====================================================
+           FIND MATCHING USERS
+        ====================================================== */
+
+        async function getTargetUsers(
+            stage,
+            grade
+        ) {
+
+            const normalizedStage =
+                normalizeStage(stage);
+
+            const normalizedGrade =
+                normalizeText(grade);
+
+
+            const snapshot =
+                await db
+                    .collection(USERS_COLLECTION)
+                    .get();
+
+
+            const users = [];
+
+
+            snapshot.forEach(doc => {
+
+                const user =
+                    doc.data() || {};
+
+
+                if (user.isBlocked === true) {
+                    return;
+                }
+
+
+                const userStage =
+                    normalizeStage(
+                        user.stage
+                    );
+
+
+                const userGrade =
+                    normalizeText(
+                        user.grade
+                    );
+
+
+                if (
+                    userStage !==
+                    normalizedStage
+                ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    normalizedGrade &&
+                    userGrade !==
+                    normalizedGrade
+                ) {
+
+                    return;
+
+                }
+
+
+                const username =
+                    normalizeText(
+                        user.username ||
+                        user.userName ||
+                        user.name
+                    );
+
+
+                if (!username) {
+                    return;
+                }
+
+
+                users.push({
+
+                    id: doc.id,
+
+                    username,
+
+                    data: user
+
+                });
+
+            });
+
+
+            return users;
+
+        }
+
+
+        /* =====================================================
+           CREATE NOTIFICATIONS
+        ====================================================== */
+
+        async function createNotificationsForUsers(
+            users,
+            giftData,
+            giftId
+        ) {
+
+            if (!users.length) {
+
+                return 0;
+
+            }
+
+
+            /*
+             Firestore batch has a maximum of 500 writes.
+             Therefore we split users into batches.
+            */
+
+            const chunkSize = 450;
+
+            let createdCount = 0;
+
+
+            for (
+                let start = 0;
+                start < users.length;
+                start += chunkSize
+            ) {
+
+                const chunk =
+                    users.slice(
+                        start,
+                        start + chunkSize
+                    );
+
+
+                const batch =
+                    db.batch();
+
+
+                chunk.forEach(user => {
+
+                    const notificationRef =
+                        db
+                            .collection(
+                                NOTIFICATIONS_COLLECTION
+                            )
+                            .doc();
+
+
+                    batch.set(
+                        notificationRef,
+                        {
+
+                            type: "gift",
+
+                            title: "🎁 هدية جديدة",
+
+                            message:
+                                `تمت إضافة هدية جديدة: ${giftData.name}`,
+
+                            giftId: giftId,
+
+                            giftName:
+                                giftData.name,
+
+                            points:
+                                giftData.points,
+
+                            quantity:
+                                giftData.quantity,
+
+                            imageUrl:
+                                giftData.images &&
+                                giftData.images.length
+                                    ? giftData.images[0]
+                                    : "",
+
+
+                            recipientUsername:
+                                user.username,
+
+                            recipientUserId:
+                                user.id,
+
+
+                            userId:
+                                user.id,
+
+
+                            targetStage:
+                                giftData.targetStage,
+
+                            targetGrade:
+                                giftData.targetGrade,
+
+                            targetType:
+                                giftData.targetType,
+
+
+                            isRead: false,
+
+                            createdAt:
+                                firebase
+                                    .firestore
+                                    .FieldValue
+                                    .serverTimestamp(),
+
+                            timestamp:
+                                firebase
+                                    .firestore
+                                    .FieldValue
+                                    .serverTimestamp(),
+
+                            createdBy:
+                                currentUsername
+
+                        }
+                    );
+
+
+                    createdCount++;
+
+                });
+
+
+                await batch.commit();
+
+            }
+
+
+            return createdCount;
+
+        }
+
+
+        /* =====================================================
+           ADD GIFT
+        ====================================================== */
+
+        giftForm.addEventListener(
+            "submit",
+            async event => {
+
+                event.preventDefault();
+
+
+                /* Login */
+
+                if (!currentUsername) {
+
+                    showAlert(
+                        "لم يتم العثور على حساب الخادم. سجل الدخول أولاً.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                /* Validate */
+
+                const name =
+                    normalizeText(
+                        giftName.value
+                    );
+
+
+                const giftQuantity =
+                    Number(
+                        quantity.value
+                    );
+
+
+                const giftPoints =
+                    Number(
+                        points.value
+                    );
+
+
+                const giftNote =
+                    normalizeText(
+                        note.value
+                    );
+
+
+                if (!name) {
+
+                    showAlert(
+                        "اكتب اسم الهدية.",
+                        "error"
+                    );
+
+                    giftName.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    !giftQuantity ||
+                    giftQuantity < 1
+                ) {
+
+                    showAlert(
+                        "أدخل كمية صحيحة.",
+                        "error"
+                    );
+
+                    quantity.focus();
+
+                    return;
+
+                }
+
+
+                if (
+                    giftPoints < 0 ||
+                    Number.isNaN(giftPoints)
+                ) {
+
+                    showAlert(
+                        "أدخل عدد نقاط صحيح.",
+                        "error"
+                    );
+
+                    points.focus();
+
+                    return;
+
+                }
+
+
+                if (!selectedStage) {
+
+                    showAlert(
+                        "اختر المرحلة التي سترسل إليها الهدية.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 Build target
+                */
+
+                const targetStage =
+                    normalizeStage(
+                        selectedStage
+                    );
+
+
+                const targetGrade =
+                    normalizeText(
+                        selectedGrade
+                    );
+
+
+                const targetType =
+                    targetGrade
+                        ? "grade"
+                        : "stage";
+
+
+                const targetKey =
+                    createTargetKey(
+                        targetStage,
+                        targetGrade
+                    );
+
+
+                try {
+
+                    setLoading(
+                        true,
+                        "جاري البحث عن المخدومين..."
+                    );
+
+
+                    /*
+                     Find users matching
+                     stage / grade.
+                    */
+
+                    const targetUsers =
+                        await getTargetUsers(
+                            targetStage,
+                            targetGrade
+                        );
+
+
+                    setLoading(
+                        true,
+                        "جاري حفظ الهدية..."
+                    );
+
+
+                    /*
+                     Gift data
+                    */
+
+                    const giftData = {
+
+                        name: name,
+
+                        note: giftNote,
+
+                        quantity:
+                            giftQuantity,
+
+                        points:
+                            giftPoints,
+
+
+                        /*
+                         Legacy fields
+                         kept for compatibility
+                        */
+
+                        stage:
+                            targetStage,
+
+                        grade:
+                            targetGrade,
+
+
+                        /*
+                         New explicit target fields
+                        */
+
+                        targetStage:
+                            targetStage,
+
+                        targetGrade:
+                            targetGrade,
+
+                        targetType:
+                            targetType,
+
+                        targetKey:
+                            targetKey,
+
+
+                        /*
+                         Creator
+                        */
+
+                        addedBy:
+                            currentUsername,
+
+                        createdBy:
+                            currentUsername,
+
+
+                        /*
+                         Images
+                        */
+
+                        images:
+                            base64Images,
+
+
+                        createdAt:
+                            firebase
+                                .firestore
+                                .FieldValue
+                                .serverTimestamp(),
+
+                        updatedAt:
+                            firebase
+                                .firestore
+                                .FieldValue
+                                .serverTimestamp()
+
+                    };
+
+
+                    /*
+                     Save gift
+                    */
+
+                    const giftRef =
+                        await db
+                            .collection(
+                                GIFTS_COLLECTION
+                            )
+                            .add(giftData);
+
+
+                    setLoading(
+                        true,
+                        "جاري إرسال الإشعارات للمخدومين..."
+                    );
+
+
+                    /*
+                     Send notifications
+                    */
+
+                    const notificationCount =
+                        await createNotificationsForUsers(
+                            targetUsers,
+                            {
+                                name:
+                                    name,
+
+                                points:
+                                    giftPoints,
+
+                                quantity:
+                                    giftQuantity,
+
+                                images:
+                                    base64Images,
+
+                                targetStage:
+                                    targetStage,
+
+                                targetGrade:
+                                    targetGrade,
+
+                                targetType:
+                                    targetType
+                            },
+                            giftRef.id
+                        );
+
+
+                    setLoading(false);
+
+
+                    /*
+                     Success message
+                    */
+
+                    if (targetGrade) {
+
+                        showAlert(
+                            `تمت إضافة الهدية وإرسال إشعار إلى ${notificationCount} مخدوم من ${targetGrade}.`,
+                            "success"
+                        );
+
+                    } else {
+
+                        showAlert(
+                            `تمت إضافة الهدية وإرسال إشعار إلى ${notificationCount} مخدوم من مرحلة ${targetStage}.`,
+                            "success"
+                        );
+
+                    }
+
+
+                    /*
+                     Reset form
+                    */
+
+                    giftForm.reset();
+
+                    quantity.value = 1;
+
+                    points.value = 0;
+
+                    selectedStage = "";
+
+                    selectedGrade = "";
+
+                    selectedTargetType = "";
+
+                    base64Images = [];
+
+                    previewGrid.innerHTML = "";
+
+                    gradeWrapper.style.display =
+                        "none";
+
+
+                    document
+                        .querySelectorAll(".stage-btn")
+                        .forEach(btn => {
+
+                            btn.classList.remove(
+                                "active"
+                            );
+
+                        });
+
+
+                    updateTargetSummary();
+
+
+                    /*
+                     Reload recent gifts
+                    */
+
+                    await renderRecentGifts();
+
+
+                } catch (error) {
+
+                    console.error(
+                        "Add gift error:",
+                        error
+                    );
+
+
+                    setLoading(false);
+
+
+                    showAlert(
+                        "حدث خطأ أثناء إضافة الهدية: " +
+                        (error.message ||
+                            "خطأ غير معروف"),
+                        "error"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =====================================================
+           RENDER RECENT GIFTS
+        ====================================================== */
+
+        async function renderRecentGifts() {
+
+            giftsList.innerHTML = `
+
+                <div class="empty">
+
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+
+                    جاري تحميل الهدايا...
+
+                </div>
+
+            `;
+
+
+            if (!currentUsername) {
+
+                giftsList.innerHTML = `
+
+                    <div class="empty">
+
+                        <i class="fa-solid fa-user-lock"></i>
+
+                        يجب تسجيل دخول الخادم أولاً.
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+
+            try {
+
+                const snapshot =
+                    await db
+                        .collection(
+                            GIFTS_COLLECTION
+                        )
+                        .where(
+                            "addedBy",
+                            "==",
+                            currentUsername
+                        )
+                        .get();
+
+
+                const gifts =
+                    snapshot.docs
+                        .map(doc => ({
+
+                            id: doc.id,
+
+                            ...doc.data()
+
+                        }))
+                        .sort(
+                            (a, b) => {
+
+                                const aTime =
+                                    getTimestamp(
+                                        a.createdAt
+                                    );
+
+                                const bTime =
+                                    getTimestamp(
+                                        b.createdAt
+                                    );
+
+                                return bTime - aTime;
+
+                            }
+                        );
+
+
+                if (!gifts.length) {
+
+                    giftsList.innerHTML = `
+
+                        <div class="empty">
+
+                            <i class="fa-solid fa-gift"></i>
+
+                            لم تقم بإضافة أي هدايا حتى الآن.
+
+                        </div>
+
+                    `;
+
+                    return;
+
+                }
+
+
+                giftsList.innerHTML =
+                    gifts
+                        .map(
+                            renderGiftCard
+                        )
+                        .join("");
+
+
+            } catch (error) {
+
+                console.error(
+                    "Render gifts error:",
+                    error
+                );
+
+
+                giftsList.innerHTML = `
+
+                    <div class="empty">
+
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+
+                        تعذر تحميل الهدايا.
+
+                    </div>
+
+                `;
+
+            }
+
+        }
+
+
+        /* =====================================================
+           TIMESTAMP
+        ====================================================== */
+
+        function getTimestamp(timestamp) {
+
+            if (!timestamp) {
+                return 0;
+            }
+
+
+            if (
+                typeof timestamp.toMillis ===
+                "function"
+            ) {
+
+                return timestamp.toMillis();
+
+            }
+
+
+            if (
+                timestamp.seconds !== undefined
+            ) {
+
+                return timestamp.seconds * 1000;
+
+            }
+
+
+            return 0;
+
+        }
+
+
+        /* =====================================================
+           FORMAT DATE
+        ====================================================== */
+
+        function formatDate(timestamp) {
+
+            const time =
+                getTimestamp(timestamp);
+
+
+            if (!time) {
+
+                return "منذ قليل";
+
+            }
+
+
+            return new Intl.DateTimeFormat(
+                "ar-EG",
+                {
+                    dateStyle: "medium",
+                    timeStyle: "short"
+                }
+            ).format(
+                new Date(time)
+            );
+
+        }
+
+
+        /* =====================================================
+           ESCAPE HTML
+        ====================================================== */
+
+        function escapeHtml(value) {
+
+            return String(value || "")
+                .replace(
+                    /&/g,
+                    "&amp;"
+                )
+                .replace(
+                    /</g,
+                    "&lt;"
+                )
+                .replace(
+                    />/g,
+                    "&gt;"
+                )
+                .replace(
+                    /"/g,
+                    "&quot;"
+                )
+                .replace(
+                    /'/g,
+                    "&#039;"
+                );
+
+        }
+
+
+        /* =====================================================
+           RENDER GIFT CARD
+        ====================================================== */
+
+        function renderGiftCard(gift) {
+
+            const targetStage =
+                normalizeStage(
+                    gift.targetStage ||
+                    gift.stage
+                );
+
+
+            const targetGrade =
+                normalizeText(
+                    gift.targetGrade ||
+                    gift.grade
+                );
+
+
+            const targetText =
+                targetGrade
+                    ? targetGrade
+                    : targetStage ||
+                      "غير محدد";
+
+
+            const images =
+                Array.isArray(gift.images)
+                    ? gift.images
+                    : [];
+
+
+            const imagesHtml =
+                images
+                    .slice(0, 5)
+                    .map(
+                        image => `
+
+                            <img
+                                src="${image}"
+                                alt="${escapeHtml(gift.name)}"
+                            >
+
+                        `
+                    )
+                    .join("");
+
+
+            return `
+
+                <article class="gift-card">
+
+                    <div class="gift-top">
+
+                        <h3 class="gift-name">
+
+                            ${escapeHtml(
+                                gift.name
+                            )}
+
+                        </h3>
+
+                        <div class="gift-points">
+
+                            ${Number(
+                                gift.points || 0
+                            )}
+
+                            نقطة
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="gift-meta">
+
+                        <div class="meta">
+
+                            <i class="fa-solid fa-users"></i>
+
+                            ${escapeHtml(
+                                targetText
+                            )}
+
+                        </div>
+
+
+                        <div class="meta">
+
+                            <i class="fa-solid fa-box"></i>
+
+                            الكمية:
+
+                            ${Number(
+                                gift.quantity || 0
+                            )}
+
+                        </div>
+
+
+                        <div class="meta">
+
+                            <i class="fa-solid fa-calendar"></i>
+
+                            ${formatDate(
+                                gift.createdAt
+                            )}
+
+                        </div>
+
+                    </div>
+
+
+                    ${
+                        gift.note
+                            ? `
+
+                                <div
+                                    class="meta"
+                                    style="
+                                        margin-top:10px;
+                                        display:block;
+                                    "
+                                >
+
+                                    <i class="fa-solid fa-note-sticky"></i>
+
+                                    ${escapeHtml(
+                                        gift.note
+                                    )}
+
+                                </div>
+
+                            `
+                            : ""
+                    }
+
+
+                    ${
+                        imagesHtml
+                            ? `
+
+                                <div class="gift-images">
+
+                                    ${imagesHtml}
+
+                                </div>
+
+                            `
+                            : ""
+                    }
+
+                </article>
+
+            `;
+
+        }
+
+
+        /* =====================================================
+           INITIAL LOAD
+        ====================================================== */
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                updateTargetSummary();
+
+                renderRecentGifts();
+
+            }
+        );
+
+
+        /* =====================================================
+           FIREBASE ERROR HANDLING
+        ====================================================== */
+
+        window.addEventListener(
+            "unhandledrejection",
+            event => {
+
+                console.error(
+                    "Unhandled promise:",
+                    event.reason
+                );
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

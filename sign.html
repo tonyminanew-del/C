@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>تسجيل دخول الخادم - مدرسة شمامسة مارجرجس بالمنصورة</title>
+    <!-- خطوط عربية فخمة -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <!-- مكتبة الأيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-space: #020408;
+            --primary-gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-dark: #997a15;
+            --glass-bg: rgba(8, 12, 22, 0.7);
+            --glass-border: rgba(212, 175, 55, 0.25);
+            --card-radius: 36px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-space);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+        }
+
+        /* --- طبقات الفضاء السينمائي الخلفي (Space 3D UI) --- */
+        .space-universe {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* النجوم والجسيمات الضوئية المتحركة */
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite alternate;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.15; transform: scale(0.8); }
+            100% { opacity: 0.9; transform: scale(1.3); }
+        }
+
+        /* كواكب بعيدة تتحرك ببطء شديد */
+        .planet {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(1px);
+            opacity: 0.35;
+            z-index: 1;
+        }
+        .planet-1 {
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle at 30% 30%, #4a3b5c, #1a1226);
+            top: 10%;
+            left: 10%;
+            animation: floatPlanet 40s linear infinite;
+        }
+        .planet-2 {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #5c3b3b, #261212);
+            bottom: 12%;
+            right: 8%;
+            animation: floatPlanet 50s linear infinite reverse;
+        }
+        @keyframes floatPlanet {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(180deg); }
+            100% { transform: translateY(0) rotate(360deg); }
+        }
+
+        /* سديم فلكي خفيف (Nebula) مع تأثير Depth of Field */
+        .nebula-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(140, 30, 50, 0.15) 0%, rgba(2, 4, 8, 0) 70%);
+            top: -150px;
+            right: -150px;
+            border-radius: 50%;
+            filter: blur(90px);
+            z-index: 1;
+        }
+        .nebula-glow-2 {
+            position: absolute;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(2, 4, 8, 0) 70%);
+            bottom: -200px;
+            left: -200px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: 1;
+        }
+
+        /* صواريخ فضائية ثلاثية الأبعاد تتحرك في الخلفية مع أثر ضوئي */
+        .space-rocket {
+            position: absolute;
+            font-size: 22px;
+            color: var(--primary-gold);
+            opacity: 0.55;
+            filter: drop-shadow(0 0 12px rgba(212, 175, 55, 0.7));
+            z-index: 2;
+            pointer-events: none;
+        }
+        .rocket-1 {
+            top: 22%;
+            left: -10%;
+            animation: flyAcross1 20s linear infinite;
+        }
+        .rocket-2 {
+            bottom: 25%;
+            right: -10%;
+            animation: flyAcross2 24s linear infinite;
+            animation-delay: 6s;
+        }
+
+        @keyframes flyAcross1 {
+            0% { transform: translate(-60px, 0) rotate(40deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translate(115vw, -180px) rotate(40deg); opacity: 0; }
+        }
+        @keyframes flyAcross2 {
+            0% { transform: translate(60px, 0) rotate(-140deg); opacity: 0; }
+            10% { opacity: 0.5; }
+            90% { opacity: 0.5; }
+            100% { transform: translate(-115vw, 180px) rotate(-140deg); opacity: 0; }
+        }
+
+        /* --- الكارت الرئيسي Glassmorphism 3D --- */
+        .app-wrapper {
+            width: 100%;
+            max-width: 440px;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .main-card {
+            width: 100%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: var(--card-radius);
+            padding: 32px 26px 28px 26px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.75),
+                        0 0 50px rgba(212, 175, 55, 0.12),
+                        inset 0 1px 2px rgba(255, 255, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        /* زر العودة للرئيسية */
+        .back-nav-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold-light);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .back-nav-btn:hover {
+            background: rgba(212, 175, 55, 0.2);
+            border-color: var(--primary-gold);
+            transform: scale(1.05);
+        }
+
+        /* الشعار الفضائي الثلاثي الأبعاد (صليب أنيق + لمسة مارجرجس) */
+        .logo-container {
+            position: relative;
+            width: 76px;
+            height: 76px;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(8, 12, 22, 0.85) 100%);
+            border: 1.5px solid var(--primary-gold);
+            border-radius: 22px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 18px;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3),
+                        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+            animation: floatLogo 4s ease-in-out infinite;
+        }
+
+        .logo-container i {
+            font-size: 28px;
+            color: var(--gold-light);
+            filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.7));
+        }
+
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* العناوين والوصف */
+        .title-section {
+            margin-bottom: 24px;
+            width: 100%;
+        }
+
+        .main-heading {
+            font-size: 21px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .sub-description {
+            font-size: 12.5px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.5;
+            max-width: 310px;
+            margin: 0 auto;
+        }
+
+        /* نموذج تسجيل الدخول */
+        .login-form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 22px;
+            text-align: right;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+        }
+
+        .input-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--gold-light);
+            padding-right: 4px;
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 52px;
+            background: rgba(0, 0, 0, 0.45);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 0 16px 0 46px;
+            color: #ffffff;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .input-field:focus {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        /* زر إظهار/إخفاء كلمة المرور */
+        .toggle-password {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 16px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .toggle-password:hover {
+            color: var(--primary-gold);
+        }
+
+        /* رسالة الخطأ المتناسقة داخل الكارت */
+        .error-message {
+            background: rgba(140, 30, 50, 0.25);
+            border: 1px solid rgba(255, 107, 107, 0.4);
+            color: #ff8787;
+            padding: 11px 14px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* زر الدخول بتصميم 3D وتفاعل متطور */
+        .submit-btn {
+            position: relative;
+            width: 100%;
+            height: 54px;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--gold-dark) 100%);
+            border: none;
+            border-radius: 16px;
+            color: #020408;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.35),
+                        inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.5),
+                        0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(1px);
+        }
+
+        .submit-btn i {
+            font-size: 15px;
+        }
+
+        /* تذييل الصفحة (يحتوي فقط على اسم المدرسة) */
+        .card-footer-info {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 16px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .footer-church {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.75);
+            letter-spacing: 0.3px;
+        }
+
+        /* تأثير التحميل (Loading Spinner) */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(2, 4, 8, 0.3);
+            border-top-color: #020408;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الخلفية الفضائية المتقدمة (نجوم، كواكب، سديم، صواريخ) -->
+    <div class="space-universe" id="spaceUniverse">
+        <div class="planet planet-1"></div>
+        <div class="planet planet-2"></div>
+        <div class="nebula-glow"></div>
+        <div class="nebula-glow-2"></div>
+        <!-- صواريخ ثلاثية الأبعاد متحركة في الخلفية -->
+        <div class="space-rocket rocket-1"><i class="fa-solid fa-rocket"></i></div>
+        <div class="space-rocket rocket-2"><i class="fa-solid fa-space-shuttle"></i></div>
+    </div>
+
+    <div class="app-wrapper">
+        <!-- الكارت الرئيسي Glassmorphism 3D -->
+        <div class="main-card">
+            
+            <!-- زر العودة -->
+            <a href="../index.html" class="back-nav-btn" title="العودة للرئيسية">
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+
+            <!-- الشعار الثلاثي الأبعاد (صليب أنيق ورمز مارجرجس) -->
+            <div class="logo-container">
+                <i class="fa-solid fa-cross"></i>
+            </div>
+
+            <!-- العنوان والوصف -->
+            <div class="title-section">
+                <h1 class="main-heading">دخول الخادم</h1>
+                <p class="sub-description">
+                    مرحبًا بك في خدمة مدرسة شمامسة كنيسة الشهيد العظيم مارجرجس بالمنصورة
+                </p>
+            </div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <form class="login-form" id="servantLoginForm" onsubmit="handleServantLogin(event)">
+                <div class="input-group">
+                    <label class="input-label">اكتب كلمة مرور الخادم</label>
+                    <div class="password-wrapper">
+                        <input type="password" class="input-field" id="servantPassword" placeholder="كلمة مرور الخادم" required autocomplete="current-password">
+                        <button type="button" class="toggle-password" id="togglePasswordBtn" onclick="togglePasswordVisibility()">
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- رسالة الخطأ المتناسقة -->
+                <div class="error-message" id="errorMessage">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>كلمة المرور غير صحيحة، حاول مرة أخرى.</span>
+                </div>
+
+                <!-- زر الدخول -->
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span id="btnText">دخول الخادم</span>
+                    <i class="fa-solid fa-rocket" id="btnIcon"></i>
+                    <div class="spinner" id="btnSpinner"></div>
+                </button>
+            </form>
+
+            <!-- تذييل الصفحة (اسم المدرسة فقط) -->
+            <div class="card-footer-info">
+                <span class="footer-church">مدرسة شمامسة كنيسة الشهيد العظيم مارجرجس بالمنصورة</span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // توليد النجوم والجسيمات الضوئية عشوائياً في الفضاء لتشكل عمقاً بصرياً (3D Depth)
+        const universe = document.getElementById('spaceUniverse');
+        const starCount = 50;
+
+        for (let i = 0; i < starCount; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            
+            const size = Math.random() * 2.5 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.setProperty('--duration', `${Math.random() * 3 + 2}s`);
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            
+            universe.appendChild(star);
+        }
+
+        // دالة إظهار وإخفاء كلمة المرور
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('servantPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // التحقق من كلمة المرور المطلوبة (stmarygrgs) والانتقال إلى admin_comb.html
+        function handleServantLogin(event) {
+            event.preventDefault();
+            const passwordInput = document.getElementById('servantPassword');
+            const errorMessage = document.getElementById('errorMessage');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            const enteredPassword = passwordInput.value.trim();
+            const correctPassword = "stmarygrgs";
+
+            // إخفاء رسالة الخطأ السابقة
+            errorMessage.style.display = 'none';
+            passwordInput.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+
+            if (enteredPassword === correctPassword) {
+                // نجاح تسجيل الدخول - إظهار التحميل والانتقال
+                btnText.style.display = 'none';
+                btnIcon.style.display = 'none';
+                btnSpinner.style.display = 'block';
+                submitBtn.style.pointerEvents = 'none';
+
+                setTimeout(() => {
+                    // الانتقال المباشر إلى لوحة التحكم المطلوبة
+                    window.location.href = 'admin_comb.html';
+                }, 1000);
+
+            } else {
+                // كلمة المرور غير صحيحة - إظهار رسالة الخطأ واهتزاز الحقل مع Glow
+                errorMessage.style.display = 'flex';
+                passwordInput.style.borderColor = '#ff6b6b';
+                passwordInput.style.boxShadow = '0 0 15px rgba(255, 107, 107, 0.4), inset 0 2px 4px rgba(0,0,0,0.5)';
+                passwordInput.focus();
+
+                // إعادة تفعيل أنيميشن الاهتزاز
+                errorMessage.style.animation = 'none';
+                void errorMessage.offsetHeight;
+                errorMessage.style.animation = 'shake 0.4s ease-in-out';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,2122 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>استكمال بيانات الخادم</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <style>
+
+        :root {
+            --navy: #061d39;
+            --navy-dark: #020c19;
+
+            --maroon: #7d1424;
+            --maroon-dark: #5d101c;
+            --maroon-light: #a51f35;
+
+            --gold: #c9a24b;
+
+            --ink: #211918;
+            --muted: #817773;
+
+            --line: #eadfe0;
+            --soft: #fff7f8;
+
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Tajawal", sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 50% 0%,
+                    #123761 0%,
+                    var(--navy) 38%,
+                    var(--navy-dark) 100%
+                );
+
+            color: var(--ink);
+
+            padding:
+                max(18px, env(safe-area-inset-top))
+                15px
+                max(20px, env(safe-area-inset-bottom));
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            overflow-x: hidden;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            width: min(440px, 100%);
+            min-height: 64px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 18px;
+
+            color: white;
+
+            margin-bottom: 12px;
+        }
+
+        .top-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-family: "Amiri", serif;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .top-title i {
+            color: var(--gold);
+            font-size: 21px;
+        }
+
+        .reload-btn {
+            width: 42px;
+            height: 42px;
+
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 50%;
+
+            background: rgba(255,255,255,.07);
+
+            color: white;
+            font-size: 16px;
+
+            cursor: pointer;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            transition: .2s;
+        }
+
+        .reload-btn:hover {
+            background: rgba(255,255,255,.13);
+            transform: rotate(90deg);
+        }
+
+        /* =========================
+           MAIN CARD
+        ========================= */
+
+        .page {
+            position: relative;
+
+            width: min(440px, 100%);
+
+            background: white;
+
+            border-radius: 28px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.35),
+                0 5px 20px rgba(0,0,0,.18);
+        }
+
+        .page::before {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+
+            height: 7px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    var(--maroon-dark),
+                    var(--maroon),
+                    var(--gold),
+                    var(--maroon)
+                );
+        }
+
+        /* Handle */
+
+        .handle {
+            width: 42px;
+            height: 5px;
+
+            border-radius: 20px;
+
+            background: #d7cdcd;
+
+            margin: 18px auto 0;
+        }
+
+        .content {
+            padding: 22px 22px 26px;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            text-align: center;
+
+            padding: 8px 0 22px;
+        }
+
+        .header-icon {
+            width: 70px;
+            height: 70px;
+
+            margin: 0 auto 12px;
+
+            border-radius: 50%;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--maroon-light),
+                    var(--maroon-dark)
+                );
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 28px;
+
+            box-shadow:
+                0 10px 25px rgba(125,20,36,.25);
+        }
+
+        .header h1 {
+            font-family: "Amiri", serif;
+
+            font-size: 27px;
+            line-height: 1.4;
+
+            color: var(--navy);
+
+            margin-bottom: 4px;
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        #welcomeHeading {
+            color: var(--maroon);
+            font-weight: 800;
+        }
+
+        /* =========================
+           SECTION
+        ========================= */
+
+        .section {
+            margin-top: 18px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            margin-bottom: 10px;
+
+            color: var(--navy);
+
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .section-title i {
+            color: var(--maroon);
+        }
+
+        /* =========================
+           INPUT
+        ========================= */
+
+        .input-box {
+            position: relative;
+
+            width: 100%;
+
+            background: var(--soft);
+
+            border: 1px solid var(--line);
+
+            border-radius: 16px;
+
+            min-height: 58px;
+
+            display: flex;
+            align-items: center;
+
+            padding: 0 15px;
+
+            transition: .2s;
+        }
+
+        .input-box:focus-within {
+            border-color: var(--maroon);
+            box-shadow: 0 0 0 3px rgba(125,20,36,.08);
+        }
+
+        .input-box input {
+            width: 100%;
+
+            border: 0;
+            outline: 0;
+
+            background: transparent;
+
+            font-family: "Tajawal", sans-serif;
+            font-size: 15px;
+
+            color: var(--ink);
+        }
+
+        /* =========================
+           AVATAR
+        ========================= */
+
+        .avatar-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .avatar-label {
+            position: relative;
+
+            width: 112px;
+            height: 112px;
+
+            border-radius: 50%;
+
+            cursor: pointer;
+
+            display: block;
+        }
+
+        .avatar-preview {
+            width: 112px;
+            height: 112px;
+
+            border-radius: 50%;
+
+            object-fit: cover;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #f4e9ea,
+                    #fff
+                );
+
+            border: 4px solid white;
+
+            box-shadow:
+                0 8px 25px rgba(0,0,0,.14),
+                0 0 0 1px var(--line);
+        }
+
+        .avatar-placeholder {
+            position: absolute;
+            inset: 4px;
+
+            border-radius: 50%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: var(--maroon);
+
+            font-size: 30px;
+
+            pointer-events: none;
+        }
+
+        .camera-badge {
+            position: absolute;
+
+            bottom: 2px;
+            right: 2px;
+
+            width: 34px;
+            height: 34px;
+
+            border-radius: 50%;
+
+            background: var(--maroon);
+
+            color: white;
+
+            border: 3px solid white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 13px;
+
+            pointer-events: none;
+        }
+
+        #avatarInput {
+            display: none;
+        }
+
+        /* =========================
+           PHONE
+        ========================= */
+
+        .phone-box {
+            display: flex;
+            align-items: stretch;
+
+            width: 100%;
+
+            background: var(--soft);
+
+            border: 1px solid var(--line);
+
+            border-radius: 16px;
+
+            overflow: hidden;
+
+            min-height: 58px;
+
+            transition: .2s;
+        }
+
+        .phone-box:focus-within {
+            border-color: var(--maroon);
+            box-shadow: 0 0 0 3px rgba(125,20,36,.08);
+        }
+
+        .country-code {
+            min-width: 72px;
+
+            background: #a51f35;
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 800;
+            font-size: 14px;
+
+            direction: ltr;
+
+            user-select: none;
+        }
+
+        .phone-box input {
+            flex: 1;
+
+            min-width: 0;
+
+            border: 0;
+            outline: 0;
+
+            padding: 0 15px;
+
+            background: transparent;
+
+            font-family: "Tajawal", sans-serif;
+            font-size: 15px;
+
+            color: var(--ink);
+
+            direction: ltr;
+            text-align: right;
+        }
+
+        /* =========================
+           STAGE CARDS
+        ========================= */
+
+        .stage-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 9px;
+        }
+
+        .stage-card {
+            min-height: 86px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 17px;
+
+            background: white;
+
+            cursor: pointer;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            transition: .2s;
+
+            user-select: none;
+        }
+
+        .stage-card i {
+            font-size: 23px;
+            color: var(--maroon);
+        }
+
+        .stage-card span {
+            font-size: 13px;
+            font-weight: 700;
+
+            color: #3c3232;
+        }
+
+        .stage-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--maroon);
+        }
+
+        .stage-card.active {
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--maroon),
+                    var(--maroon-dark)
+                );
+
+            border-color: var(--maroon);
+
+            box-shadow:
+                0 8px 18px rgba(125,20,36,.22);
+        }
+
+        .stage-card.active i,
+        .stage-card.active span {
+            color: white;
+        }
+
+        /* =========================
+           GRADE
+        ========================= */
+
+        #gradeSection {
+            display: none;
+            flex-direction: column;
+        }
+
+        .grade-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 9px;
+        }
+
+        .grade-card {
+            min-height: 62px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 15px;
+
+            background: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 8px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: .2s;
+        }
+
+        .grade-card:hover {
+            border-color: var(--maroon);
+        }
+
+        .grade-card.active {
+            color: white;
+
+            background: var(--maroon);
+
+            border-color: var(--maroon);
+
+            box-shadow:
+                0 7px 16px rgba(125,20,36,.2);
+        }
+
+        /* =========================
+           ROLE
+        ========================= */
+
+        .role-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 9px;
+        }
+
+        .role-card {
+            min-height: 72px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 16px;
+
+            background: white;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            gap: 7px;
+
+            cursor: pointer;
+
+            transition: .2s;
+
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .role-card i {
+            color: var(--gold);
+            font-size: 20px;
+        }
+
+        .role-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .role-card.active {
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--navy),
+                    #0b2e53
+                );
+
+            border-color: var(--navy);
+
+            color: white;
+
+            box-shadow:
+                0 8px 18px rgba(6,29,57,.2);
+        }
+
+        .role-card.active i {
+            color: var(--gold);
+        }
+
+        /* =========================
+           SUBMIT
+        ========================= */
+
+        .submit-btn {
+            width: 100%;
+
+            min-height: 58px;
+
+            margin-top: 24px;
+
+            border: 0;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #d9d9d9,
+                    #bcbcbc
+                );
+
+            color: #777;
+
+            font-family: "Tajawal", sans-serif;
+
+            font-size: 16px;
+            font-weight: 800;
+
+            cursor: not-allowed;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+
+            transition: .25s;
+        }
+
+        .submit-btn.active {
+            cursor: pointer;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    var(--maroon-light),
+                    var(--maroon-dark)
+                );
+
+            box-shadow:
+                0 10px 25px rgba(125,20,36,.28);
+        }
+
+        .submit-btn.active:hover {
+            transform: translateY(-2px);
+        }
+
+        .submit-btn.active:active {
+            transform: scale(.98);
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            text-align: center;
+
+            padding: 18px 10px 5px;
+
+            color: var(--muted);
+
+            font-family: "Amiri", serif;
+
+            font-size: 13px;
+
+            line-height: 1.7;
+        }
+
+        .footer i {
+            color: var(--maroon);
+            margin-left: 4px;
+        }
+
+        /* =========================
+           LOADING
+        ========================= */
+
+        .loading-overlay {
+            display: none;
+
+            position: fixed;
+            inset: 0;
+
+            z-index: 1000;
+
+            background:
+                rgba(2,12,25,.82);
+
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-box {
+            width: min(310px, calc(100% - 40px));
+
+            background: white;
+
+            border-radius: 25px;
+
+            padding: 28px 22px;
+
+            text-align: center;
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.4);
+        }
+
+        .loader {
+            width: 52px;
+            height: 52px;
+
+            border-radius: 50%;
+
+            border: 5px solid #eee;
+
+            border-top-color: var(--maroon);
+
+            animation:
+                spin .8s linear infinite;
+
+            margin: 0 auto 18px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-box h3 {
+            font-family: "Amiri", serif;
+
+            color: var(--navy);
+
+            font-size: 22px;
+
+            margin-bottom: 5px;
+        }
+
+        .loading-box p {
+            color: var(--muted);
+
+            font-size: 13px;
+        }
+
+        /* =========================
+           EXPLOSION TRANSITION
+        ========================= */
+
+        .rocket-container {
+            display: none;
+
+            position: fixed;
+            inset: 0;
+
+            z-index: 1100;
+
+            overflow: hidden;
+
+            pointer-events: none;
+        }
+
+        .explosion {
+            position: absolute;
+
+            left: 50%;
+            top: 50%;
+
+            width: 25px;
+            height: 25px;
+
+            transform:
+                translate(-50%, -50%)
+                scale(.1);
+
+            opacity: 0;
+
+            border-radius: 50%;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #fff 0%,
+                    #fff7c7 18%,
+                    #ffd85a 38%,
+                    #ff9f1a 58%,
+                    transparent 72%
+                );
+
+            box-shadow:
+                0 0 25px #fff,
+                0 0 60px var(--gold),
+                0 0 110px #ff8c00;
+        }
+
+        .explosion.active {
+            animation:
+                explosionAnim .55s ease-out forwards;
+        }
+
+        @keyframes explosionAnim {
+
+            0% {
+                opacity: 0;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(.1);
+            }
+
+            20% {
+                opacity: 1;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(2);
+            }
+
+            50% {
+                opacity: 1;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(7);
+            }
+
+            100% {
+                opacity: 0;
+
+                transform:
+                    translate(-50%, -50%)
+                    scale(18);
+            }
+        }
+
+        .space-flash {
+            display: none;
+
+            position: fixed;
+            inset: 0;
+
+            z-index: 1200;
+
+            background: white;
+
+            opacity: 0;
+
+            pointer-events: none;
+        }
+
+        .space-flash.active {
+            display: block;
+
+            animation:
+                flashAnim .5s ease-out forwards;
+        }
+
+        @keyframes flashAnim {
+
+            0% {
+                opacity: 0;
+            }
+
+            25% {
+                opacity: 1;
+            }
+
+            55% {
+                opacity: .75;
+            }
+
+            100% {
+                opacity: 0;
+            }
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 430px) {
+
+            body {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .topbar {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .content {
+                padding-left: 17px;
+                padding-right: 17px;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+            .stage-grid,
+            .role-grid {
+                gap: 7px;
+            }
+
+            .grade-grid {
+                gap: 7px;
+            }
+        }
+
+        @media (max-width: 350px) {
+
+            .stage-card {
+                min-height: 78px;
+            }
+
+            .stage-card span,
+            .role-card,
+            .grade-card {
+                font-size: 12px;
+            }
+
+            .country-code {
+                min-width: 64px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         TOP BAR
+    ========================= -->
+
+    <div class="topbar">
+
+        <div class="top-title">
+            <i class="fa-solid fa-user-shield"></i>
+            <span>بيانات الخادم</span>
+        </div>
+
+        <button
+            class="reload-btn"
+            type="button"
+            onclick="location.reload()"
+            aria-label="إعادة تحميل">
+
+            <i class="fa-solid fa-rotate-right"></i>
+
+        </button>
+
+    </div>
+
+
+    <!-- =========================
+         MAIN PAGE
+    ========================= -->
+
+    <main class="page">
+
+        <div class="handle"></div>
+
+        <div class="content">
+
+            <!-- HEADER -->
+
+            <div class="header">
+
+                <div class="header-icon">
+                    <i class="fa-solid fa-user-gear"></i>
+                </div>
+
+                <h1>استكمال بياناتك</h1>
+
+                <p id="welcomeHeading">
+                    أهلاً يا خادم 👋
+                </p>
+
+            </div>
+
+
+            <!-- =========================
+                 PROFILE IMAGE
+            ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>صورتك الشخصية</span>
+                </div>
+
+                <div class="avatar-wrapper">
+
+                    <label
+                        class="avatar-label"
+                        for="avatarInput">
+
+                        <img
+                            id="avatarPreview"
+                            class="avatar-preview"
+                            alt="الصورة الشخصية">
+
+                        <div
+                            class="avatar-placeholder"
+                            id="avatarPlaceholder">
+
+                            <i class="fa-solid fa-user"></i>
+
+                        </div>
+
+                        <div class="camera-badge">
+                            <i class="fa-solid fa-camera"></i>
+                        </div>
+
+                    </label>
+
+                    <input
+                        id="avatarInput"
+                        type="file"
+                        accept="image/*">
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 PHONE
+            ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                    <span>رقم الهاتف</span>
+                </div>
+
+                <div class="phone-box">
+
+                    <div class="country-code">
+                        +20
+                    </div>
+
+                    <input
+                        id="phoneInput"
+                        type="tel"
+                        inputmode="numeric"
+                        autocomplete="tel"
+                        maxlength="10"
+                        placeholder="أدخل رقم الهاتف">
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 STAGE
+            ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    <i class="fa-solid fa-school"></i>
+                    <span>المرحلة</span>
+                </div>
+
+                <div class="stage-grid">
+
+                    <div
+                        class="stage-card"
+                        onclick="selectStage('ابتدائي', this)">
+
+                        <i class="fa-solid fa-child"></i>
+
+                        <span>ابتدائي</span>
+
+                    </div>
+
+
+                    <div
+                        class="stage-card"
+                        onclick="selectStage('إعدادي', this)">
+
+                        <i class="fa-solid fa-graduation-cap"></i>
+
+                        <span>إعدادي</span>
+
+                    </div>
+
+
+                    <div
+                        class="stage-card"
+                        onclick="selectStage('ثانوي', this)">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        <span>ثانوي</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 GRADE
+            ========================= -->
+
+            <div
+                class="section"
+                id="gradeSection">
+
+                <div class="section-title">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>الصف</span>
+                </div>
+
+                <div
+                    class="grade-grid"
+                    id="gradesContainer">
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 ROLE
+            ========================= -->
+
+            <div class="section">
+
+                <div class="section-title">
+                    <i class="fa-solid fa-user-tie"></i>
+                    <span>نوع الخادم</span>
+                </div>
+
+                <div class="role-grid">
+
+                    <div
+                        class="role-card"
+                        onclick="selectRole('أخ', this)">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        <span>أخ</span>
+
+                    </div>
+
+
+                    <div
+                        class="role-card"
+                        onclick="selectRole('تاسوني', this)">
+
+                        <i class="fa-solid fa-user-tie"></i>
+
+                        <span>تاسوني</span>
+
+                    </div>
+
+
+                    <div
+                        class="role-card"
+                        onclick="selectRole('أبونا', this)">
+
+                        <i class="fa-solid fa-cross"></i>
+
+                        <span>أبونا</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 SUBMIT
+            ========================= -->
+
+            <button
+                id="submitBtn"
+                class="submit-btn"
+                type="button"
+                disabled
+                onclick="handleSaveData(event)">
+
+                <i class="fa-solid fa-check"></i>
+
+                <span>تأكيد وحفظ البيانات</span>
+
+            </button>
+
+
+            <!-- =========================
+                 FOOTER
+            ========================= -->
+
+            <div class="footer">
+
+                <i class="fa-solid fa-church"></i>
+
+                مدرسة شمامسة كنيسة الشهيد العظيم مارجرجس بالمنصورة
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         LOADING
+    ========================= -->
+
+    <div
+        class="loading-overlay"
+        id="loadingOverlay">
+
+        <div class="loading-box">
+
+            <div class="loader"></div>
+
+            <h3>جاري الحفظ</h3>
+
+            <p id="loadingText">
+                جاري حفظ البيانات...
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         EXPLOSION TRANSITION
+    ========================= -->
+
+    <div
+        class="rocket-container"
+        id="rocketContainer">
+
+        <div
+            class="explosion"
+            id="explosion">
+        </div>
+
+    </div>
+
+
+    <div
+        class="space-flash"
+        id="spaceFlash">
+    </div>
+
+
+    <script>
+
+        /* =========================
+           FIREBASE
+        ========================= */
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDk8HJVho9up6Hof7d6S_Or8ICnaGnuIUg",
+            authDomain: "tony-c78c0.firebaseapp.com",
+            projectId: "tony-c78c0",
+            storageBucket: "tony-c78c0.firebasestorage.app",
+            messagingSenderId: "182062544524",
+            appId: "1:182062544524:web:59afdba4f0d1dfd929ada9",
+            measurementId: "G-4FER9HW0JS"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const db = firebase.firestore();
+
+
+        /* =========================
+           CURRENT USER
+        ========================= */
+
+        const currentUsername =
+            localStorage.getItem(
+                "current_servant_username"
+            ) || "";
+
+
+        /* =========================
+           VARIABLES
+        ========================= */
+
+        let selectedStageValue = "";
+        let selectedGradeValue = "";
+        let selectedRoleValue = "";
+        let selectedAvatarBase64 = "";
+
+
+        /* =========================
+           ELEMENTS
+        ========================= */
+
+        const welcomeHeading =
+            document.getElementById(
+                "welcomeHeading"
+            );
+
+        const phoneInput =
+            document.getElementById(
+                "phoneInput"
+            );
+
+        const avatarInput =
+            document.getElementById(
+                "avatarInput"
+            );
+
+        const avatarPreview =
+            document.getElementById(
+                "avatarPreview"
+            );
+
+        const avatarPlaceholder =
+            document.getElementById(
+                "avatarPlaceholder"
+            );
+
+        const gradeSection =
+            document.getElementById(
+                "gradeSection"
+            );
+
+        const gradesContainer =
+            document.getElementById(
+                "gradesContainer"
+            );
+
+        const submitBtn =
+            document.getElementById(
+                "submitBtn"
+            );
+
+        const loadingOverlay =
+            document.getElementById(
+                "loadingOverlay"
+            );
+
+        const loadingText =
+            document.getElementById(
+                "loadingText"
+            );
+
+
+        /* =========================
+           DEFAULT AVATAR
+        ========================= */
+
+        avatarPreview.style.display = "none";
+
+
+        /* =========================
+           FETCH SERVANT DATA
+        ========================= */
+
+        async function fetchServantData() {
+
+            if (!currentUsername) {
+
+                welcomeHeading.textContent =
+                    "أهلاً يا خادم 👋";
+
+                return;
+            }
+
+            try {
+
+                const docRef =
+                    db.collection("servants")
+                        .doc(currentUsername);
+
+                const docSnap =
+                    await docRef.get();
+
+                if (docSnap.exists) {
+
+                    const data =
+                        docSnap.data();
+
+                    const username =
+                        data.username ||
+                        currentUsername;
+
+                    welcomeHeading.textContent =
+                        `أهلاً يا ${username} 👋`;
+
+                    /* Existing avatar */
+
+                    if (data.avatar) {
+
+                        avatarPreview.src =
+                            data.avatar;
+
+                        avatarPreview.style.display =
+                            "block";
+
+                        avatarPlaceholder.style.display =
+                            "none";
+                    }
+
+                    /* Existing phone */
+
+                    if (data.phone) {
+
+                        let phone =
+                            String(data.phone);
+
+                        if (phone.startsWith("+20")) {
+                            phone =
+                                phone.substring(3);
+                        }
+
+                        phoneInput.value =
+                            phone;
+                    }
+
+                    checkFormValidity();
+
+                } else {
+
+                    welcomeHeading.textContent =
+                        `أهلاً يا ${currentUsername} 👋`;
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                welcomeHeading.textContent =
+                    `أهلاً يا ${currentUsername} 👋`;
+            }
+        }
+
+        fetchServantData();
+
+
+        /* =========================
+           COMPRESS IMAGE
+        ========================= */
+
+        function compressImage(
+            file,
+            maxSize = 300,
+            quality = 0.75
+        ) {
+
+            return new Promise(
+                (resolve, reject) => {
+
+                    const reader =
+                        new FileReader();
+
+                    reader.onload = function () {
+
+                        const img =
+                            new Image();
+
+                        img.onload = function () {
+
+                            let width =
+                                img.width;
+
+                            let height =
+                                img.height;
+
+                            if (
+                                width > maxSize ||
+                                height > maxSize
+                            ) {
+
+                                if (
+                                    width >
+                                    height
+                                ) {
+
+                                    height =
+                                        Math.round(
+                                            height *
+                                            maxSize /
+                                            width
+                                        );
+
+                                    width =
+                                        maxSize;
+
+                                } else {
+
+                                    width =
+                                        Math.round(
+                                            width *
+                                            maxSize /
+                                            height
+                                        );
+
+                                    height =
+                                        maxSize;
+                                }
+                            }
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
+                                );
+
+                            canvas.width =
+                                width;
+
+                            canvas.height =
+                                height;
+
+                            const ctx =
+                                canvas.getContext(
+                                    "2d"
+                                );
+
+                            ctx.drawImage(
+                                img,
+                                0,
+                                0,
+                                width,
+                                height
+                            );
+
+                            resolve(
+                                canvas.toDataURL(
+                                    "image/jpeg",
+                                    quality
+                                )
+                            );
+                        };
+
+                        img.onerror =
+                            reject;
+
+                        img.src =
+                            reader.result;
+                    };
+
+                    reader.onerror =
+                        reject;
+
+                    reader.readAsDataURL(file);
+                }
+            );
+        }
+
+
+        /* =========================
+           AVATAR SELECT
+        ========================= */
+
+        avatarInput.addEventListener(
+            "change",
+            async function () {
+
+                const file =
+                    this.files[0];
+
+                if (!file) return;
+
+                if (!file.type.startsWith("image/")) {
+
+                    alert(
+                        "من فضلك اختر صورة صحيحة."
+                    );
+
+                    return;
+                }
+
+                try {
+
+                    selectedAvatarBase64 =
+                        await compressImage(
+                            file,
+                            300,
+                            0.75
+                        );
+
+                    avatarPreview.src =
+                        selectedAvatarBase64;
+
+                    avatarPreview.style.display =
+                        "block";
+
+                    avatarPlaceholder.style.display =
+                        "none";
+
+                } catch (error) {
+
+                    console.error(error);
+
+                    alert(
+                        "حدث خطأ أثناء تجهيز الصورة."
+                    );
+                }
+
+                checkFormValidity();
+            }
+        );
+
+
+        /* =========================
+           PHONE
+        ========================= */
+
+        phoneInput.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value
+                        .replace(/\D/g, "")
+                        .slice(0, 10);
+
+                checkFormValidity();
+            }
+        );
+
+
+        /* =========================
+           SELECT STAGE
+        ========================= */
+
+        function selectStage(
+            stageName,
+            element
+        ) {
+
+            document
+                .querySelectorAll(
+                    ".stage-card"
+                )
+                .forEach(
+                    card =>
+                        card.classList.remove(
+                            "active"
+                        )
+                );
+
+            element.classList.add(
+                "active"
+            );
+
+            selectedStageValue =
+                stageName;
+
+            selectedGradeValue = "";
+
+            gradesContainer.innerHTML =
+                "";
+
+            if (
+                stageName ===
+                "ابتدائي"
+            ) {
+
+                const gradeOptions = [
+                    "أولى + ثانية",
+                    "ثالثة + رابعة",
+                    "خامسة + سادسة"
+                ];
+
+                gradeOptions.forEach(
+                    grade => {
+
+                        const card =
+                            document.createElement(
+                                "div"
+                            );
+
+                        card.className =
+                            "grade-card";
+
+                        card.textContent =
+                            grade;
+
+                        card.onclick =
+                            function () {
+
+                                selectGrade(
+                                    grade,
+                                    card
+                                );
+                            };
+
+                        gradesContainer.appendChild(
+                            card
+                        );
+                    }
+                );
+
+                gradeSection.style.display =
+                    "flex";
+
+            } else if (
+                stageName ===
+                "إعدادي"
+            ) {
+
+                gradeSection.style.display =
+                    "none";
+
+                selectedGradeValue =
+                    "إعدادي";
+
+            } else if (
+                stageName ===
+                "ثانوي"
+            ) {
+
+                gradeSection.style.display =
+                    "none";
+
+                selectedGradeValue =
+                    "ثانوي";
+            }
+
+            checkFormValidity();
+        }
+
+
+        /* =========================
+           SELECT GRADE
+        ========================= */
+
+        function selectGrade(
+            grade,
+            element
+        ) {
+
+            document
+                .querySelectorAll(
+                    ".grade-card"
+                )
+                .forEach(
+                    card =>
+                        card.classList.remove(
+                            "active"
+                        )
+                );
+
+            element.classList.add(
+                "active"
+            );
+
+            selectedGradeValue =
+                grade;
+
+            checkFormValidity();
+        }
+
+
+        /* =========================
+           SELECT ROLE
+        ========================= */
+
+        function selectRole(
+            roleName,
+            element
+        ) {
+
+            document
+                .querySelectorAll(
+                    ".role-card"
+                )
+                .forEach(
+                    card =>
+                        card.classList.remove(
+                            "active"
+                        )
+                );
+
+            element.classList.add(
+                "active"
+            );
+
+            selectedRoleValue =
+                roleName;
+
+            checkFormValidity();
+        }
+
+
+        /* =========================
+           FORM VALIDATION
+        ========================= */
+
+        function checkFormValidity() {
+
+            const phone =
+                phoneInput.value.trim();
+
+            const phoneValid =
+                phone.length >= 7;
+
+            const stageValid =
+                selectedStageValue !== "";
+
+            const gradeValid =
+                selectedGradeValue !== "";
+
+            const roleValid =
+                selectedRoleValue !== "";
+
+            const valid =
+                currentUsername !== "" &&
+                phoneValid &&
+                stageValid &&
+                gradeValid &&
+                roleValid;
+
+            submitBtn.disabled =
+                !valid;
+
+            if (valid) {
+
+                submitBtn.classList.add(
+                    "active"
+                );
+
+            } else {
+
+                submitBtn.classList.remove(
+                    "active"
+                );
+            }
+        }
+
+
+        /* =========================
+           TRANSITION
+        ========================= */
+
+        function startRocketTransition() {
+
+            const rocketContainer =
+                document.getElementById(
+                    "rocketContainer"
+                );
+
+            const explosion =
+                document.getElementById(
+                    "explosion"
+                );
+
+            const spaceFlash =
+                document.getElementById(
+                    "spaceFlash"
+                );
+
+            rocketContainer.style.display =
+                "block";
+
+            explosion.classList.remove(
+                "active"
+            );
+
+            spaceFlash.classList.remove(
+                "active"
+            );
+
+            void explosion.offsetWidth;
+            void spaceFlash.offsetWidth;
+
+            explosion.classList.add(
+                "active"
+            );
+
+            spaceFlash.classList.add(
+                "active"
+            );
+
+            setTimeout(
+                function () {
+
+                    window.location.replace(
+                        "home.html"
+                    );
+
+                },
+                700
+            );
+        }
+
+
+        /* =========================
+           SAVE DATA
+        ========================= */
+
+        async function handleSaveData(
+            event
+        ) {
+
+            if (event) {
+                event.preventDefault();
+            }
+
+            if (
+                submitBtn.disabled ||
+                !currentUsername
+            ) {
+                return;
+            }
+
+            const phoneNumber =
+                phoneInput.value.trim();
+
+            const fullPhone =
+                "+20" + phoneNumber;
+
+
+            loadingText.textContent =
+                "جاري حفظ البيانات...";
+
+            loadingOverlay.style.display =
+                "flex";
+
+
+            try {
+
+                const docRef =
+                    db.collection("servants")
+                        .doc(currentUsername);
+
+                const docSnap =
+                    await docRef.get();
+
+
+                if (!docSnap.exists) {
+
+                    throw new Error(
+                        "Servant document not found"
+                    );
+                }
+
+
+                const dataToSave = {
+
+                    phone: fullPhone,
+
+                    stage:
+                        selectedStageValue,
+
+                    grade:
+                        selectedGradeValue,
+
+                    titleRole:
+                        selectedRoleValue,
+
+                    role:
+                        "servant",
+
+                    updatedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+                };
+
+
+                if (
+                    selectedAvatarBase64
+                ) {
+
+                    dataToSave.avatar =
+                        selectedAvatarBase64;
+                }
+
+
+                await docRef.update(
+                    dataToSave
+                );
+
+
+                loadingOverlay.style.display =
+                    "none";
+
+
+                startRocketTransition();
+
+
+            } catch (error) {
+
+                console.error(
+                    "Firestore Save Error:",
+                    error
+                );
+
+                loadingOverlay.style.display =
+                    "none";
+
+
+                alert(
+                    "فشل حفظ البيانات.\n" +
+                    "تأكد من الإنترنت وحاول مرة أخرى."
+                );
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>
+

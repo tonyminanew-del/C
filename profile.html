@@ -1,0 +1,3683 @@
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>حسابي - مدرسة الشمامسة</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Tajawal", sans-serif;
+            background: #f5f7fb;
+            color: #111827;
+            padding-bottom: 90px;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* =========================
+           TOP BAR
+        ========================= */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+
+            height: 68px;
+            width: 100%;
+
+            background:
+                linear-gradient(135deg,
+                    #07152f 0%,
+                    #101f42 50%,
+                    #35131e 100%);
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 18px;
+
+            box-shadow:
+                0 8px 25px rgba(7, 21, 47, 0.16);
+        }
+
+        .topbar-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .topbar-title i {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: rgba(255, 255, 255, 0.10);
+            color: #f3c969;
+
+            font-size: 17px;
+        }
+
+        .topbar-title div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar-title strong {
+            font-family: "Amiri", serif;
+            font-size: 19px;
+            line-height: 20px;
+        }
+
+        .topbar-title span {
+            color: rgba(255, 255, 255, 0.58);
+            font-size: 10px;
+            margin-top: 2px;
+        }
+
+        .refresh-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+
+            background: rgba(255, 255, 255, 0.09);
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            transition: .2s;
+        }
+
+        .refresh-btn:active {
+            transform: scale(.9);
+        }
+
+        /* =========================
+           PAGE
+        ========================= */
+
+        .page {
+            width: min(100%, 700px);
+            margin: auto;
+            padding: 18px 14px 30px;
+        }
+
+        /* =========================
+           HERO
+        ========================= */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+
+            border-radius: 30px;
+
+            padding: 25px 20px;
+
+            color: white;
+
+            background:
+                radial-gradient(circle at 10% 10%,
+                    rgba(243, 201, 105, .16),
+                    transparent 30%),
+
+                radial-gradient(circle at 90% 90%,
+                    rgba(128, 26, 52, .35),
+                    transparent 35%),
+
+                linear-gradient(135deg,
+                    #07152f,
+                    #12254c 55%,
+                    #401622);
+
+            box-shadow:
+                0 20px 45px rgba(7, 21, 47, .20);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+
+            width: 190px;
+            height: 190px;
+
+            border-radius: 50%;
+
+            left: -100px;
+            bottom: -120px;
+
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+
+            width: 120px;
+            height: 120px;
+
+            border-radius: 50%;
+
+            right: -60px;
+            top: -65px;
+
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+            gap: 17px;
+        }
+
+        .avatar {
+            flex-shrink: 0;
+
+            width: 86px;
+            height: 86px;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            border: 3px solid rgba(255, 255, 255, .75);
+
+            background:
+                linear-gradient(135deg, #7d1f36, #12254c);
+
+            box-shadow:
+                0 10px 25px rgba(0, 0, 0, .25);
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar i {
+            font-size: 32px;
+            color: rgba(255, 255, 255, .75);
+        }
+
+        .hero-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .hero-small {
+            font-size: 14px;
+            color: rgba(255, 255, 255, .70);
+            margin-bottom: 1px;
+        }
+
+        .hero-name {
+            font-family: "Amiri", serif;
+            font-size: clamp(24px, 7vw, 34px);
+            font-weight: 700;
+
+            line-height: 1.15;
+
+            margin: 0;
+
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .hero-sub {
+            margin-top: 7px;
+
+            color: rgba(255, 255, 255, .70);
+
+            font-size: 12px;
+        }
+
+        .hero-tags {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+
+            margin-top: 18px;
+        }
+
+        .tag {
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            background: rgba(255, 255, 255, .10);
+            border: 1px solid rgba(255, 255, 255, .12);
+
+            color: white;
+
+            font-size: 11px;
+            font-weight: 700;
+
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tag i {
+            color: #f3c969;
+        }
+
+        /* =========================
+           SECTION
+        ========================= */
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin: 24px 3px 11px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+
+            font-family: "Amiri", serif;
+
+            font-size: 22px;
+            color: #101d39;
+        }
+
+        .section-title span {
+            color: #9aa2b1;
+            font-size: 11px;
+        }
+
+        /* =========================
+           INFO GRID
+        ========================= */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 11px;
+        }
+
+        .info-card {
+            min-height: 105px;
+
+            background: white;
+
+            border: 1px solid #edf0f5;
+
+            border-radius: 19px;
+
+            padding: 16px;
+
+            box-shadow:
+                0 8px 25px rgba(15, 23, 42, .055);
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+
+            transition: .2s;
+        }
+
+        .info-icon {
+            width: 38px;
+            height: 38px;
+
+            border-radius: 12px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #f6f1e2;
+            color: #8c6817;
+
+            font-size: 15px;
+        }
+
+        .info-label {
+            color: #9aa2b1;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+
+        .info-value {
+            color: #17213a;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            margin-top: 2px;
+
+            word-break: break-word;
+        }
+
+        /* =========================
+           EDIT CARD
+        ========================= */
+
+        .edit-card {
+            display: none;
+
+            background: white;
+
+            border-radius: 25px;
+
+            padding: 18px;
+
+            border: 1px solid #edf0f5;
+
+            box-shadow:
+                0 15px 40px rgba(15, 23, 42, .08);
+
+            animation: editIn .25s ease;
+        }
+
+        .edit-card.show {
+            display: block;
+        }
+
+        @keyframes editIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .edit-title {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            margin-bottom: 18px;
+        }
+
+        .edit-title-icon {
+            width: 44px;
+            height: 44px;
+
+            border-radius: 14px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            background: #f6f1e2;
+            color: #8c6817;
+        }
+
+        .edit-title h3 {
+            margin: 0;
+
+            font-family: "Amiri", serif;
+
+            color: #101d39;
+            font-size: 21px;
+        }
+
+        .edit-title p {
+            margin: 1px 0 0;
+
+            font-size: 10px;
+            color: #9aa2b1;
+        }
+
+        /* =========================
+           EDIT AVATAR
+        ========================= */
+
+        .edit-avatar-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .edit-avatar {
+            width: 105px;
+            height: 105px;
+
+            border-radius: 50%;
+
+            overflow: hidden;
+
+            position: relative;
+
+            background:
+                linear-gradient(135deg, #07152f, #7d1f36);
+
+            border: 4px solid white;
+
+            box-shadow:
+                0 10px 30px rgba(7, 21, 47, .18);
+        }
+
+        .edit-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .edit-avatar i {
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: white;
+            font-size: 35px;
+        }
+
+        .change-photo {
+            margin-top: 9px;
+
+            padding: 8px 14px;
+
+            border-radius: 999px;
+
+            background: #f4f6fa;
+            color: #17213a;
+
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .change-photo i {
+            margin-left: 5px;
+            color: #7d1f36;
+        }
+
+        #avatarInput {
+            display: none;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .field {
+            margin-bottom: 15px;
+        }
+
+        .field label {
+            display: block;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            color: #17213a;
+
+            margin: 0 3px 7px;
+        }
+
+        .input-box {
+            position: relative;
+        }
+
+        .input-box i {
+            position: absolute;
+
+            right: 14px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            color: #8d6b20;
+
+            font-size: 14px;
+
+            pointer-events: none;
+        }
+
+        .input-box input,
+        .input-box select {
+            width: 100%;
+
+            height: 50px;
+
+            border-radius: 15px;
+
+            border: 1px solid #e7eaf0;
+
+            background: #f8f9fc;
+
+            color: #17213a;
+
+            outline: none;
+
+            padding: 0 43px 0 13px;
+
+            font-size: 13px;
+            font-weight: 600;
+
+            transition: .2s;
+        }
+
+        .input-box input:focus,
+        .input-box select:focus {
+            border-color: #8d6b20;
+
+            background: white;
+
+            box-shadow:
+                0 0 0 4px rgba(141, 107, 32, .08);
+        }
+
+        .phone-box {
+            display: flex;
+            direction: ltr;
+        }
+
+        .phone-prefix {
+            flex: 0 0 57px;
+
+            height: 50px;
+
+            border-radius: 15px 0 0 15px;
+
+            background: #7d1f36;
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .phone-input {
+            flex: 1;
+
+            border-radius: 0 15px 15px 0 !important;
+
+            padding-left: 13px !important;
+            padding-right: 43px !important;
+
+            direction: ltr;
+            text-align: left;
+        }
+
+        .phone-input-icon {
+            right: auto !important;
+            left: 14px !important;
+        }
+
+        /* =========================
+           CHOICE CARDS
+        ========================= */
+
+        .choice-title {
+            display: block;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            color: #17213a;
+
+            margin: 0 3px 8px;
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .choice {
+            min-height: 62px;
+
+            border: 1px solid #e8ebf1;
+
+            background: #f8f9fc;
+
+            border-radius: 15px;
+
+            color: #596273;
+
+            font-size: 11px;
+            font-weight: 800;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            gap: 5px;
+
+            transition: .2s;
+        }
+
+        .choice i {
+            font-size: 17px;
+        }
+
+        .choice.active {
+            background: #101d39;
+            border-color: #101d39;
+            color: white;
+
+            box-shadow:
+                0 7px 18px rgba(16, 29, 57, .18);
+        }
+
+        .choice.active i {
+            color: #f3c969;
+        }
+
+        /* =========================
+           GRADE
+        ========================= */
+
+        .grade-section {
+            margin-top: 15px;
+        }
+
+        .grade-section.hidden {
+            display: none;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        .edit-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+        .save-btn,
+        .cancel-btn {
+            height: 50px;
+
+            border-radius: 15px;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+        }
+
+        .save-btn {
+            background:
+                linear-gradient(135deg, #07152f, #35131e);
+
+            color: white;
+
+            box-shadow:
+                0 9px 20px rgba(7, 21, 47, .18);
+        }
+
+        .save-btn:active,
+        .cancel-btn:active {
+            transform: scale(.97);
+        }
+
+        .cancel-btn {
+            background: #f1f3f7;
+            color: #596273;
+        }
+
+        /* =========================
+           MAIN EDIT BUTTON
+        ========================= */
+
+        .edit-main-btn {
+            width: 100%;
+
+            height: 53px;
+
+            margin-top: 15px;
+
+            border-radius: 17px;
+
+            background:
+                linear-gradient(135deg,
+                    #07152f,
+                    #35131e);
+
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 9px;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            box-shadow:
+                0 10px 25px rgba(7, 21, 47, .17);
+
+            transition: .2s;
+        }
+
+        .edit-main-btn i {
+            color: #f3c969;
+        }
+
+        .edit-main-btn:active {
+            transform: scale(.98);
+        }
+
+        /* =========================
+           LOGOUT BUTTON
+        ========================= */
+
+        .logout-btn {
+            width: 100%;
+
+            height: 50px;
+
+            margin-top: 10px;
+
+            border-radius: 16px;
+
+            background: #fff1f1;
+
+            color: #9b2335;
+
+            border: 1px solid #ffd9de;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 8px;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            transition: .2s;
+        }
+
+        .logout-btn i {
+            font-size: 15px;
+        }
+
+        .logout-btn:active {
+            transform: scale(.97);
+            background: #ffe5e8;
+        }
+
+        /* =========================
+           VERSE
+        ========================= */
+
+        .verse {
+            margin-top: 18px;
+
+            background:
+                linear-gradient(135deg,
+                    #fffdf7,
+                    #f7f3e8);
+
+            border: 1px solid #eee7d4;
+
+            border-radius: 22px;
+
+            padding: 18px;
+
+            text-align: center;
+
+            box-shadow:
+                0 8px 25px rgba(15, 23, 42, .04);
+        }
+
+        .verse-icon {
+            color: #a27a1c;
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .verse-text {
+            font-family: "Amiri", serif;
+
+            color: #4b3a17;
+
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .verse-ref {
+            color: #9a8b65;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        /* =========================
+           BOTTOM NAV
+        ========================= */
+
+        .bottom-nav {
+            position: fixed;
+
+            left: 50%;
+            bottom: 12px;
+
+            transform: translateX(-50%);
+
+            width: min(calc(100% - 22px), 620px);
+
+            height: 67px;
+
+            background: rgba(255, 255, 255, .96);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border: 1px solid #e7eaf0;
+
+            border-radius: 22px;
+
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+
+            box-shadow:
+                0 15px 40px rgba(15, 23, 42, .13);
+
+            z-index: 2000;
+        }
+
+        .nav-item {
+            text-decoration: none;
+
+            color: #9aa2b1;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            gap: 4px;
+
+            font-size: 9px;
+            font-weight: 700;
+
+            transition: .2s;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: #7d1f36;
+        }
+
+        .nav-item.active i {
+            color: #8d6b20;
+        }
+
+        /* =========================
+           LOADING
+        ========================= */
+
+        .loading-overlay {
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(7, 21, 47, .76);
+
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+
+            z-index: 9999;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            opacity: 1;
+            visibility: visible;
+
+            transition: .25s;
+        }
+
+        .loading-overlay.hide {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-box {
+            width: min(85%, 310px);
+
+            background: white;
+
+            border-radius: 25px;
+
+            padding: 28px 20px;
+
+            text-align: center;
+
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, .25);
+        }
+
+        .loading-logo {
+            width: 65px;
+            height: 65px;
+
+            margin: auto;
+
+            border-radius: 20px;
+
+            background:
+                linear-gradient(135deg,
+                    #07152f,
+                    #7d1f36);
+
+            color: #f3c969;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+
+            animation: pulse 1.3s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.07);
+            }
+        }
+
+        .loading-title {
+            font-family: "Amiri", serif;
+
+            font-size: 20px;
+
+            color: #101d39;
+
+            margin-top: 14px;
+        }
+
+        .loading-text {
+            color: #8b94a4;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .loader {
+            width: 30px;
+            height: 30px;
+
+            border: 3px solid #e7eaf0;
+            border-top-color: #7d1f36;
+
+            border-radius: 50%;
+
+            margin: 15px auto 0;
+
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================
+           TOAST
+        ========================= */
+
+        .toast {
+            position: fixed;
+
+            left: 50%;
+            bottom: 92px;
+
+            transform: translate(-50%, 20px);
+
+            width: min(calc(100% - 30px), 430px);
+
+            background: #101d39;
+            color: white;
+
+            border-radius: 15px;
+
+            padding: 13px 16px;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            box-shadow:
+                0 12px 35px rgba(0, 0, 0, .20);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition: .3s;
+
+            z-index: 10000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0);
+        }
+
+        .toast i {
+            color: #f3c969;
+            font-size: 16px;
+        }
+
+        .toast.error i {
+            color: #ff7a7a;
+        }
+
+        /* =========================
+           ERROR
+        ========================= */
+
+        .error-box {
+            display: none;
+
+            margin-top: 20px;
+
+            background: #fff0f0;
+
+            border: 1px solid #ffd6d6;
+
+            color: #8f2525;
+
+            border-radius: 17px;
+
+            padding: 15px;
+
+            text-align: center;
+
+            font-size: 12px;
+        }
+
+        .error-box.show {
+            display: block;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 430px) {
+
+            .page {
+                padding: 13px 10px 25px;
+            }
+
+            .hero {
+                border-radius: 25px;
+                padding: 21px 16px;
+            }
+
+            .avatar {
+                width: 74px;
+                height: 74px;
+            }
+
+            .hero-name {
+                font-size: 26px;
+            }
+
+            .info-grid {
+                gap: 8px;
+            }
+
+            .info-card {
+                padding: 13px;
+                min-height: 100px;
+            }
+
+            .choices {
+                gap: 6px;
+            }
+
+            .choice {
+                min-height: 58px;
+                font-size: 10px;
+            }
+
+            .bottom-nav {
+                bottom: 8px;
+                height: 63px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+
+    <header class="topbar">
+
+        <div class="topbar-title">
+
+            <i class="fa-solid fa-user-circle"></i>
+
+            <div>
+                <strong>حسابي</strong>
+                <span>مدرسة الشمامسة</span>
+            </div>
+
+        </div>
+
+        <button class="refresh-btn" id="refreshBtn">
+            <i class="fa-solid fa-rotate"></i>
+        </button>
+
+    </header>
+
+
+    <main class="page">
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <div class="avatar" id="heroAvatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div class="hero-info">
+
+                    <div class="hero-small">
+                        أهلاً بك
+                    </div>
+
+                    <h1 class="hero-name" id="heroName">
+                        جاري التحميل...
+                    </h1>
+
+                    <div class="hero-sub">
+                        ملفك الشخصي في مدرسة الشمامسة
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="hero-tags">
+
+                <div class="tag" id="stageTag">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>...</span>
+                </div>
+
+                <div class="tag" id="gradeTag">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>...</span>
+                </div>
+
+                <div class="tag" id="roleTag">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>...</span>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ERROR -->
+
+        <div class="error-box" id="errorBox">
+
+            <i class="fa-solid fa-triangle-exclamation"></i>
+
+            <div id="errorMessage"></div>
+
+        </div>
+
+
+        <!-- VIEW MODE -->
+
+        <div id="viewMode">
+
+            <div class="section-title">
+
+                <h2>بياناتي</h2>
+
+                <span>
+                    معلومات الحساب
+                </span>
+
+            </div>
+
+
+            <section class="info-grid">
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="info-label">
+                            الاسم الكامل
+                        </div>
+
+                        <div class="info-value"
+                            id="infoFullName">
+                            ...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fa-solid fa-at"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="info-label">
+                            اسم المستخدم
+                        </div>
+
+                        <div class="info-value"
+                            id="infoUsername">
+                            ...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="info-label">
+                            رقم الهاتف
+                        </div>
+
+                        <div class="info-value"
+                            id="infoPhone">
+                            ...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="info-label">
+                            المرحلة
+                        </div>
+
+                        <div class="info-value"
+                            id="infoStage">
+                            ...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-card" id="gradeCard">
+
+                    <div class="info-icon">
+                        <i class="fa-solid fa-book"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="info-label">
+                            الصف
+                        </div>
+
+                        <div class="info-value"
+                            id="infoGrade">
+                            ...
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <div class="info-icon">
+                        <i class="fa-solid fa-cross"></i>
+                    </div>
+
+                    <div>
+
+                        <div class="info-label">
+                            الدور
+                        </div>
+
+                        <div class="info-value"
+                            id="infoRole">
+                            ...
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- EDIT -->
+
+            <button class="edit-main-btn"
+                id="editButton">
+
+                <i class="fa-solid fa-pen-to-square"></i>
+
+                تعديل البيانات
+
+            </button>
+
+
+            <!-- LOGOUT -->
+
+            <button class="logout-btn"
+                id="logoutButton">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+
+                تسجيل الخروج
+
+            </button>
+
+
+            <!-- VERSE -->
+
+            <div class="verse">
+
+                <div class="verse-icon">
+                    <i class="fa-solid fa-cross"></i>
+                </div>
+
+                <div class="verse-text">
+                    «كُنْ أَمِينًا إِلَى الْمَوْتِ فَسَأُعْطِيكَ إِكْلِيلَ الْحَيَاةِ»
+                </div>
+
+                <div class="verse-ref">
+                    سفر الرؤيا ٢:١٠
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EDIT MODE -->
+
+        <section class="edit-card" id="editCard">
+
+            <div class="edit-title">
+
+                <div class="edit-title-icon">
+                    <i class="fa-solid fa-user-pen"></i>
+                </div>
+
+                <div>
+
+                    <h3>
+                        تعديل البيانات
+                    </h3>
+
+                    <p>
+                        عدّل بياناتك ثم اضغط حفظ
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- IMAGE -->
+
+            <div class="edit-avatar-wrap">
+
+                <div class="edit-avatar"
+                    id="editAvatar">
+
+                    <i class="fa-solid fa-user"></i>
+
+                </div>
+
+                <input
+                    type="file"
+                    id="avatarInput"
+                    accept="image/*">
+
+                <button
+                    class="change-photo"
+                    id="changePhotoBtn">
+
+                    <i class="fa-solid fa-camera"></i>
+
+                    تغيير الصورة
+
+                </button>
+
+            </div>
+
+
+            <!-- FULL NAME -->
+
+            <div class="field">
+
+                <label>
+                    الاسم الكامل
+                </label>
+
+                <div class="input-box">
+
+                    <i class="fa-solid fa-user"></i>
+
+                    <input
+                        type="text"
+                        id="editFullName"
+                        placeholder="اكتب اسمك بالكامل"
+                        autocomplete="name">
+
+                </div>
+
+            </div>
+
+
+            <!-- USERNAME -->
+
+            <div class="field">
+
+                <label>
+                    اسم المستخدم
+                </label>
+
+                <div class="input-box">
+
+                    <i class="fa-solid fa-at"></i>
+
+                    <input
+                        type="text"
+                        id="editUsername"
+                        disabled>
+
+                </div>
+
+            </div>
+
+
+            <!-- PHONE -->
+
+            <div class="field">
+
+                <label>
+                    رقم الهاتف
+                </label>
+
+                <div class="phone-box">
+
+                    <div class="phone-prefix">
+                        +20
+                    </div>
+
+                    <div class="input-box"
+                        style="flex:1">
+
+                        <i class="fa-solid fa-phone phone-input-icon"></i>
+
+                        <input
+                            class="phone-input"
+                            type="tel"
+                            id="editPhone"
+                            inputmode="numeric"
+                            maxlength="11"
+                            placeholder="01xxxxxxxxx">
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STAGE -->
+
+            <div class="field">
+
+                <span class="choice-title">
+                    المرحلة
+                </span>
+
+                <div class="choices">
+
+                    <button
+                        type="button"
+                        class="choice stage-choice"
+                        data-stage="ابتدائي">
+
+                        <i class="fa-solid fa-child"></i>
+
+                        ابتدائي
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="choice stage-choice"
+                        data-stage="إعدادي">
+
+                        <i class="fa-solid fa-user-graduate"></i>
+
+                        إعدادي
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="choice stage-choice"
+                        data-stage="ثانوي">
+
+                        <i class="fa-solid fa-graduation-cap"></i>
+
+                        ثانوي
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- GRADE -->
+
+            <div class="grade-section"
+                id="gradeSection">
+
+                <span class="choice-title">
+                    الصف
+                </span>
+
+                <div class="choices">
+
+                    <button
+                        type="button"
+                        class="choice grade-choice"
+                        data-grade="أولى + ثانية">
+
+                        <i class="fa-solid fa-1"></i>
+
+                        أولى + ثانية
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="choice grade-choice"
+                        data-grade="ثالثة + رابعة">
+
+                        <i class="fa-solid fa-3"></i>
+
+                        ثالثة + رابعة
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="choice grade-choice"
+                        data-grade="خامسة + سادسة">
+
+                        <i class="fa-solid fa-5"></i>
+
+                        خامسة + سادسة
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ROLE -->
+
+            <div class="field"
+                style="margin-top:15px">
+
+                <span class="choice-title">
+                    الدور
+                </span>
+
+                <div class="choices">
+
+                    <button
+                        type="button"
+                        class="choice role-choice"
+                        data-role="أخ">
+
+                        <i class="fa-solid fa-user"></i>
+
+                        أخ
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="choice role-choice"
+                        data-role="تاسوني">
+
+                        <i class="fa-solid fa-hands-praying"></i>
+
+                        تاسوني
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="choice role-choice"
+                        data-role="أبونا">
+
+                        <i class="fa-solid fa-cross"></i>
+
+                        أبونا
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="edit-actions">
+
+                <button
+                    class="cancel-btn"
+                    id="cancelButton">
+
+                    <i class="fa-solid fa-xmark"></i>
+
+                    إلغاء
+
+                </button>
+
+
+                <button
+                    class="save-btn"
+                    id="saveButton">
+
+                    <i class="fa-solid fa-check"></i>
+
+                    حفظ التعديلات
+
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- BOTTOM NAV -->
+
+    <nav class="bottom-nav">
+
+        <a class="nav-item"
+            href="home.html">
+
+            <i class="fa-solid fa-house"></i>
+
+            <span>الرئيسية</span>
+
+        </a>
+
+
+        <a class="nav-item"
+            href="servants.html">
+
+            <i class="fa-solid fa-users"></i>
+
+            <span>مخدوميني</span>
+
+        </a>
+
+
+        <a class="nav-item"
+            href="attendance.html">
+
+            <i class="fa-solid fa-calendar-check"></i>
+
+            <span>الحضور</span>
+
+        </a>
+
+
+        <a class="nav-item"
+            href="gifts.html">
+
+            <i class="fa-solid fa-gift"></i>
+
+            <span>الهدايا</span>
+
+        </a>
+
+
+        <a class="nav-item active"
+            href="profile.html">
+
+            <i class="fa-solid fa-user"></i>
+
+            <span>حسابي</span>
+
+        </a>
+
+    </nav>
+
+
+    <!-- LOADING -->
+
+    <div class="loading-overlay"
+        id="loadingOverlay">
+
+        <div class="loading-box">
+
+            <div class="loading-logo">
+
+                <i class="fa-solid fa-cross"></i>
+
+            </div>
+
+            <div class="loading-title">
+                مدرسة الشمامسة
+            </div>
+
+            <div class="loading-text"
+                id="loadingText">
+
+                جاري تحميل بياناتك...
+
+            </div>
+
+            <div class="loader"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TOAST -->
+
+    <div class="toast"
+        id="toast">
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span id="toastText"></span>
+
+    </div>
+
+
+    <script>
+
+        /* =========================================
+           FIREBASE
+        ========================================= */
+
+        const firebaseConfig = {
+
+            apiKey:
+                "AIzaSyDk8HJVho9up6Hof7d6S_Or8ICnaGnuIUg",
+
+            authDomain:
+                "tony-c78c0.firebaseapp.com",
+
+            projectId:
+                "tony-c78c0",
+
+            storageBucket:
+                "tony-c78c0.firebasestorage.app",
+
+            messagingSenderId:
+                "182062544524",
+
+            appId:
+                "1:182062544524:web:59afdba4f0d1dfd929ada9",
+
+            measurementId:
+                "G-4FER9HW0JS"
+        };
+
+
+        if (!firebase.apps.length) {
+
+            firebase.initializeApp(
+                firebaseConfig
+            );
+
+        }
+
+
+        const db =
+            firebase.firestore();
+
+
+        /* =========================================
+           ELEMENTS
+        ========================================= */
+
+        const loadingOverlay =
+            document.getElementById(
+                "loadingOverlay"
+            );
+
+        const loadingText =
+            document.getElementById(
+                "loadingText"
+            );
+
+        const errorBox =
+            document.getElementById(
+                "errorBox"
+            );
+
+        const errorMessage =
+            document.getElementById(
+                "errorMessage"
+            );
+
+        const refreshBtn =
+            document.getElementById(
+                "refreshBtn"
+            );
+
+        const editButton =
+            document.getElementById(
+                "editButton"
+            );
+
+        const logoutButton =
+            document.getElementById(
+                "logoutButton"
+            );
+
+        const cancelButton =
+            document.getElementById(
+                "cancelButton"
+            );
+
+        const saveButton =
+            document.getElementById(
+                "saveButton"
+            );
+
+        const viewMode =
+            document.getElementById(
+                "viewMode"
+            );
+
+        const editCard =
+            document.getElementById(
+                "editCard"
+            );
+
+        const avatarInput =
+            document.getElementById(
+                "avatarInput"
+            );
+
+        const changePhotoBtn =
+            document.getElementById(
+                "changePhotoBtn"
+            );
+
+        const editAvatar =
+            document.getElementById(
+                "editAvatar"
+            );
+
+        const heroAvatar =
+            document.getElementById(
+                "heroAvatar"
+            );
+
+        const heroName =
+            document.getElementById(
+                "heroName"
+            );
+
+        const stageTag =
+            document.getElementById(
+                "stageTag"
+            );
+
+        const gradeTag =
+            document.getElementById(
+                "gradeTag"
+            );
+
+        const roleTag =
+            document.getElementById(
+                "roleTag"
+            );
+
+        const infoFullName =
+            document.getElementById(
+                "infoFullName"
+            );
+
+        const infoUsername =
+            document.getElementById(
+                "infoUsername"
+            );
+
+        const infoPhone =
+            document.getElementById(
+                "infoPhone"
+            );
+
+        const infoStage =
+            document.getElementById(
+                "infoStage"
+            );
+
+        const infoGrade =
+            document.getElementById(
+                "infoGrade"
+            );
+
+        const infoRole =
+            document.getElementById(
+                "infoRole"
+            );
+
+        const gradeCard =
+            document.getElementById(
+                "gradeCard"
+            );
+
+        const gradeSection =
+            document.getElementById(
+                "gradeSection"
+            );
+
+        const editFullName =
+            document.getElementById(
+                "editFullName"
+            );
+
+        const editUsername =
+            document.getElementById(
+                "editUsername"
+            );
+
+        const editPhone =
+            document.getElementById(
+                "editPhone"
+            );
+
+
+        /* =========================================
+           STATE
+        ========================================= */
+
+        let currentUsername = "";
+
+        let currentProfileData = {};
+
+        let selectedStage = "";
+
+        let selectedGrade = "";
+
+        let selectedRole = "";
+
+        let newAvatarBase64 = null;
+
+        let toastTimer = null;
+
+
+        /* =========================================
+           LOADING
+        ========================================= */
+
+        function showLoading(text) {
+
+            loadingText.textContent =
+                text || "جاري التحميل...";
+
+            loadingOverlay.classList.remove(
+                "hide"
+            );
+
+        }
+
+
+        function hideLoading() {
+
+            loadingOverlay.classList.add(
+                "hide"
+            );
+
+        }
+
+
+        /* =========================================
+           ERROR
+        ========================================= */
+
+        function showError(message) {
+
+            errorMessage.textContent =
+                message;
+
+            errorBox.classList.add(
+                "show"
+            );
+
+        }
+
+
+        function hideError() {
+
+            errorBox.classList.remove(
+                "show"
+            );
+
+        }
+
+
+        /* =========================================
+           TOAST
+        ========================================= */
+
+        function showToast(
+            message,
+            type = "success"
+        ) {
+
+            const toast =
+                document.getElementById(
+                    "toast"
+                );
+
+            const toastText =
+                document.getElementById(
+                    "toastText"
+                );
+
+            toastText.textContent =
+                message;
+
+
+            toast.classList.toggle(
+                "error",
+                type === "error"
+            );
+
+
+            const icon =
+                toast.querySelector("i");
+
+
+            if (
+                type === "error"
+            ) {
+
+                icon.className =
+                    "fa-solid fa-circle-exclamation";
+
+            } else {
+
+                icon.className =
+                    "fa-solid fa-circle-check";
+
+            }
+
+
+            toast.classList.add(
+                "show"
+            );
+
+
+            clearTimeout(
+                toastTimer
+            );
+
+
+            toastTimer =
+                setTimeout(() => {
+
+                    toast.classList.remove(
+                        "show"
+                    );
+
+                }, 3000);
+
+        }
+
+
+        /* =========================================
+           CURRENT USER
+        ========================================= */
+
+        function getCurrentUsername() {
+
+            const first =
+                localStorage.getItem(
+                    "current_servant_username"
+                );
+
+            const second =
+                localStorage.getItem(
+                    "currentUser"
+                );
+
+            return (
+                first ||
+                second ||
+                ""
+            ).trim();
+
+        }
+
+
+        /* =========================================
+           PHONE
+        ========================================= */
+
+        function normalizePhone(phone) {
+
+            if (!phone) {
+                return "";
+            }
+
+
+            let value =
+                String(phone)
+                    .replace(/\s+/g, "")
+                    .replace(/-/g, "");
+
+
+            if (
+                value.startsWith("+20")
+            ) {
+
+                value =
+                    value.substring(3);
+
+            }
+
+
+            if (
+                value.startsWith("20") &&
+                value.length > 10
+            ) {
+
+                value =
+                    value.substring(2);
+
+            }
+
+
+            return value;
+
+        }
+
+
+        function formatPhone(phone) {
+
+            const local =
+                normalizePhone(phone);
+
+
+            if (!local) {
+                return "غير مضاف";
+            }
+
+
+            return "+20 " + local;
+
+        }
+
+
+        /* =========================================
+           IMAGE
+        ========================================= */
+
+        function setImage(
+            element,
+            src
+        ) {
+
+            if (
+                src &&
+                typeof src === "string" &&
+                src.startsWith("data:image")
+            ) {
+
+                element.innerHTML = "";
+
+
+                const img =
+                    document.createElement(
+                        "img"
+                    );
+
+
+                img.src =
+                    src;
+
+
+                element.appendChild(
+                    img
+                );
+
+            } else {
+
+                element.innerHTML =
+                    '<i class="fa-solid fa-user"></i>';
+
+            }
+
+        }
+
+
+        /* =========================================
+           LOAD PROFILE
+        ========================================= */
+
+        async function loadProfile() {
+
+            hideError();
+
+
+            currentUsername =
+                getCurrentUsername();
+
+
+            if (!currentUsername) {
+
+                hideLoading();
+
+
+                showError(
+                    "لم يتم العثور على حساب الخادم. برجاء تسجيل الدخول مرة أخرى."
+                );
+
+                return;
+
+            }
+
+
+            showLoading(
+                "جاري تحميل بياناتك..."
+            );
+
+
+            try {
+
+                let snap =
+                    await db
+                        .collection("servants")
+                        .doc(currentUsername)
+                        .get();
+
+
+                /*
+                 * Fallback:
+                 * Search by username
+                 */
+
+                if (!snap.exists) {
+
+                    const query =
+                        await db
+                            .collection("servants")
+                            .where(
+                                "username",
+                                "==",
+                                currentUsername
+                            )
+                            .limit(1)
+                            .get();
+
+
+                    if (!query.empty) {
+
+                        snap =
+                            query.docs[0];
+
+                    }
+
+                }
+
+
+                if (!snap.exists) {
+
+                    throw new Error(
+                        "لم يتم العثور على بيانات هذا الخادم."
+                    );
+
+                }
+
+
+                currentProfileData =
+                    snap.data() || {};
+
+
+                if (
+                    currentProfileData.username
+                ) {
+
+                    currentUsername =
+                        String(
+                            currentProfileData.username
+                        ).trim();
+
+
+                    localStorage.setItem(
+                        "current_servant_username",
+                        currentUsername
+                    );
+
+                }
+
+
+                renderProfile();
+
+
+                hideLoading();
+
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+
+                hideLoading();
+
+
+                showError(
+                    "حدث خطأ أثناء تحميل البيانات: " +
+                    (
+                        error.message ||
+                        ""
+                    )
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           RENDER
+        ========================================= */
+
+        function renderProfile() {
+
+            const data =
+                currentProfileData;
+
+
+            const username =
+                data.username ||
+                currentUsername ||
+                "غير معروف";
+
+
+            const fullName =
+                data.fullName ||
+                data.name ||
+                username;
+
+
+            const phone =
+                data.phone ||
+                "";
+
+
+            const stage =
+                data.stage ||
+                "";
+
+
+            const grade =
+                data.grade ||
+                "";
+
+
+            const titleRole =
+                data.titleRole ||
+                data.roleTitle ||
+                (
+                    ["أخ", "تاسوني", "أبونا"]
+                        .includes(data.role)
+                        ? data.role
+                        : "خادم"
+                );
+
+
+            /* Hero */
+
+            heroName.textContent =
+                fullName;
+
+
+            setImage(
+                heroAvatar,
+                data.avatar
+            );
+
+
+            /* Stage */
+
+            stageTag
+                .querySelector("span")
+                .textContent =
+                stage ||
+                "غير محدد";
+
+
+            /* Role */
+
+            roleTag
+                .querySelector("span")
+                .textContent =
+                titleRole ||
+                "خادم";
+
+
+            /*
+             * Grade:
+             * only primary
+             */
+
+            if (
+                stage === "ابتدائي"
+            ) {
+
+                gradeTag.style.display =
+                    "flex";
+
+
+                gradeTag
+                    .querySelector("span")
+                    .textContent =
+                    grade ||
+                    "غير محدد";
+
+
+                gradeCard.style.display =
+                    "flex";
+
+
+                infoGrade.textContent =
+                    grade ||
+                    "غير محدد";
+
+            } else {
+
+                gradeTag.style.display =
+                    "none";
+
+
+                gradeCard.style.display =
+                    "none";
+
+
+                infoGrade.textContent =
+                    "";
+
+            }
+
+
+            /* Info */
+
+            infoFullName.textContent =
+                fullName;
+
+
+            infoUsername.textContent =
+                username;
+
+
+            infoPhone.textContent =
+                formatPhone(phone);
+
+
+            infoStage.textContent =
+                stage ||
+                "غير محدد";
+
+
+            infoRole.textContent =
+                titleRole ||
+                "خادم";
+
+
+            /* Edit */
+
+            editFullName.value =
+                fullName;
+
+
+            editUsername.value =
+                username;
+
+
+            editPhone.value =
+                normalizePhone(phone);
+
+
+            selectedStage =
+                stage;
+
+
+            selectedRole =
+                data.titleRole ||
+                data.roleTitle ||
+                (
+                    ["أخ", "تاسوني", "أبونا"]
+                        .includes(data.role)
+                        ? data.role
+                        : ""
+                );
+
+
+            if (
+                stage === "ابتدائي"
+            ) {
+
+                selectedGrade =
+                    grade;
+
+            } else if (
+                stage === "إعدادي"
+            ) {
+
+                selectedGrade =
+                    "إعدادي";
+
+            } else if (
+                stage === "ثانوي"
+            ) {
+
+                selectedGrade =
+                    "ثانوي";
+
+            } else {
+
+                selectedGrade =
+                    "";
+
+            }
+
+
+            newAvatarBase64 =
+                null;
+
+
+            renderEditChoices();
+
+
+            setImage(
+                editAvatar,
+                data.avatar
+            );
+
+        }
+
+
+        /* =========================================
+           EDIT CHOICES
+        ========================================= */
+
+        function renderEditChoices() {
+
+            document
+                .querySelectorAll(
+                    ".stage-choice"
+                )
+                .forEach(button => {
+
+                    button.classList.toggle(
+                        "active",
+                        button.dataset.stage ===
+                        selectedStage
+                    );
+
+                });
+
+
+            if (
+                selectedStage === "ابتدائي"
+            ) {
+
+                gradeSection.classList.remove(
+                    "hidden"
+                );
+
+
+                document
+                    .querySelectorAll(
+                        ".grade-choice"
+                    )
+                    .forEach(button => {
+
+                        button.classList.toggle(
+                            "active",
+                            button.dataset.grade ===
+                            selectedGrade
+                        );
+
+                    });
+
+            } else {
+
+                gradeSection.classList.add(
+                    "hidden"
+                );
+
+
+                document
+                    .querySelectorAll(
+                        ".grade-choice"
+                    )
+                    .forEach(button => {
+
+                        button.classList.remove(
+                            "active"
+                        );
+
+                    });
+
+            }
+
+
+            document
+                .querySelectorAll(
+                    ".role-choice"
+                )
+                .forEach(button => {
+
+                    button.classList.toggle(
+                        "active",
+                        button.dataset.role ===
+                        selectedRole
+                    );
+
+                });
+
+        }
+
+
+        /* =========================================
+           OPEN EDIT
+        ========================================= */
+
+        function openEdit() {
+
+            hideError();
+
+            renderProfile();
+
+
+            viewMode.style.display =
+                "none";
+
+
+            editCard.classList.add(
+                "show"
+            );
+
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        /* =========================================
+           CLOSE EDIT
+        ========================================= */
+
+        function closeEdit() {
+
+            editCard.classList.remove(
+                "show"
+            );
+
+
+            viewMode.style.display =
+                "block";
+
+
+            renderProfile();
+
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+
+        }
+
+
+        /* =========================================
+           STAGE
+        ========================================= */
+
+        document
+            .querySelectorAll(
+                ".stage-choice"
+            )
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        selectedStage =
+                            button.dataset.stage;
+
+
+                        if (
+                            selectedStage ===
+                            "إعدادي"
+                        ) {
+
+                            selectedGrade =
+                                "إعدادي";
+
+                        } else if (
+                            selectedStage ===
+                            "ثانوي"
+                        ) {
+
+                            selectedGrade =
+                                "ثانوي";
+
+                        } else {
+
+                            selectedGrade =
+                                "";
+
+                        }
+
+
+                        renderEditChoices();
+
+                    }
+                );
+
+            });
+
+
+        /* =========================================
+           GRADE
+        ========================================= */
+
+        document
+            .querySelectorAll(
+                ".grade-choice"
+            )
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        if (
+                            selectedStage !==
+                            "ابتدائي"
+                        ) {
+
+                            return;
+
+                        }
+
+
+                        selectedGrade =
+                            button.dataset.grade;
+
+
+                        renderEditChoices();
+
+                    }
+                );
+
+            });
+
+
+        /* =========================================
+           ROLE
+        ========================================= */
+
+        document
+            .querySelectorAll(
+                ".role-choice"
+            )
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        selectedRole =
+                            button.dataset.role;
+
+
+                        renderEditChoices();
+
+                    }
+                );
+
+            });
+
+
+        /* =========================================
+           PHONE INPUT
+        ========================================= */
+
+        editPhone.addEventListener(
+            "input",
+            () => {
+
+                editPhone.value =
+                    editPhone.value
+                        .replace(/\D/g, "")
+                        .slice(0, 11);
+
+            }
+        );
+
+
+        /* =========================================
+           IMAGE PICKER
+        ========================================= */
+
+        changePhotoBtn.addEventListener(
+            "click",
+            () => {
+
+                avatarInput.click();
+
+            }
+        );
+
+
+        avatarInput.addEventListener(
+            "change",
+            async event => {
+
+                const file =
+                    event.target.files?.[0];
+
+
+                if (!file) {
+                    return;
+                }
+
+
+                if (
+                    !file.type.startsWith(
+                        "image/"
+                    )
+                ) {
+
+                    showToast(
+                        "من فضلك اختر صورة صحيحة.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                try {
+
+                    showLoading(
+                        "جاري تجهيز الصورة..."
+                    );
+
+
+                    newAvatarBase64 =
+                        await compressImage(
+                            file,
+                            300,
+                            0.75
+                        );
+
+
+                    setImage(
+                        editAvatar,
+                        newAvatarBase64
+                    );
+
+
+                    hideLoading();
+
+
+                    showToast(
+                        "تم اختيار الصورة بنجاح."
+                    );
+
+
+                } catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+
+                    hideLoading();
+
+
+                    showToast(
+                        "تعذر تجهيز الصورة.",
+                        "error"
+                    );
+
+                }
+
+            }
+        );
+
+
+        /* =========================================
+           COMPRESS IMAGE
+        ========================================= */
+
+        function compressImage(
+            file,
+            maxSize = 300,
+            quality = 0.75
+        ) {
+
+            return new Promise(
+                (
+                    resolve,
+                    reject
+                ) => {
+
+                    const reader =
+                        new FileReader();
+
+
+                    reader.onload =
+                        event => {
+
+                            const img =
+                                new Image();
+
+
+                            img.onload =
+                                () => {
+
+                                    let width =
+                                        img.width;
+
+                                    let height =
+                                        img.height;
+
+
+                                    if (
+                                        width >
+                                        maxSize ||
+                                        height >
+                                        maxSize
+                                    ) {
+
+                                        const ratio =
+                                            Math.min(
+                                                maxSize /
+                                                width,
+                                                maxSize /
+                                                height
+                                            );
+
+
+                                        width =
+                                            Math.round(
+                                                width *
+                                                ratio
+                                            );
+
+
+                                        height =
+                                            Math.round(
+                                                height *
+                                                ratio
+                                            );
+
+                                    }
+
+
+                                    const canvas =
+                                        document
+                                            .createElement(
+                                                "canvas"
+                                            );
+
+
+                                    canvas.width =
+                                        width;
+
+
+                                    canvas.height =
+                                        height;
+
+
+                                    const ctx =
+                                        canvas
+                                            .getContext(
+                                                "2d"
+                                            );
+
+
+                                    ctx.drawImage(
+                                        img,
+                                        0,
+                                        0,
+                                        width,
+                                        height
+                                    );
+
+
+                                    const result =
+                                        canvas.toDataURL(
+                                            "image/jpeg",
+                                            quality
+                                        );
+
+
+                                    resolve(
+                                        result
+                                    );
+
+                                };
+
+
+                            img.onerror =
+                                reject;
+
+
+                            img.src =
+                                event.target.result;
+
+                        };
+
+
+                    reader.onerror =
+                        reject;
+
+
+                    reader.readAsDataURL(
+                        file
+                    );
+
+                }
+            );
+
+        }
+
+
+        /* =========================================
+           VALIDATION
+        ========================================= */
+
+        function validateForm() {
+
+            const fullName =
+                editFullName.value.trim();
+
+
+            const phone =
+                editPhone.value
+                    .replace(/\D/g, "")
+                    .trim();
+
+
+            if (!fullName) {
+
+                showToast(
+                    "اكتب الاسم الكامل.",
+                    "error"
+                );
+
+                editFullName.focus();
+
+                return false;
+
+            }
+
+
+            if (
+                phone.length < 7
+            ) {
+
+                showToast(
+                    "اكتب رقم هاتف صحيح.",
+                    "error"
+                );
+
+                editPhone.focus();
+
+                return false;
+
+            }
+
+
+            if (!selectedStage) {
+
+                showToast(
+                    "اختر المرحلة.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            if (
+                selectedStage ===
+                "ابتدائي" &&
+                !selectedGrade
+            ) {
+
+                showToast(
+                    "اختر الصف.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            if (!selectedRole) {
+
+                showToast(
+                    "اختر الدور.",
+                    "error"
+                );
+
+                return false;
+
+            }
+
+
+            return true;
+
+        }
+
+
+        /* =========================================
+           SAVE PROFILE
+        ========================================= */
+
+        async function saveProfile() {
+
+            if (!validateForm()) {
+                return;
+            }
+
+
+            showLoading(
+                "جاري حفظ التعديلات..."
+            );
+
+
+            saveButton.disabled =
+                true;
+
+            cancelButton.disabled =
+                true;
+
+
+            try {
+
+                const fullName =
+                    editFullName.value.trim();
+
+
+                const localPhone =
+                    editPhone.value
+                        .replace(/\D/g, "")
+                        .trim();
+
+
+                let finalGrade =
+                    selectedGrade;
+
+
+                if (
+                    selectedStage ===
+                    "إعدادي"
+                ) {
+
+                    finalGrade =
+                        "إعدادي";
+
+                } else if (
+                    selectedStage ===
+                    "ثانوي"
+                ) {
+
+                    finalGrade =
+                        "ثانوي";
+
+                }
+
+
+                const updateData = {
+
+                    fullName:
+                        fullName,
+
+                    phone:
+                        "+20" +
+                        localPhone,
+
+                    stage:
+                        selectedStage,
+
+                    grade:
+                        finalGrade,
+
+                    titleRole:
+                        selectedRole,
+
+                    role:
+                        "servant",
+
+                    updatedAt:
+                        firebase.firestore
+                            .FieldValue
+                            .serverTimestamp()
+
+                };
+
+
+                if (newAvatarBase64) {
+
+                    updateData.avatar =
+                        newAvatarBase64;
+
+                }
+
+
+                let docRef =
+                    db
+                        .collection("servants")
+                        .doc(
+                            currentUsername
+                        );
+
+
+                let snap =
+                    await docRef.get();
+
+
+                if (!snap.exists) {
+
+                    const query =
+                        await db
+                            .collection("servants")
+                            .where(
+                                "username",
+                                "==",
+                                currentUsername
+                            )
+                            .limit(1)
+                            .get();
+
+
+                    if (
+                        !query.empty
+                    ) {
+
+                        docRef =
+                            query.docs[0].ref;
+
+                    } else {
+
+                        throw new Error(
+                            "لم يتم العثور على حساب الخادم."
+                        );
+
+                    }
+
+                }
+
+
+                await docRef.update(
+                    updateData
+                );
+
+
+                currentProfileData = {
+
+                    ...currentProfileData,
+
+                    ...updateData,
+
+                    username:
+                        currentProfileData.username ||
+                        currentUsername
+
+                };
+
+
+                newAvatarBase64 =
+                    null;
+
+
+                renderProfile();
+
+
+                editCard.classList.remove(
+                    "show"
+                );
+
+
+                viewMode.style.display =
+                    "block";
+
+
+                hideLoading();
+
+
+                saveButton.disabled =
+                    false;
+
+                cancelButton.disabled =
+                    false;
+
+
+                showToast(
+                    "تم حفظ بياناتك بنجاح ✓"
+                );
+
+
+                window.scrollTo({
+                    top: 0,
+                    behavior: "smooth"
+                });
+
+
+            } catch (error) {
+
+                console.error(
+                    "SAVE ERROR:",
+                    error
+                );
+
+
+                hideLoading();
+
+
+                saveButton.disabled =
+                    false;
+
+                cancelButton.disabled =
+                    false;
+
+
+                showToast(
+                    "حدث خطأ أثناء الحفظ: " +
+                    (
+                        error.message ||
+                        "خطأ غير معروف"
+                    ),
+                    "error"
+                );
+
+            }
+
+        }
+
+
+        /* =========================================
+           LOGOUT
+        ========================================= */
+
+        logoutButton.addEventListener(
+            "click",
+            () => {
+
+                const confirmed =
+                    confirm(
+                        "هل أنت متأكد أنك تريد تسجيل الخروج؟"
+                    );
+
+
+                if (!confirmed) {
+                    return;
+                }
+
+
+                /*
+                 * Remove servant session
+                 */
+
+                localStorage.removeItem(
+                    "current_servant_username"
+                );
+
+                localStorage.removeItem(
+                    "currentUser"
+                );
+
+                localStorage.removeItem(
+                    "isLoggedIn"
+                );
+
+                localStorage.removeItem(
+                    "adminData"
+                );
+
+
+                /*
+                 * Go to main page
+                 */
+
+                window.location.href =
+                    "../index.html";
+
+            }
+        );
+
+
+        /* =========================================
+           EVENTS
+        ========================================= */
+
+        editButton.addEventListener(
+            "click",
+            openEdit
+        );
+
+
+        cancelButton.addEventListener(
+            "click",
+            closeEdit
+        );
+
+
+        saveButton.addEventListener(
+            "click",
+            saveProfile
+        );
+
+
+        refreshBtn.addEventListener(
+            "click",
+            async () => {
+
+                refreshBtn
+                    .querySelector("i")
+                    .classList.add(
+                        "fa-spin"
+                    );
+
+
+                await loadProfile();
+
+
+                setTimeout(
+                    () => {
+
+                        refreshBtn
+                            .querySelector("i")
+                            .classList.remove(
+                                "fa-spin"
+                            );
+
+                    },
+                    400
+                );
+
+            }
+        );
+
+
+        /* =========================================
+           START
+        ========================================= */
+
+        loadProfile();
+
+    </script>
+
+</body>
+
+</html>
+```

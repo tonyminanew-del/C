@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>إنشاء حساب جديد - St. Mina</title>
+  <!-- خطوط Amiri و Tajawal الفخمة -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <!-- مكتبة الأيقونات FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  
+  <style>
+    :root {
+      --navy: #061d39;
+      --navy-dark: #020c19;
+      --maroon: #7d1424;
+      --maroon-dark: #5d101c;
+      --maroon-light: #a51f35;
+      --gold: #c9a24b;
+      --ink: #211918;
+      --muted: #817773;
+      --line: #eadfe0;
+      --soft: #fff7f8;
+      --green: #137333;
+      --blue: #185abc;
+      --orange: #9a6700;
+      --red: #b42318;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      min-height: 100dvh;
+      padding: 15px 12px 30px;
+      color: var(--ink);
+      font-family: "Tajawal", sans-serif;
+      background: radial-gradient(circle at top, #0a2d57 0, var(--navy) 48%, var(--navy-dark) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    button { cursor: pointer; font: inherit; }
+
+    .topbar, .page {
+      width: min(440px, 100%);
+      margin-inline: auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 14px;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .topbar-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 16px;
+    }
+
+    .topbar-title i { color: var(--gold); }
+
+    .topbar-actions {
+      display: flex;
+      gap: 7px;
+    }
+
+    .topbar-actions button {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 12px;
+      color: var(--maroon);
+      background: #fff;
+      box-shadow: 0 7px 18px rgb(0 0 0 / 22%);
+      display: grid;
+      place-items: center;
+      transition: transform 0.2s;
+    }
+
+    .topbar-actions button:hover {
+      transform: translateY(-2px);
+    }
+
+    .page {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border-radius: 27px;
+      background: #fff;
+      box-shadow: 0 30px 70px rgb(0 0 0 / 35%);
+    }
+
+    .page::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 7px;
+      background: linear-gradient(90deg, var(--navy), var(--maroon), var(--gold), var(--maroon), var(--navy));
+    }
+
+    .page-head {
+      margin-bottom: 22px;
+      text-align: center;
+    }
+
+    .page-icon {
+      width: 65px;
+      height: 65px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 10px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 27px;
+      background: linear-gradient(145deg, var(--maroon-light), var(--maroon-dark));
+      box-shadow: 0 10px 20px rgba(125, 20, 36, 0.25);
+    }
+
+    h1 {
+      color: var(--ink);
+      font: 700 clamp(22px, 4vw, 30px) "Amiri", serif;
+    }
+
+    h1 span { color: var(--maroon); }
+
+    .page-head p {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .complete-form {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: right;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+    }
+
+    .input-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink);
+      padding-right: 2px;
+    }
+
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .input-wrapper:focus-within {
+      border-color: var(--maroon);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(125, 20, 36, 0.1);
+    }
+
+    .input-field {
+      width: 100%;
+      height: 48px;
+      background: transparent;
+      border: none;
+      padding: 0 44px 0 16px;
+      color: var(--ink);
+      font-size: 14px;
+      font-family: "Tajawal", sans-serif;
+      outline: none;
+      text-align: right;
+    }
+
+    .input-field.password-field {
+      padding-left: 45px;
+    }
+
+    .input-icon-right {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+
+    .input-wrapper:focus-within .input-icon-right {
+      color: var(--maroon);
+    }
+
+    .toggle-password {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 14px;
+      transition: color 0.2s;
+      z-index: 5;
+    }
+
+    .toggle-password:hover {
+      color: var(--ink);
+    }
+
+    .status-msg {
+      font-size: 11.5px;
+      margin-top: 2px;
+      padding-right: 2px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    .status-msg.error { color: var(--red); }
+    .status-msg.success { color: var(--green); }
+
+    .submit-btn {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      background: #e2d7d8;
+      border: none;
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: not-allowed;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .submit-btn.active {
+      background: linear-gradient(135deg, var(--maroon-light), var(--maroon-dark));
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(125, 20, 36, 0.3);
+    }
+
+    .submit-btn.active:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(125, 20, 36, 0.4);
+    }
+
+    /* شاشة التحميل الحديثة المتناسقة مع التصميم */
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(6, 29, 57, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 3px solid rgba(201, 162, 75, 0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .loading-text {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: "Amiri", serif;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* أنيميشن الصاروخ عند النجاح */
+    .rocket-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1100;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .space-rocket {
+      position: absolute;
+      bottom: -150px;
+      font-size: 50px;
+      transform: rotate(-45deg);
+      opacity: 0;
+    }
+
+    @keyframes rocketLaunch {
+      0% { bottom: -100px; transform: scale(0.6) rotate(-45deg); opacity: 0; }
+      30% { opacity: 1; }
+      80% { bottom: 70vh; transform: scale(4) rotate(-45deg); opacity: 1; filter: drop-shadow(0 0 30px var(--gold)); }
+      100% { bottom: 100vh; transform: scale(10) rotate(-45deg); opacity: 0; }
+    }
+
+    .space-flash {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      z-index: 1200;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes spaceExplosion {
+      0% { opacity: 0; }
+      50% { opacity: 0.9; }
+      100% { opacity: 0; }
+    }
+
+    .card-footer-info {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      width: 100%;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .footer-church {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.2px;
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 9px 8px 22px; }
+      .page { padding: 22px 16px; border-radius: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- شاشة التحميل -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">جاري إنشاء الحساب...</div>
+  </div>
+
+  <!-- تأثير الصاروخ -->
+  <div class="rocket-container" id="rocketContainer">
+    <div class="space-rocket" id="spaceRocket">🚀</div>
+  </div>
+  <div class="space-flash" id="spaceFlash"></div>
+
+  <!-- الشريط العلوي (بدون زر الرئيسية) -->
+  <header class="topbar">
+    <div class="topbar-title"><i class="fas fa-fingerprint"></i><span>إنشاء حساب جديد</span></div>
+    <div class="topbar-actions">
+      <button id="reloadBtn" type="button" title="تحديث"><i class="fas fa-rotate"></i></button>
+    </div>
+  </header>
+
+  <!-- محتوى الصفحة الرئيسي -->
+  <main class="page">
+    <header class="page-head">
+      <div class="page-icon"><i class="fas fa-user-plus"></i></div>
+      <h1>حساب <span>جديد</span></h1>
+      <p>أدخل بياناتك للانضمام إلى النظام الكنسي</p>
+    </header>
+
+    <form class="complete-form" id="registerForm" onsubmit="handleRegister(event)">
+      
+      <div class="input-group">
+        <label class="input-label" for="username">اسم المستخدم</label>
+        <div class="input-wrapper">
+          <input type="text" class="input-field" id="username" placeholder="اكتب اسم المستخدم..." autocomplete="off" required>
+          <i class="fa-solid fa-at input-icon-right"></i>
+        </div>
+        <div id="usernameStatus" class="status-msg"></div>
+      </div>
+
+      <div class="input-group">
+        <label class="input-label" for="password">كلمة المرور</label>
+        <div class="input-wrapper">
+          <input type="password" class="input-field password-field" id="password" placeholder="••••••••" required>
+          <i class="fa-solid fa-lock input-icon-right"></i>
+          <i class="fa-solid fa-eye toggle-password" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+        </div>
+        <div id="passwordStatus" class="status-msg"></div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>
+        <span id="btnText">إنشاء الحساب</span>
+      </button>
+    </form>
+
+    <div class="card-footer-info">
+      <span class="footer-church">مدرسة شمامسة كنيسة الشهيد العظيم مارجرجس بالمنصورة</span>
+    </div>
+  </main>
+
+  <script>
+    // إعدادات Firebase (مطابقة لمشروعك tony-c78c0)
+    const firebaseConfig = {
+      projectId: "tony-c78c0"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.firestore();
+
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const submitBtn = document.getElementById('submitBtn');
+    const usernameStatus = document.getElementById('usernameStatus');
+    const passwordStatus = document.getElementById('passwordStatus');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+
+    let isUsernameValid = false;
+    let isPasswordValid = false;
+
+    function togglePasswordVisibility() {
+      const toggleIcon = document.getElementById('togglePassword');
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    }
+
+    function checkFormValidity() {
+      if (isUsernameValid && isPasswordValid) {
+        submitBtn.classList.add('active');
+        submitBtn.removeAttribute('disabled');
+      } else {
+        submitBtn.classList.remove('active');
+        submitBtn.setAttribute('disabled', 'true');
+      }
+    }
+
+    let debounceTimer;
+    usernameInput.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      const val = usernameInput.value.trim();
+      
+      if (val.length < 3) {
+        showStatus(usernameStatus, 'error', 'fa-circle-xmark', 'اسم المستخدم يجب أن يكون 3 أحرف على الأقل');
+        isUsernameValid = false;
+        checkFormValidity();
+        return;
+      }
+
+      debounceTimer = setTimeout(async () => {
+        try {
+          const docRef = db.collection('servants').doc(val);
+          const docSnap = await docRef.get();
+          
+          if (docSnap.exists) {
+            showStatus(usernameStatus, 'error', 'fa-circle-xmark', 'هذا الاسم مستخدم بالفعل، اختر اسمًا آخر');
+            isUsernameValid = false;
+          } else {
+            showStatus(usernameStatus, 'success', 'fa-circle-check', 'اسم المستخدم متاح ويمكنك استخدامه');
+            isUsernameValid = true;
+          }
+        } catch (e) {
+          console.error(e);
+        }
+        checkFormValidity();
+      }, 500);
+    });
+
+    passwordInput.addEventListener('input', () => {
+      const val = passwordInput.value;
+      if (val.length < 6) {
+        showStatus(passwordStatus, 'error', 'fa-circle-xmark', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+        isPasswordValid = false;
+      } else {
+        showStatus(passwordStatus, 'success', 'fa-circle-check', 'كلمة المرور قوية ومناسبة');
+        isPasswordValid = true;
+      }
+      checkFormValidity();
+    });
+
+    function showStatus(element, type, iconClass, message) {
+      element.style.display = 'flex';
+      element.className = `status-msg ${type}`;
+      element.innerHTML = `<i class="fa-solid ${iconClass}"></i> ${message}`;
+    }
+
+    async function handleRegister(event) {
+      event.preventDefault();
+      if (!isUsernameValid || !isPasswordValid) return;
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      loadingText.textContent = 'جاري إنشاء الحساب...';
+      loadingOverlay.style.display = 'flex';
+
+      try {
+        const docRef = db.collection('servants').doc(username);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+          loadingOverlay.style.display = 'none';
+          showStatus(usernameStatus, 'error', 'fa-circle-xmark', 'هذا الاسم تم حجزه للتو، اختر اسمًا آخر');
+          isUsernameValid = false;
+          checkFormValidity();
+          return;
+        }
+
+        await docRef.set({
+          username: username,
+          password: password,
+          role: 'servant',
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        localStorage.setItem('current_servant_username', username);
+
+        // تشغيل أنيميشن الإطلاق الناجح
+        loadingOverlay.style.display = 'none';
+
+        const rocketContainer = document.getElementById('rocketContainer');
+        const spaceRocket = document.getElementById('spaceRocket');
+        const spaceFlash = document.getElementById('spaceFlash');
+
+        rocketContainer.style.display = 'flex';
+        spaceRocket.style.animation = 'rocketLaunch 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+
+        setTimeout(() => {
+          spaceFlash.style.display = 'block';
+          spaceFlash.style.animation = 'spaceExplosion 0.4s ease forwards';
+        }, 850);
+
+        setTimeout(() => {
+          window.location.href = 'admin_sign_end.html';
+        }, 1250);
+
+      } catch (error) {
+        console.error("Creation Error:", error);
+        loadingOverlay.style.display = 'none';
+        alert('حدث خطأ أثناء الاتصال بقاعدة البيانات، حاول مرة أخرى.');
+      }
+    }
+
+    // ربط زر التحديث في الشريط العلوي
+    document.getElementById('reloadBtn').addEventListener('click', () => location.reload());
+  </script>
+</body>
+</html>
